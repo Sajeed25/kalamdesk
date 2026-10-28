@@ -15,7 +15,7 @@ export default async function People() {
   });
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between"><h1 className="text-2xl font-bold">People</h1>{u.role === "FOUNDER" && <Link href="/people/new" className="btn btn-primary">+ Add person</Link>}</div>
+      <div className="flex items-center justify-between"><h1 className="text-2xl font-bold">People</h1>{u.role === "FOUNDER" && <div className="flex gap-2"><Link href="/departments" className="btn">Departments</Link><Link href="/people/new" className="btn btn-primary">+ Add person</Link></div>}</div>
       <div className="panel overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b border-line text-left text-xs uppercase tracking-wide text-mute">

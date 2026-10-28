@@ -3,12 +3,14 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { taskInclude, visibleWhere } from "@/lib/tasks";
-import { canReview } from "@/lib/rbac";
+import { canAssignOthers, canReview } from "@/lib/rbac";
 import { fmtDateTime } from "@/lib/time";
 import { PRIORITY_LABEL } from "@/lib/constants";
 import StatusMenu from "@/components/StatusMenu";
 import TaskActions from "@/components/TaskActions";
 import ChecklistAndFiles from "@/components/ChecklistAndFiles";
+import EditTask from "@/components/EditTask";
+import { toIstInputValue } from "@/lib/time";
 import { PriorityChip, isOverdue } from "@/components/TaskRow";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +30,8 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
   if (!t) notFound();
   const mayChangeStatus = canReview(u) || t.assignees.some((a) => a.userId === u.id);
   const canEdit = canReview(u) || t.creatorId === u.id || t.assignees.some((a) => a.userId === u.id);
+  const canEditFields = canReview(u) || t.creatorId === u.id;
+  const people = canAssignOthers(u) ? await db.user.findMany({ where: { active: true }, select: { id: true, name: true }, orderBy: { name: "asc" } }) : [];
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
@@ -39,7 +43,9 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
           {t.selfInitiated && <span className="chip bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300">Self-initiated{t.initiativeAccepted ? " · accepted" : ""}</span>}
           {t.department && <span className="chip bg-line">{t.department.name}</span>}
         </div>
-        <h1 className="text-2xl font-bold">{t.title}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <h1 className="text-2xl font-bold">{t.title}</h1>
+        </div>
       </div>
 
       <dl className="panel grid grid-cols-[8rem_1fr] gap-y-2 p-4 text-sm">
@@ -53,6 +59,8 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
         {t.requiresProof && (<><dt className="text-mute">Proof</dt><dd>{t.proofNote ?? "Required before Done"}</dd></>)}
         {t.reviewState && (<><dt className="text-mute">Review</dt><dd>{t.reviewState === "APPROVED" ? "Approved" : "Sent back"}</dd></>)}
       </dl>
+
+      {canEditFields && <EditTask task={{ id: t.id, title: t.title, description: t.description, priority: t.priority, complexity: t.complexity, dueInput: toIstInputValue(t.dueAt), assigneeIds: t.assignees.map((a) => a.userId) }} people={people} canAssign={canAssignOthers(u)} />}
 
       {t.description && <p className="whitespace-pre-wrap text-sm">{t.description}</p>}
 

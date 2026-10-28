@@ -148,32 +148,53 @@ export async function updateTask(u: SessionUser, id: string, input: z.infer<type
   if (input.assigneeIds && !canAssignOthers(u) && input.assigneeIds.some((a) => a !== u.id))
     throw new HttpError(403, "You can't assign work to others");
 
-  if (input.title !== undefined) data.title = input.title;
-  if (input.description !== undefined) data.description = input.description;
-  if (input.complexity !== undefined) data.complexity = input.complexity;
+  const notifyChange = (title: string, body: string) =>
+    after.push(() => notifyMany(task.assignees.map((x) => x.userId), { kind: "STATUS", title, body, url: `/tasks/${id}` }, u.id));
+
+  if (input.title !== undefined && input.title !== task.title) {
+    data.title = input.title;
+    log.push({ action: "EDITED", detail: `Title: "${task.title}" → "${input.title}"` });
+  }
+  if (input.description !== undefined && input.description !== task.description) {
+    data.description = input.description;
+    log.push({ action: "EDITED", detail: "Description updated" });
+  }
+  if (input.complexity !== undefined && input.complexity !== task.complexity) {
+    data.complexity = input.complexity;
+    log.push({ action: "EDITED", detail: `Complexity ${task.complexity} → ${input.complexity}` });
+  }
   if (input.priority !== undefined && input.priority !== task.priority) {
     data.priority = input.priority;
     log.push({ action: "PRIORITY", detail: `${task.priority} → ${input.priority}` });
+    notifyChange(`Priority changed to ${input.priority}: ${task.title}`, `${u.name} changed the priority from ${task.priority} to ${input.priority}.`);
   }
   if (input.dueAt !== undefined) {
-    data.dueAt = input.dueAt ? new Date(input.dueAt) : null;
-    log.push({ action: "DUE", detail: input.dueAt ?? "cleared" });
+    const nextDue = input.dueAt ? new Date(input.dueAt) : null;
+    if ((nextDue?.getTime() ?? null) !== (task.dueAt?.getTime() ?? null)) {
+      data.dueAt = nextDue;
+      log.push({ action: "DUE", detail: nextDue ? `Due ${nextDue.toISOString()}` : "Due date cleared" });
+      // a moved deadline should be able to trigger its reminders again
+      after.push(async () => void (await db.jobRun.deleteMany({ where: { key: id, kind: { in: ["remind-2h", "remind-overdue"] } } })));
+      notifyChange(`Due date changed: ${task.title}`, `${u.name} ${nextDue ? "moved the deadline" : "removed the deadline"}.`);
+    }
   }
 
   if (input.assigneeIds) {
     const next = Array.from(new Set(input.assigneeIds));
+    if (next.length === 0) throw new HttpError(400, "A task needs at least one assignee");
+    const valid = await db.user.count({ where: { id: { in: next }, active: true } });
+    if (valid !== next.length) throw new HttpError(400, "Unknown or inactive assignee");
     const current = task.assignees.map((a) => a.userId);
     const added = next.filter((x) => !current.includes(x));
-    data.assignees = {
-      deleteMany: { userId: { notIn: next } },
-      create: added.map((userId) => ({ userId })),
-    };
-    if (added.length) {
-      log.push({ action: "ASSIGNED", detail: `Assigned to ${added.length} more` });
-      after.push(() =>
-        notifyMany(added, { kind: "ASSIGNED", title: `New task: ${task.title}`, body: `${u.name} assigned you a ${task.priority} task.`, url: `/tasks/${id}` }, u.id)
-      );
+    const removed = current.filter((x) => !next.includes(x));
+    if (added.length || removed.length) {
+      data.assignees = { deleteMany: { userId: { notIn: next } }, create: added.map((userId) => ({ userId })) };
+      log.push({ action: "ASSIGNED", detail: `${added.length ? `+${added.length} added` : ""}${added.length && removed.length ? ", " : ""}${removed.length ? `${removed.length} removed` : ""}` });
     }
+    if (added.length)
+      after.push(() => notifyMany(added, { kind: "ASSIGNED", title: `New task: ${task.title}`, body: `${u.name} assigned you a ${input.priority ?? task.priority} task.`, url: `/tasks/${id}` }, u.id));
+    if (removed.length)
+      after.push(() => notifyMany(removed, { kind: "STATUS", title: `Removed from: ${task.title}`, body: `${u.name} took you off this task.`, url: `/tasks/${id}`, email: false }, u.id));
   }
 
   // Status transitions

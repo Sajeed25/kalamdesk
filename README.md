@@ -19,6 +19,8 @@ Person-first daily operations and task tracker for Robokalam (Hyderabad / Warang
 | Cron: 8:30 AM morning digest, 7 PM founder digest, 2-hour and overdue reminders | done |
 | Password reset by email link, change password in Settings, invite emails for new people | done |
 | People admin (founder): add / edit / deactivate, resend invite, last-founder guard, audit log | done |
+| Edit tasks after creation (title, description, due date, assignees, priority, complexity); assignees are notified of priority/due changes | done |
+| Department admin (founder): add, rename, recolour, delete-if-unused | done |
 | Task checklist, file attachments (images, PDF, Office, CSV; 10 MB), full new-task form, month Calendar view | done |
 | Light/dark mode, mobile bottom-nav, PWA manifest | done |
 | Recurring tasks + check-in, daily stand-up, scoring/leaderboards, dashboards | Phase 2 (schema ready) |
@@ -123,7 +125,7 @@ On Vercel, put these in `vercel.json` `crons` (Vercel sends the secret as `Autho
 4. **Managers' scope = people whose profile lists them as `managerId`.** Founders see everyone.
 5. **Health dot rules** (`src/lib/desk.ts`): red = 2+ overdue or any overdue P1; amber = 1 overdue, any blocked, or no activity in 24h with open work; else green. Easy to change.
 6. **Attachments** use a local-disk driver (`UPLOAD_DIR`). On Vercel or multiple servers, swap `src/lib/storage.ts` for an S3-compatible bucket (the interface is three functions). The file type check uses the browser-declared type; downloads are forced as attachments with `nosniff`, so uploads can never render as pages. Add content sniffing before opening uploads to untrusted users.
-6b. **Still missing:** editing a task after creation (title / description / due date from the UI; the API supports it), department admin screen, bulk actions on the list, per-person pages for the Calendar. Schema tables exist.
+6b. **Still missing:** bulk actions on the list, editing location / estimate / tags / proof-required after creation (the form sets them at creation), per-person calendar. Schema tables exist.
 7. UI uses Tailwind with small custom components rather than the full shadcn/ui library.
 
 ## Security notes
