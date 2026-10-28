@@ -19,7 +19,7 @@ const parts = [
         callouts: [
           "**New password.** Choose at least 8 characters. A short sentence you will remember is better than a clever word, for example `blue-chai-at-6pm`.",
           "**Confirm password.** Type the same password again so a typo cannot lock you out.",
-          "**Set password.** Click it. You are signed in straight away.",
+          "**Set password.** Click it. You then see a Sign in button, which takes you to the sign-in page.",
         ],
         tips: ["The link expired or stopped working? Ask your founder to open **People → your name → Edit** and send a new invitation.", "Never share your password. Nobody at the company will ever ask you for it."],
       },
