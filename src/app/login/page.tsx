@@ -50,18 +50,18 @@ export default function Login() {
       <section className="hero relative hidden !rounded-none !p-14 lg:flex lg:flex-col lg:justify-between">
         <div className="relative z-10 flex items-center gap-3"><Logo /><span className="text-2xl font-extrabold tracking-tight">KalamDesk</span></div>
         <div className="relative z-10 max-w-xl">
-          <h2 className="text-6xl font-extrabold leading-[1.02] tracking-tight">Your work.<br />Your wins.</h2>
-          <p className="mt-5 text-xl font-semibold text-white/85">Robokalam&apos;s daily operations, made fast, fair and a little bit fun.</p>
+          <h2 className="text-6xl font-bold leading-[1.04] tracking-tight">Your work.<br />Your wins.</h2>
+          <p className="mt-5 text-xl font-semibold text-white/85">Every team and every organisation you run, in one calm place. Fast, fair and a little bit fun.</p>
           <ul className="mt-10 space-y-5">
             {POINTS.map((p) => (
               <li key={p.title} className="flex items-start gap-4">
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/20 backdrop-blur"><Icon name={p.icon} className="h-6 w-6" /></span>
-                <span><span className="block text-lg font-extrabold">{p.title}</span><span className="text-base font-medium text-white/80">{p.text}</span></span>
+                <span><span className="block text-lg font-bold">{p.title}</span><span className="text-base font-medium text-white/80">{p.text}</span></span>
               </li>
             ))}
           </ul>
         </div>
-        <p className="relative z-10 text-sm font-semibold text-white/70">Hyderabad · Warangal</p>
+        <p className="relative z-10 text-sm font-medium text-white/70">Separate workspaces. Private by design.</p>
       </section>
 
       {/* form */}
@@ -74,7 +74,7 @@ export default function Login() {
             {step === "password" ? (
               <>
                 <label className="block text-sm font-bold">Email
-                  <input name="email" type="email" required autoComplete="username" className="input mt-2" placeholder="you@robokalam.com" />
+                  <input name="email" type="email" required autoComplete="username" className="input mt-2" placeholder="you@yourcompany.com" />
                 </label>
                 <label className="block text-sm font-bold">Password
                   <input name="password" type="password" required autoComplete="current-password" className="input mt-2" placeholder="••••••••" />

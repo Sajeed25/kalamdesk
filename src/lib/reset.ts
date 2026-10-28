@@ -19,10 +19,11 @@ export async function sendPasswordLink(userId: string, kind: "reset" | "invite")
 export async function consumeToken(token: string, newPasswordHash: string) {
   const row = await db.passwordReset.findUnique({ where: { tokenHash: sha(token) } });
   if (!row || row.usedAt || row.expiresAt < new Date()) return false;
+  const person = await db.user.findUnique({ where: { id: row.userId }, select: { orgId: true } });
   await db.$transaction([
     db.user.update({ where: { id: row.userId }, data: { passwordHash: newPasswordHash } }),
     db.passwordReset.update({ where: { id: row.id }, data: { usedAt: new Date() } }),
-    db.auditLog.create({ data: { actorId: row.userId, action: "PASSWORD_RESET", target: row.userId } }),
+    db.auditLog.create({ data: { actorId: row.userId, orgId: person?.orgId, action: "PASSWORD_RESET", target: row.userId } }),
   ]);
   return true;
 }

@@ -36,10 +36,10 @@ export default async function Desk() {
   const count = (h: string) => people.filter((p) => p.health === h).length;
   const standups = people.filter((p) => p.updatedToday).length;
   const tiles = [
-    { label: "Needs attention", value: count("RED"), tone: "from-red-500 to-rose-500" },
-    { label: "Keep an eye", value: count("AMBER"), tone: "from-amber-400 to-orange-500" },
-    { label: "On track", value: count("GREEN"), tone: "from-emerald-400 to-teal-500" },
-    { label: "Stand-ups in", value: `${standups}/${people.length}`, tone: "from-violet-500 to-fuchsia-500" },
+    { label: "Needs attention", value: count("RED"), tone: "text-red-600 dark:text-red-400", bar: "bg-red-500" },
+    { label: "Keep an eye", value: count("AMBER"), tone: "text-amber-600 dark:text-amber-400", bar: "bg-amber-500" },
+    { label: "On track", value: count("GREEN"), tone: "text-emerald-600 dark:text-emerald-400", bar: "bg-emerald-500" },
+    { label: "Stand-ups in", value: `${standups}/${people.length}`, tone: "text-brand", bar: "bg-brand" },
   ];
 
   return (
@@ -53,9 +53,9 @@ export default async function Desk() {
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {tiles.map((t, i) => (
           <div key={t.label} className="panel rise relative overflow-hidden p-5" style={{ ["--i" as string]: i }}>
-            <span aria-hidden className={`absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${t.tone} opacity-25 blur-xl`} />
+            <span aria-hidden className={`absolute inset-x-0 top-0 h-1 ${t.bar}`} />
             <div className="eyebrow">{t.label}</div>
-            <div className={`stat-value mt-2 bg-gradient-to-br ${t.tone} bg-clip-text text-transparent`}>{t.value}</div>
+            <div className={`stat-value mt-2 ${t.tone}`}>{t.value}</div>
           </div>
         ))}
       </div>

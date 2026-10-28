@@ -16,17 +16,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ---------- Organisations (Robokalam, Samaritan, Calvings, Nextpreneur ...) ----------
+// Every top-level row carries an orgId; src/lib/tenancy.ts filters by it so one organisation never sees another.
+model Organization {
+  id        String   @id @default(cuid())
+  name      String   @unique @db.VarChar(100)
+  slug      String   @unique @db.VarChar(60)
+  tagline   String   @default("") @db.VarChar(160)
+  color     String   @default("#4f46e5") @db.VarChar(9)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
 // ---------- People ----------
 
 model Department {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id        String  @id @default(cuid())
-  name      String  @unique
+  name      String
   color     String  @default("#64748b")
   users     User[]
   tasks     Task[]
+  @@index([orgId])
 }
 
 model User {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id             String    @id @default(cuid())
   email          String    @unique // official email, used for login + notifications
   name           String
@@ -35,6 +50,7 @@ model User {
   active         Boolean   @default(true)
   departmentId   String?
   department     Department? @relation(fields: [departmentId], references: [id])
+  allOrgs        Boolean   @default(false) // group owner: may switch between every organisation
   totpSecret     String? // Phase 3: 2FA for admins
   consentAt      DateTime? // DPDP Act: consent recorded at onboarding
   lastSeenAt     DateTime?
@@ -54,6 +70,7 @@ model User {
   referrals      Referral[]
   auditEntries   AuditLog[]
   managedUsers   EmployeeProfile[] @relation("ReportingManager")
+  @@index([orgId])
 }
 
 model EmployeeProfile {
@@ -92,6 +109,7 @@ model EmployeeSensitive {
 // ---------- Tasks ----------
 
 model Task {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id            String   @id @default(cuid())
   title         String @db.VarChar(255)
   description   String   @default("") @db.VarChar(5000)
@@ -130,6 +148,7 @@ model Task {
 
   @@index([status, dueAt])
   @@index([creatorId])
+  @@index([orgId])
 }
 
 model TaskAssignee {
@@ -186,6 +205,7 @@ model TaskActivity {
 // ---------- Phase 2: recurring ----------
 
 model RecurringRule {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id            String   @id @default(cuid())
   title         String @db.VarChar(255)
   description   String   @default("") @db.VarChar(2000)
@@ -199,6 +219,7 @@ model RecurringRule {
   active        Boolean  @default(true)
   tasks         Task[]
   instances     TaskInstance[]
+  @@index([orgId])
 }
 
 model TaskInstance {
@@ -249,6 +270,7 @@ model ScoreEvent {
 // ---------- Phase 3: incentives, referrals, snapshots ----------
 
 model IncentiveRule {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id        String @id @default(cuid())
   name      String
   minPoints Float  @default(0)
@@ -259,6 +281,7 @@ model IncentiveRule {
   topN      Int?
   audience  String  @default("ALL") // ALL | EMPLOYEE | INTERN
   awards    IncentiveAward[]
+  @@index([orgId])
 }
 
 model IncentiveAward {
@@ -277,6 +300,7 @@ model IncentiveAward {
 }
 
 model ReferralProgram {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id          String   @id @default(cuid())
   name        String
   reward      String
@@ -284,6 +308,7 @@ model ReferralProgram {
   validUntil  DateTime?
   active      Boolean  @default(true)
   referrals   Referral[]
+  @@index([orgId])
 }
 
 model Referral {
@@ -301,12 +326,14 @@ model Referral {
 }
 
 model DashboardSnapshot {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id        String   @id @default(cuid())
   period    String // WEEKLY | MONTHLY
   label     String
   payload   String @db.Text // serialized metrics
   shareSlug String   @unique
   createdAt DateTime @default(now())
+  @@index([orgId])
 }
 
 // ---------- Cross-cutting ----------
@@ -325,6 +352,7 @@ model Notification {
 }
 
 model AuditLog {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id        String   @id @default(cuid())
   actorId   String?
   actor     User?    @relation(fields: [actorId], references: [id])
@@ -333,6 +361,7 @@ model AuditLog {
   meta      String   @default("") @db.VarChar(500)
   createdAt DateTime @default(now())
   @@index([createdAt])
+  @@index([orgId])
 }
 
 // Password reset / invite links. Only the SHA-256 of the token is stored.
@@ -373,6 +402,7 @@ model RecoveryCode {
 
 // Offer letters / ID scans. The file CONTENT is AES-256-GCM encrypted before it is written to storage.
 model IdDocument {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id           String   @id @default(cuid())
   userId       String
   uploadedById String
@@ -383,6 +413,7 @@ model IdDocument {
   sizeBytes    Int
   createdAt    DateTime @default(now())
   @@index([userId])
+  @@index([orgId])
 }
 
 // Secret salt behind each person's private calendar-feed link; changing it revokes the old link.
@@ -394,11 +425,14 @@ model CalendarFeed {
 
 // Optional "MM-DD" birthday, shown to the team on the celebrations card.
 model PersonDate {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   userId   String @id
   birthday String
+  @@index([orgId])
 }
 
 model LeaveRequest {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id           String    @id @default(cuid())
   userId       String
   type         String    @default("CASUAL") // CASUAL | SICK | UNPAID | OTHER
@@ -414,18 +448,22 @@ model LeaveRequest {
   createdAt    DateTime  @default(now())
   @@index([userId, status])
   @@index([fromDate, toDate])
+  @@index([orgId])
 }
 
 model AttendanceLog {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id         String    @id @default(cuid())
   userId     String
   forDate    String    // YYYY-MM-DD (IST)
   checkInAt  DateTime
   checkOutAt DateTime?
   @@unique([userId, forDate])
+  @@index([orgId])
 }
 
 model ExpenseClaim {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id           String    @id @default(cuid())
   userId       String
   title        String    @db.VarChar(200)
@@ -443,9 +481,11 @@ model ExpenseClaim {
   paidAt       DateTime?
   createdAt    DateTime  @default(now())
   @@index([userId, status])
+  @@index([orgId])
 }
 
 model Lead {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id           String    @id @default(cuid())
   name         String    @db.VarChar(150)
   organisation String?   @db.VarChar(150)
@@ -462,6 +502,7 @@ model Lead {
   calls        LeadCall[]
   @@index([ownerId, stage])
   @@index([nextFollowUp])
+  @@index([orgId])
 }
 
 model LeadCall {
@@ -478,6 +519,7 @@ model LeadCall {
 
 // One report per field-visit task. Photos are ordinary task attachments.
 model VisitReport {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id        String   @id @default(cuid())
   taskId    String   @unique
   userId    String
@@ -487,9 +529,11 @@ model VisitReport {
   followUp  String   @default("") @db.VarChar(1000)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  @@index([orgId])
 }
 
 model TaskTemplate {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id            String   @id @default(cuid())
   name          String   @db.VarChar(100)
   title         String   @db.VarChar(200)
@@ -501,10 +545,12 @@ model TaskTemplate {
   checklist     String   @default("") @db.VarChar(2000) // one item per line
   createdById   String
   createdAt     DateTime @default(now())
+  @@index([orgId])
 }
 
 // Founder-created, time-boxed team challenges (e.g. a Diwali sprint). Progress is derived from existing data.
 model Challenge {
+  orgId        String? // organisation this row belongs to (see src/lib/tenancy.ts)
   id          String   @id @default(cuid())
   title       String   @db.VarChar(120)
   description String   @default("") @db.VarChar(500)
@@ -516,4 +562,5 @@ model Challenge {
   active      Boolean  @default(true)
   createdById String
   createdAt   DateTime @default(now())
+  @@index([orgId])
 }

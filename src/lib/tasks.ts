@@ -4,15 +4,13 @@ import { db } from "./db";
 import { notifyMany } from "./notify";
 import { onTaskSaved } from "./recurring";
 import { awayOn } from "./leave";
+import { assertDepartment } from "./orgGuard";
 import { canAssignOthers, canReview, isLead } from "./rbac";
 import { STATUS_LABEL, STATUSES, PRIORITIES } from "./constants";
 import type { SessionUser } from "./auth";
 
-export class HttpError extends Error {
-  constructor(public status: number, message: string) {
-    super(message);
-  }
-}
+export { HttpError } from "./httpError";
+import { HttpError } from "./httpError";
 
 export const taskInclude = {
   assignees: { include: { user: { select: { id: true, name: true } } } },
@@ -70,6 +68,7 @@ export async function createTask(u: SessionUser, input: z.infer<typeof createSch
 
   const valid = await db.user.findMany({ where: { id: { in: assigneeIds }, active: true }, select: { id: true } });
   if (valid.length !== assigneeIds.length) throw new HttpError(400, "Unknown assignee");
+  await assertDepartment(input.departmentId);
 
   // Someone on approved leave today: their named cover person gets the task too, so nothing sits idle.
   const covering: string[] = [];

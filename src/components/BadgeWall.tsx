@@ -4,7 +4,7 @@ const DISC: Record<Tier, string> = {
   bronze: "from-orange-300 to-amber-600",
   silver: "from-slate-200 to-slate-400",
   gold: "from-yellow-300 to-amber-500",
-  special: "from-violet-400 to-fuchsia-500",
+  special: "from-indigo-400 to-violet-600",
 };
 
 /** Earned badges are bright with a glow; locked ones are dimmed and show how close you are. */

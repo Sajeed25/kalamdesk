@@ -105,6 +105,7 @@ Reset demo data: `npm run db:reset`.
 | `FIELD_ENCRYPTION_KEY` | 32-byte base64 key for bank/ID encryption. Required to save or view bank details. See "Bank details" below |
 | `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_TEMPLATE`, `WHATSAPP_LANG` | optional WhatsApp alerts. Off unless the first three are set |
 | `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` | optional: let staff reply DONE/START/BLOCKED on WhatsApp (webhook `/api/inbound/whatsapp`) |
+| `BOOTSTRAP_ORG_NAME` | optional: name of the first organisation created by the first-founder bootstrap (default `Robokalam`) |
 | `RESET_2FA_EMAILS` | emergency only: switches off two-step sign-in for these emails at startup. Delete after use |
 
 ## Scheduled jobs
@@ -326,3 +327,34 @@ Founder-only, on **People → person → Bank & ID**. Files (PDF/image/Office, u
 - Leave days are counted as calendar days (no Sunday or holiday calendar yet); there is no leave balance.
 - Expense approval is founders-only; receipts are stored on the server disk, not encrypted (IDs are).
 - Birthdays are stored without a year and only if the person adds them.
+
+## Phase 5: organisations (Robokalam, Samaritan Stand-Up, Calvings, Nextpreneur …)
+
+One KalamDesk can now run several organisations side by side. Each has its **own** people, departments, tasks, scores, leads, expenses, leave, incentives and dashboards, and **nobody in one organisation can see or touch another's data**. The founder who owns the group (a **group owner**) can switch between them from the top of the sidebar; everyone else is pinned to their own organisation and only ever sees that one.
+
+### Upgrading an existing database (do this BEFORE redeploying)
+
+This one **changes existing tables** (it adds an `orgId` column to 17 of them), so back up first (hPanel → Databases → phpMyAdmin → Export).
+
+1. In phpMyAdmin, select your database → **SQL** tab. If you have not yet run `prisma/phase4-upgrade.sql`, run that first.
+2. Paste the whole of `prisma/phase5-orgs-upgrade.sql` and click **Go**. Run it **once**. Everything that exists today becomes part of an organisation called **Robokalam**, and every current founder becomes a group owner.
+3. Redeploy the app. Open `/api/health`: `orgSchema` must say `true`. (Old code keeps working after the SQL, so the order is safe; new code does **not** work before it.)
+4. Sign in, open **Organisations** in the sidebar, and create **Samaritan Stand-Up**, **Calvings** and **Nextpreneur**. Enter each organisation's first founder (name and email): they get an invite email and will only ever see their own organisation.
+
+A fresh install uses `prisma/mysql-init.sql` (already includes this). `BOOTSTRAP_ORG_NAME` (optional) names the first organisation created by the first-founder bootstrap (default `Robokalam`).
+
+### How the separation works
+
+- Every top-level table carries an `orgId`. One central filter (`src/lib/tenancy.ts` + `src/lib/db.ts`) adds `orgId = <your organisation>` to **every** database read and write for a signed-in person, and stamps it on everything they create. A page or API that forgets to filter still cannot leak, because the filter is not in the page.
+- Ids that arrive from the browser (an assignee, a department, a manager) are checked inside that filter, so pointing at another organisation's id is refused.
+- Group owners are the one exception that is visible across organisations (as the founder). Other founders cannot edit or remove them.
+- Each organisation has its own accent colour (set on the Organisations page); the whole app repaints in it.
+- Scheduled emails (digests, weekly summaries, incentives, recurring tasks) run **once per organisation**, each inside its own filter, and the email names the organisation.
+- People sign in with one email and one password; an email address can belong to only one organisation. A group owner who also works for another organisation should use their own email for the home organisation and switch.
+- Not separated on purpose: the scoring rules (`ScoreSetting`) are shared by all organisations, and `Notification` rows belong to a person, not an organisation.
+
+### Phase 5 assumptions to confirm
+
+- An email address belongs to exactly one organisation (no one has two logins with the same email).
+- Archiving an organisation hides it from the switcher, stops its scheduled emails and signs its people out (they see "archived" at sign-in); nothing is deleted and a group owner can restore it from the Organisations page.
+- Office choices now include "Remote" and "Other" besides Hyderabad and Warangal.

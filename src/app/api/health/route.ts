@@ -71,6 +71,7 @@ export async function GET() {
     dbProblem: null as string | null,
     phase3Schema: null as boolean | null,
     phase4Schema: null as boolean | null,
+    orgSchema: null as boolean | null,
     encryptionKeyOk: cryptoConfigured(),
     whatsappConfigured: whatsappConfigured(),
     emailMode: emailStatus().mode, // "console" means no real email is being sent
@@ -86,12 +87,14 @@ export async function GET() {
     try { await db.incentiveRule.count(); await db.employeeProfile.findFirst({ select: { whatsappOptIn: true } }); out.phase3Schema = true; } catch { out.phase3Schema = false; }
     // Phase 4 added tables only. If false, run prisma/phase4-upgrade.sql; the older features keep working meanwhile.
     try { await db.lead.count(); await db.recoveryCode.count(); await db.challenge.count(); out.phase4Schema = true; } catch { out.phase4Schema = false; }
+    // Phase 5 added organisations. If false, run prisma/phase5-orgs-upgrade.sql BEFORE using this version: nobody can sign in until then.
+    try { await db.organization.count(); await db.user.findFirst({ select: { orgId: true, allOrgs: true } }); out.orgSchema = true; } catch { out.orgSchema = false; }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[health]", msg);
     out.dbProblem = classify(msg);
   }
   // phase3Schema === false means the upgrade SQL was not run: the app is broken until it is.
-  const ok = out.sessionSecretOk && out.dbReachable && out.schemaReady && out.hasUsers && out.phase3Schema !== false;
+  const ok = out.sessionSecretOk && out.dbReachable && out.schemaReady && out.hasUsers && out.phase3Schema !== false && out.orgSchema !== false;
   return NextResponse.json({ ok, ...out }, { status: ok ? 200 : 503 });
 }

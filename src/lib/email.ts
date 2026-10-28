@@ -89,6 +89,6 @@ export function emailTemplate(opts: { heading: string; lines: string[]; ctaLabel
   return `<div style="font-family:system-ui,sans-serif;max-width:520px;margin:auto;color:#0f172a">
 <h2 style="margin:0 0 12px">${esc(opts.heading)}</h2>
 ${opts.lines.map((l) => `<p style="margin:6px 0;color:#334155">${l}</p>`).join("")}${cta}
-<p style="color:#94a3b8;font-size:12px">KalamDesk · Robokalam</p></div>`;
+<p style="color:#94a3b8;font-size:12px">KalamDesk</p></div>`;
 }
 export { esc as escapeHtml };

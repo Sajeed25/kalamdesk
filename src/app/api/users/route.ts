@@ -2,8 +2,9 @@ import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { z } from "zod";
 import { authed } from "@/lib/api";
-import { db } from "@/lib/db";
+import { db, dbRaw } from "@/lib/db";
 import { hashPassword } from "@/lib/auth";
+import { assertDepartment, assertPeople } from "@/lib/orgGuard";
 import { isFounder } from "@/lib/rbac";
 import { sendPasswordLink } from "@/lib/reset";
 import { HttpError } from "@/lib/tasks";
@@ -18,7 +19,10 @@ export const GET = authed(async (_req, u) => {
 export const POST = authed(async (req, u) => {
   if (!isFounder(u)) throw new HttpError(403, "Only founders can add people");
   const input = z.object({ ...userFields, email: z.string().trim().toLowerCase().email() }).parse(await req.json());
-  if (await db.user.findUnique({ where: { email: input.email } })) throw new HttpError(409, "That email already has an account");
+  if (await dbRaw.user.findUnique({ where: { email: input.email } })) throw new HttpError(409, "That email already has an account");
+
+  await assertDepartment(input.departmentId);
+  await assertPeople([input.managerId], "manager");
 
   const user = await db.user.create({
     data: {

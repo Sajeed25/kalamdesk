@@ -22,7 +22,7 @@ export async function celebrationsFor(now = new Date()): Promise<Celebration[]> 
       if (pr.joinedOn) {
         const j = toIstParts(pr.joinedOn);
         const years = p.y - j.y;
-        if (md(j.m, j.d) === today && years >= 1) out.push({ userId: pr.userId, name: pr.user.name, kind: "ANNIVERSARY", text: `${pr.user.name} completes ${years} year${years > 1 ? "s" : ""} at Robokalam today! 🎉` });
+        if (md(j.m, j.d) === today && years >= 1) out.push({ userId: pr.userId, name: pr.user.name, kind: "ANNIVERSARY", text: `${pr.user.name} completes ${years} year${years > 1 ? "s" : ""} with the team today! 🎉` });
       }
       if (pr.internEnd && pr.user.role === "INTERN") {
         const left = Math.round((Date.parse(`${istDateKey(pr.internEnd)}T00:00:00Z`) - Date.parse(`${todayKey}T00:00:00Z`)) / 864e5);

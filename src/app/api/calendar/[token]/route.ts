@@ -1,4 +1,5 @@
-import { db } from "@/lib/db";
+import { db, dbRaw } from "@/lib/db";
+import { runInOrg } from "@/lib/tenancy";
 import { appUrl } from "@/lib/email";
 import { buildCalendar, userIdFromToken, verifyToken } from "@/lib/ics";
 
@@ -8,15 +9,15 @@ export async function GET(_req: Request, { params }: { params: { token: string }
   const notFound = () => new Response("Not found", { status: 404 });
   const userId = userIdFromToken(params.token);
   if (!userId) return notFound();
-  const [feed, user] = await Promise.all([db.calendarFeed.findUnique({ where: { userId } }), db.user.findUnique({ where: { id: userId }, select: { id: true, name: true, active: true } })]);
+  const [feed, user] = await Promise.all([db.calendarFeed.findUnique({ where: { userId } }), dbRaw.user.findUnique({ where: { id: userId }, select: { id: true, name: true, active: true, orgId: true } })]);
   if (!feed || !user?.active || !verifyToken(params.token, feed.salt)) return notFound();
 
   const now = Date.now();
-  const tasks = await db.task.findMany({
+  const tasks = await runInOrg(user.orgId, () => db.task.findMany({
     where: { assignees: { some: { userId } }, status: { notIn: ["DONE", "CANCELLED"] }, dueAt: { gte: new Date(now - 7 * 864e5), lte: new Date(now + 120 * 864e5) } },
     select: { id: true, title: true, priority: true, dueAt: true, location: true, description: true, status: true },
     orderBy: { dueAt: "asc" }, take: 500,
-  });
+  }));
   const ics = buildCalendar(`KalamDesk: ${user.name}`, tasks.map((t) => ({
     uid: t.id, title: `[${t.priority}] ${t.title}`, start: t.dueAt!, location: t.location, priority: t.priority,
     description: `${t.status === "BLOCKED" ? "BLOCKED. " : ""}${t.description}`.slice(0, 400), url: appUrl(`/tasks/${t.id}`),

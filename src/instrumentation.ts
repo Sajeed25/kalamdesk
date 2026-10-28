@@ -13,22 +13,24 @@ export async function register() {
   if (!email || !name || !password) return;
 
   try {
-    const { db } = await import("./lib/db");
+    const { dbRaw: db } = await import("./lib/db");
     if ((await db.user.count()) > 0) return;
     if (password.length < 10) {
       console.error("[bootstrap] BOOTSTRAP_FOUNDER_PASSWORD must be at least 10 characters; no account created.");
       return;
     }
     const { hashPassword } = await import("./lib/auth");
+    const { ensureDefaultOrg } = await import("./lib/orgs");
+    const org = await ensureDefaultOrg(process.env.BOOTSTRAP_ORG_NAME?.trim() || "Robokalam");
     const user = await db.user.create({
       data: {
-        email, name, role: "FOUNDER", passwordHash: await hashPassword(password),
+        email, name, role: "FOUNDER", orgId: org.id, allOrgs: true, passwordHash: await hashPassword(password),
         profile: { create: { office: "Hyderabad", title: "Founder" } },
       },
     });
     for (const d of ["Accounts", "BD", "Marketing", "Training", "Product", "HR", "Tech"])
-      await db.department.upsert({ where: { name: d }, update: {}, create: { name: d } });
-    await db.auditLog.create({ data: { actorId: user.id, action: "FOUNDER_BOOTSTRAPPED", target: user.id } });
+      await db.department.create({ data: { name: d, orgId: org.id } });
+    await db.auditLog.create({ data: { actorId: user.id, orgId: org.id, action: "FOUNDER_BOOTSTRAPPED", target: user.id } });
     console.log(`[bootstrap] Created first founder ${email}. Remove the BOOTSTRAP_FOUNDER_* variables now.`);
   } catch (e) {
     // Most likely the tables don't exist yet. Never stop the app from starting.
@@ -45,14 +47,14 @@ async function emergencyTwoFactorReset() {
   const raw = process.env.RESET_2FA_EMAILS;
   if (!raw) return;
   try {
-    const { db } = await import("./lib/db");
+    const { dbRaw: db } = await import("./lib/db");
     const emails = raw.split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
     for (const email of emails) {
       const u = await db.user.findUnique({ where: { email } });
       if (!u?.totpSecret) continue;
       await db.user.update({ where: { id: u.id }, data: { totpSecret: null } });
       await db.recoveryCode.deleteMany({ where: { userId: u.id } });
-      await db.auditLog.create({ data: { actorId: u.id, action: "TWOFA_RESET_VIA_SERVER", target: u.id } });
+      await db.auditLog.create({ data: { actorId: u.id, orgId: u.orgId, action: "TWOFA_RESET_VIA_SERVER", target: u.id } });
       console.log(`[2fa] Two-step sign-in switched off for ${email} via RESET_2FA_EMAILS. Remove that variable now.`);
     }
   } catch (e) {

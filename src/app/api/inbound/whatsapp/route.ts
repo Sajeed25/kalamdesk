@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { runInOrg } from "@/lib/tenancy";
 import { HttpError, updateTask } from "@/lib/tasks";
 import { normalizePhone, sendWhatsappText, whatsappConfigured } from "@/lib/whatsapp";
 import { HELP_TEXT, extractMessages, parseCommand, taskCode, verifySignature, type Command } from "@/lib/whatsappInbound";
@@ -44,10 +45,14 @@ export async function POST(req: Request) {
     if (!person) continue; // unknown or not opted in: say nothing
     const user = await db.user.findFirst({ where: { id: person.userId, active: true } });
     if (!user) continue;
-    const me: SessionUser = { id: user.id, name: user.name, email: user.email, role: user.role as Role, departmentId: user.departmentId, consentAt: user.consentAt };
-    const reply = await run(me, parseCommand(m.text)).catch((e) => (e instanceof HttpError ? `Sorry: ${e.message}` : "Sorry, something went wrong. Please use the app."));
+    const me: SessionUser = { id: user.id, name: user.name, email: user.email, role: user.role as Role, departmentId: user.departmentId, consentAt: user.consentAt, orgId: user.orgId, homeOrgId: user.orgId, allOrgs: false };
+    // Everything the reply touches stays inside the sender's own organisation.
+    const reply = await runInOrg(user.orgId, async () => {
+      const text = await run(me, parseCommand(m.text)).catch((e) => (e instanceof HttpError ? `Sorry: ${e.message}` : "Sorry, something went wrong. Please use the app."));
+      await db.auditLog.create({ data: { actorId: user.id, action: "WHATSAPP_COMMAND", target: user.id, meta: m.text.slice(0, 120) } });
+      return text;
+    });
     await sendWhatsappText(m.from, reply);
-    await db.auditLog.create({ data: { actorId: user.id, action: "WHATSAPP_COMMAND", target: user.id, meta: m.text.slice(0, 120) } });
   }
   return NextResponse.json({ ok: true });
 }

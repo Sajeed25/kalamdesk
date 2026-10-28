@@ -1,15 +1,32 @@
 -- CreateTable
+CREATE TABLE `Organization` (
+    `id` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(100) NOT NULL,
+    `slug` VARCHAR(60) NOT NULL,
+    `tagline` VARCHAR(160) NOT NULL DEFAULT '',
+    `color` VARCHAR(9) NOT NULL DEFAULT '#4f46e5',
+    `active` BOOLEAN NOT NULL DEFAULT true,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    UNIQUE INDEX `Organization_name_key`(`name`),
+    UNIQUE INDEX `Organization_slug_key`(`slug`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
 CREATE TABLE `Department` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `color` VARCHAR(191) NOT NULL DEFAULT '#64748b',
 
-    UNIQUE INDEX `Department_name_key`(`name`),
+    INDEX `Department_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `User` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
@@ -17,12 +34,14 @@ CREATE TABLE `User` (
     `role` VARCHAR(191) NOT NULL DEFAULT 'EMPLOYEE',
     `active` BOOLEAN NOT NULL DEFAULT true,
     `departmentId` VARCHAR(191) NULL,
+    `allOrgs` BOOLEAN NOT NULL DEFAULT false,
     `totpSecret` VARCHAR(191) NULL,
     `consentAt` DATETIME(3) NULL,
     `lastSeenAt` DATETIME(3) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `User_email_key`(`email`),
+    INDEX `User_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -63,6 +82,7 @@ CREATE TABLE `EmployeeSensitive` (
 
 -- CreateTable
 CREATE TABLE `Task` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `description` VARCHAR(5000) NOT NULL DEFAULT '',
@@ -90,6 +110,7 @@ CREATE TABLE `Task` (
 
     INDEX `Task_status_dueAt_idx`(`status`, `dueAt`),
     INDEX `Task_creatorId_idx`(`creatorId`),
+    INDEX `Task_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -152,6 +173,7 @@ CREATE TABLE `TaskActivity` (
 
 -- CreateTable
 CREATE TABLE `RecurringRule` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `title` VARCHAR(255) NOT NULL,
     `description` VARCHAR(2000) NOT NULL DEFAULT '',
@@ -164,6 +186,7 @@ CREATE TABLE `RecurringRule` (
     `creatorId` VARCHAR(191) NOT NULL,
     `active` BOOLEAN NOT NULL DEFAULT true,
 
+    INDEX `RecurringRule_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -219,6 +242,7 @@ CREATE TABLE `ScoreEvent` (
 
 -- CreateTable
 CREATE TABLE `IncentiveRule` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `minPoints` DOUBLE NOT NULL DEFAULT 0,
@@ -229,6 +253,7 @@ CREATE TABLE `IncentiveRule` (
     `topN` INTEGER NULL,
     `audience` VARCHAR(191) NOT NULL DEFAULT 'ALL',
 
+    INDEX `IncentiveRule_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -250,6 +275,7 @@ CREATE TABLE `IncentiveAward` (
 
 -- CreateTable
 CREATE TABLE `ReferralProgram` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `reward` VARCHAR(191) NOT NULL,
@@ -257,6 +283,7 @@ CREATE TABLE `ReferralProgram` (
     `validUntil` DATETIME(3) NULL,
     `active` BOOLEAN NOT NULL DEFAULT true,
 
+    INDEX `ReferralProgram_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -277,6 +304,7 @@ CREATE TABLE `Referral` (
 
 -- CreateTable
 CREATE TABLE `DashboardSnapshot` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `period` VARCHAR(191) NOT NULL,
     `label` VARCHAR(191) NOT NULL,
@@ -285,6 +313,7 @@ CREATE TABLE `DashboardSnapshot` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     UNIQUE INDEX `DashboardSnapshot_shareSlug_key`(`shareSlug`),
+    INDEX `DashboardSnapshot_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -305,6 +334,7 @@ CREATE TABLE `Notification` (
 
 -- CreateTable
 CREATE TABLE `AuditLog` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `actorId` VARCHAR(191) NULL,
     `action` VARCHAR(191) NOT NULL,
@@ -313,6 +343,7 @@ CREATE TABLE `AuditLog` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `AuditLog_createdAt_idx`(`createdAt`),
+    INDEX `AuditLog_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -356,6 +387,7 @@ CREATE TABLE `RecoveryCode` (
 
 -- CreateTable
 CREATE TABLE `IdDocument` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `uploadedById` VARCHAR(191) NOT NULL,
@@ -367,6 +399,7 @@ CREATE TABLE `IdDocument` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `IdDocument_userId_idx`(`userId`),
+    INDEX `IdDocument_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -381,14 +414,17 @@ CREATE TABLE `CalendarFeed` (
 
 -- CreateTable
 CREATE TABLE `PersonDate` (
+    `orgId` VARCHAR(191) NULL,
     `userId` VARCHAR(191) NOT NULL,
     `birthday` VARCHAR(191) NOT NULL,
 
+    INDEX `PersonDate_orgId_idx`(`orgId`),
     PRIMARY KEY (`userId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `LeaveRequest` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `type` VARCHAR(191) NOT NULL DEFAULT 'CASUAL',
@@ -405,23 +441,27 @@ CREATE TABLE `LeaveRequest` (
 
     INDEX `LeaveRequest_userId_status_idx`(`userId`, `status`),
     INDEX `LeaveRequest_fromDate_toDate_idx`(`fromDate`, `toDate`),
+    INDEX `LeaveRequest_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `AttendanceLog` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `forDate` VARCHAR(191) NOT NULL,
     `checkInAt` DATETIME(3) NOT NULL,
     `checkOutAt` DATETIME(3) NULL,
 
+    INDEX `AttendanceLog_orgId_idx`(`orgId`),
     UNIQUE INDEX `AttendanceLog_userId_forDate_key`(`userId`, `forDate`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `ExpenseClaim` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
     `title` VARCHAR(200) NOT NULL,
@@ -440,11 +480,13 @@ CREATE TABLE `ExpenseClaim` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     INDEX `ExpenseClaim_userId_status_idx`(`userId`, `status`),
+    INDEX `ExpenseClaim_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Lead` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(150) NOT NULL,
     `organisation` VARCHAR(150) NULL,
@@ -461,6 +503,7 @@ CREATE TABLE `Lead` (
 
     INDEX `Lead_ownerId_stage_idx`(`ownerId`, `stage`),
     INDEX `Lead_nextFollowUp_idx`(`nextFollowUp`),
+    INDEX `Lead_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -480,6 +523,7 @@ CREATE TABLE `LeadCall` (
 
 -- CreateTable
 CREATE TABLE `VisitReport` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `taskId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
@@ -491,11 +535,13 @@ CREATE TABLE `VisitReport` (
     `updatedAt` DATETIME(3) NOT NULL,
 
     UNIQUE INDEX `VisitReport_taskId_key`(`taskId`),
+    INDEX `VisitReport_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `TaskTemplate` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(100) NOT NULL,
     `title` VARCHAR(200) NOT NULL,
@@ -508,11 +554,13 @@ CREATE TABLE `TaskTemplate` (
     `createdById` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    INDEX `TaskTemplate_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
 CREATE TABLE `Challenge` (
+    `orgId` VARCHAR(191) NULL,
     `id` VARCHAR(191) NOT NULL,
     `title` VARCHAR(120) NOT NULL,
     `description` VARCHAR(500) NOT NULL DEFAULT '',
@@ -525,6 +573,7 @@ CREATE TABLE `Challenge` (
     `createdById` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
+    INDEX `Challenge_orgId_idx`(`orgId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

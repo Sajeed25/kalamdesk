@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { authed } from "@/lib/api";
-import { db } from "@/lib/db";
+import { dbRaw as db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/auth";
 import { HttpError } from "@/lib/tasks";
 

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
-import { db } from "./db";
+import { db, dbRaw } from "./db";
 import { verifyPassword } from "./auth";
 import { cryptoConfigured, decryptField, encryptField } from "./crypto";
 import { hashRecovery, looksLikeRecovery, matchTotp, newRecoveryCodes } from "./totp";
@@ -97,7 +97,7 @@ export async function verifyCode(user: U, code: string): Promise<"totp" | "recov
 
 export async function enableTwoFactor(userId: string, secret: string): Promise<string[]> {
   if (!cryptoConfigured()) throw new Error("FIELD_ENCRYPTION_KEY is not configured");
-  await db.user.update({ where: { id: userId }, data: { totpSecret: encryptField(secret, `${userId}:totp`) } });
+  await dbRaw.user.update({ where: { id: userId }, data: { totpSecret: encryptField(secret, `${userId}:totp`) } });
   return regenerateRecoveryCodes(userId);
 }
 
@@ -109,7 +109,7 @@ export async function regenerateRecoveryCodes(userId: string): Promise<string[]>
 }
 
 export async function disableTwoFactor(userId: string) {
-  await db.user.update({ where: { id: userId }, data: { totpSecret: null } });
+  await dbRaw.user.update({ where: { id: userId }, data: { totpSecret: null } });
   await db.recoveryCode.deleteMany({ where: { userId } });
 }
 

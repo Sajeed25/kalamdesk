@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { authed } from "@/lib/api";
 import { db } from "@/lib/db";
 import { isFounder, isLead } from "@/lib/rbac";
+import { assertDepartment, assertPeople } from "@/lib/orgGuard";
 import { HttpError } from "@/lib/tasks";
 import { joinChecklist, templateSchema } from "@/lib/templates";
 
@@ -17,6 +18,7 @@ async function load(u: { id: string; role: string }, id: string) {
 export const PATCH = authed<{ params: { id: string } }>(async (req, u, { params }) => {
   const t = await load(u, params.id);
   const b = templateSchema.parse(await req.json());
+  await assertDepartment(b.departmentId);
   await db.taskTemplate.update({ where: { id: t.id }, data: { name: b.name, title: b.title, description: b.description, priority: b.priority, complexity: b.complexity, estimateHours: b.estimateHours ?? null, departmentId: b.departmentId || null, checklist: joinChecklist(b.checklist) } });
   return NextResponse.json({ ok: true });
 });

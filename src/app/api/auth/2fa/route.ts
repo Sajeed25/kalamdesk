@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/lib/db";
+import { dbRaw as db } from "@/lib/db";
 import { createSession } from "@/lib/auth";
 import { clearFails, clearPending, isThrottled, readPending, recordFail, recoveryRemaining, verifyCode } from "@/lib/twofa";
 
@@ -18,13 +18,13 @@ export async function POST(req: Request) {
   const kind = await verifyCode(user, body.data.code);
   if (!kind) {
     recordFail(uid);
-    await db.auditLog.create({ data: { actorId: uid, action: "LOGIN_2FA_FAILED", target: uid } });
+    await db.auditLog.create({ data: { actorId: uid, orgId: user.orgId, action: "LOGIN_2FA_FAILED", target: uid } });
     return NextResponse.json({ error: "That code didn't work. Check the time on your phone and try the newest code." }, { status: 401 });
   }
   clearFails(uid);
   clearPending();
-  await createSession(user.id);
+  await createSession(user);
   await db.user.update({ where: { id: user.id }, data: { lastSeenAt: new Date() } });
-  await db.auditLog.create({ data: { actorId: uid, action: kind === "recovery" ? "LOGIN_2FA_RECOVERY" : "LOGIN_2FA", target: uid } });
+  await db.auditLog.create({ data: { actorId: uid, orgId: user.orgId, action: kind === "recovery" ? "LOGIN_2FA_RECOVERY" : "LOGIN_2FA", target: uid } });
   return NextResponse.json({ ok: true, usedRecovery: kind === "recovery", recoveryLeft: kind === "recovery" ? await recoveryRemaining(uid) : undefined });
 }

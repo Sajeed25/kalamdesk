@@ -35,5 +35,5 @@ export const ROLES = ["FOUNDER", "MANAGER", "EMPLOYEE", "INTERN"] as const;
 export type Role = (typeof ROLES)[number];
 
 export const DEPARTMENTS = ["Accounts", "BD", "Marketing", "Training", "Product", "HR", "Tech"];
-export const OFFICES = ["Hyderabad", "Warangal"];
+export const OFFICES = ["Hyderabad", "Warangal", "Remote", "Other"];
 export const TZ = "Asia/Kolkata";

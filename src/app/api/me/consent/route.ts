@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { authed } from "@/lib/api";
-import { db } from "@/lib/db";
+import { dbRaw as db } from "@/lib/db";
 
 // DPDP Act 2023: record the user's consent to processing for the stated purposes.
 export const POST = authed(async (_req, u) => {

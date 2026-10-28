@@ -3,57 +3,68 @@
 @tailwind utilities;
 
 /* ------------------------------------------------------------------
-   KalamDesk design system: big, bold, rounded, calm-to-energetic.
-   Colours are space-separated RGB so Tailwind can add opacity.
+   KalamDesk design system: calm neutrals, one confident accent per organisation.
+   Colours are space-separated RGB so Tailwind can add opacity. --org / --org-a / --org-b / --org-dk are
+   injected per organisation by the app layout (src/lib/orgTheme.ts); the fallbacks below are the default indigo.
    ------------------------------------------------------------------ */
 :root {
-  --ink: 20 14 44; --paper: 246 244 253; --card: 255 255 255; --line: 226 221 245; --mute: 106 100 140;
-  --brand: 109 74 255; --brand2: 192 38 211; --accent: 255 140 40; --good: 16 150 90;
-  /* constant across modes so white text on buttons always keeps >= 4.5:1 */
-  --grad-a: 109 74 255; --grad-b: 176 43 208;
-  --glow: 0 10px 30px -8px rgb(109 74 255 / 0.45);
-  --shadow: 0 1px 2px rgb(20 14 44 / 0.04), 0 8px 24px -10px rgb(60 40 140 / 0.18);
+  --ink: 15 23 42; --paper: 244 245 248; --card: 255 255 255; --line: 227 231 238; --mute: 100 112 134;
+  --brand: var(--org, 79 70 229);
+  /* gradient ends are constant across light/dark so white text on buttons always keeps >= 4.5:1 */
+  --grad-a: var(--org-a, 79 70 229); --grad-b: var(--org-b, 40 36 124);
+  --brand2: var(--grad-b);
+  --accent: 184 134 11; --good: 5 150 105;
+  --side: 11 16 32; --side-line: 36 45 66;
+  --glow: 0 10px 24px -12px rgb(var(--grad-a) / 0.55);
+  --shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px -14px rgb(15 23 42 / 0.16);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --ink: 240 237 255; --paper: 10 8 22; --card: 22 19 44; --line: 46 40 80; --mute: 158 152 196;
-    --brand: 150 120 255; --brand2: 225 110 245; --accent: 255 170 90; --good: 52 211 153;
-    --glow: 0 10px 34px -8px rgb(150 120 255 / 0.5);
-    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 30px -12px rgb(0 0 0 / 0.6);
+    --ink: 238 241 247; --paper: 9 12 22; --card: 18 23 38; --line: 38 46 66; --mute: 143 154 177;
+    --brand: var(--org-dk, 150 156 255);
+    --accent: 226 176 60; --good: 52 211 153;
+    --side: 7 10 20; --side-line: 30 38 58;
+    --glow: 0 10px 28px -12px rgb(var(--grad-a) / 0.7);
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 12px 30px -14px rgb(0 0 0 / 0.7);
   }
 }
 
-html { font-size: 17px; -webkit-text-size-adjust: 100%; }
+html { font-size: 16.5px; -webkit-text-size-adjust: 100%; }
 body {
   @apply bg-paper text-ink antialiased;
-  font-family: "Segoe UI Variable Display", "Segoe UI", ui-sans-serif, system-ui, -apple-system, "Inter", sans-serif;
+  font-family: "Inter", "Segoe UI Variable Display", "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif;
   font-feature-settings: "cv11", "ss01";
-  background-image:
-    radial-gradient(60rem 30rem at 8% -10%, rgb(var(--brand) / 0.10), transparent 60%),
-    radial-gradient(50rem 28rem at 100% 0%, rgb(var(--brand2) / 0.08), transparent 55%);
+  background-image: radial-gradient(70rem 26rem at 12% -12%, rgb(var(--grad-a) / 0.07), transparent 65%);
   background-attachment: fixed;
 }
-::selection { background: rgb(var(--brand) / 0.28); }
-:focus-visible { outline: 3px solid rgb(var(--brand) / 0.55); outline-offset: 2px; border-radius: 10px; }
+::selection { background: rgb(var(--brand) / 0.25); }
+:focus-visible { outline: 2px solid rgb(var(--brand) / 0.7); outline-offset: 2px; border-radius: 8px; }
 
 @layer components {
-  .btn { @apply inline-flex min-h-[2.75rem] select-none items-center justify-center gap-1.5 rounded-xl border border-line bg-card px-4 py-2 text-[0.95rem] font-semibold shadow-sm transition duration-150 hover:-translate-y-px hover:border-brand/40 hover:shadow-md active:translate-y-0 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50; }
-  .btn-primary { @apply border-transparent text-white shadow-md hover:border-transparent hover:brightness-110; background-image: linear-gradient(135deg, rgb(var(--grad-a)), rgb(var(--grad-b))); box-shadow: var(--glow); }
-  .btn-ghost { @apply border-transparent bg-transparent shadow-none hover:bg-brand/10 hover:shadow-none; }
-  .input { @apply w-full rounded-xl border border-line bg-card px-4 py-3 text-base outline-none transition placeholder:text-mute/70 focus:border-brand focus:ring-4 focus:ring-brand/15; }
-  .chip { @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-bold tracking-wide; }
-  .panel { @apply rounded-3xl border border-line/80 bg-card; box-shadow: var(--shadow); }
-  .panel-hover { @apply transition duration-200 hover:-translate-y-0.5 hover:border-brand/40; }
-  .glass { @apply bg-paper/75 backdrop-blur-xl; }
-  .page-title { @apply text-[2.1rem] font-extrabold leading-tight tracking-tight; }
-  .section-title { @apply text-lg font-extrabold tracking-tight; }
-  .eyebrow { @apply text-xs font-bold uppercase tracking-[0.14em] text-mute; }
-  .grad-text { background-image: linear-gradient(135deg, rgb(var(--grad-a)), rgb(var(--grad-b)), rgb(var(--accent))); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .hero { @apply relative overflow-hidden rounded-[2rem] p-7 text-white sm:p-9; background-image: linear-gradient(135deg, rgb(var(--grad-a)) 0%, rgb(var(--grad-b)) 70%, rgb(255 110 70) 130%); box-shadow: var(--glow); }
-  .hero::after { content: ""; position: absolute; inset: auto -6rem -8rem auto; width: 22rem; height: 22rem; border-radius: 9999px; background: radial-gradient(circle, rgb(255 255 255 / 0.28), transparent 65%); pointer-events: none; }
+  .btn { @apply inline-flex min-h-[2.6rem] select-none items-center justify-center gap-1.5 rounded-xl border border-line bg-card px-4 py-2 text-[0.92rem] font-semibold shadow-sm transition duration-150 hover:border-ink/25 hover:shadow-md active:scale-[0.985] disabled:pointer-events-none disabled:opacity-50; }
+  .btn-primary { @apply border-transparent text-white hover:border-transparent hover:brightness-110; background-image: linear-gradient(160deg, rgb(var(--grad-a)), rgb(var(--grad-b))); box-shadow: var(--glow), inset 0 1px 0 rgb(255 255 255 / 0.16); }
+  .btn-ghost { @apply border-transparent bg-transparent shadow-none hover:bg-ink/5 hover:shadow-none; }
+  .input { @apply w-full rounded-xl border border-line bg-card px-4 py-2.5 text-base outline-none transition placeholder:text-mute/70 focus:border-brand focus:ring-4 focus:ring-brand/15; }
+  .chip { @apply inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold tracking-wide; }
+  .panel { @apply rounded-2xl border border-line bg-card; box-shadow: var(--shadow); }
+  .panel-hover { @apply transition duration-200 hover:-translate-y-0.5 hover:border-brand/35; }
+  .glass { @apply bg-paper/80 backdrop-blur-xl; }
+  .page-title { @apply text-[2rem] font-bold leading-tight tracking-tight; }
+  .section-title { @apply text-lg font-bold tracking-tight; }
+  .eyebrow { @apply text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-mute; }
+  .grad-text { background-image: linear-gradient(135deg, rgb(var(--grad-a)), rgb(var(--accent))); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero { @apply relative overflow-hidden rounded-3xl p-7 text-white sm:p-9; background-image: linear-gradient(135deg, rgb(var(--grad-a)) 0%, rgb(var(--grad-b)) 100%); box-shadow: var(--glow); }
+  .hero::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgb(255 255 255 / 0.10) 1px, transparent 1px); background-size: 22px 22px; mask-image: linear-gradient(120deg, transparent 30%, #000); pointer-events: none; }
+  .hero::after { content: ""; position: absolute; inset: auto -6rem -9rem auto; width: 24rem; height: 24rem; border-radius: 9999px; background: radial-gradient(circle, rgb(255 255 255 / 0.18), transparent 65%); pointer-events: none; }
   .stat { @apply panel p-5; }
-  .stat-value { @apply text-4xl font-extrabold leading-none tracking-tight; }
+  .stat-value { @apply text-4xl font-bold leading-none tracking-tight; }
+  /* dark navigation rail: re-maps the colour tokens so everything inside reads light-on-dark */
+  .rail { --ink: 238 241 247; --mute: 148 160 184; --line: 36 45 66; --card: 20 27 46; --brand: var(--org-dk, 150 156 255); background: rgb(var(--side)); color: rgb(var(--ink)); }
 }
+
+/* slim scrollbars, dark on the rail */
+.rail ::-webkit-scrollbar { width: 6px; } .rail ::-webkit-scrollbar-thumb { background: rgb(255 255 255 / 0.14); border-radius: 9999px; } .rail ::-webkit-scrollbar-track { background: transparent; }
+.rail nav { scrollbar-width: thin; scrollbar-color: rgb(255 255 255 / 0.18) transparent; }
 
 /* ---------- motion ---------- */
 @keyframes rise { from { opacity: 0; transform: translateY(14px) scale(0.985); } to { opacity: 1; transform: none; } }
@@ -77,7 +88,7 @@ body {
 .viz-root {
   --viz-surface: #fcfcfb; --viz-ink: #0b0b0b; --viz-ink2: #52514e; --viz-muted: #898781;
   --viz-grid: #e1e0d9; --viz-axis: #c3c2b7;
-  --series-1: #2a78d6; --series-2: #eb6834; --viz-critical: #d03b3b;
+  --series-1: #3b5bdb; --series-2: #c98a0a; --viz-critical: #d03b3b;
 }
 @media (prefers-color-scheme: dark) {
   .viz-root {

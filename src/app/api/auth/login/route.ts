@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { db } from "@/lib/db";
+import { dbRaw as db } from "@/lib/db";
 import { createSession, verifyPassword } from "@/lib/auth";
 import { setPending } from "@/lib/twofa";
 
@@ -30,13 +30,15 @@ async function handle(req: Request) {
     return NextResponse.json({ error: "Wrong email or password" }, { status: 401 });
   }
   fails.delete(email);
+  if (!user.allOrgs && user.orgId && !(await db.organization.count({ where: { id: user.orgId, active: true } })))
+    return NextResponse.json({ error: "Your organisation has been archived. Ask your founder." }, { status: 403 });
 
   // Two-step sign-in: the password alone only earns a 5-minute "pending" pass. No session yet.
   if (user.totpSecret) {
     await setPending(user.id);
     return NextResponse.json({ ok: true, needs2fa: true });
   }
-  await createSession(user.id);
+  await createSession(user);
   await db.user.update({ where: { id: user.id }, data: { lastSeenAt: new Date() } });
   return NextResponse.json({ ok: true });
 }

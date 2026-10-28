@@ -2,19 +2,22 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Icon, { type IconName } from "./Icon";
+import OrgSwitcher from "./OrgSwitcher";
 
 type Item = { href: string; label: string; icon: IconName };
 export type NavLevel = { level: number; name: string; points: number; toNext: number; progress: number };
 
-export function Logo({ size = "h-11 w-11" }: { size?: string }) {
+export function Logo({ size = "h-11 w-11", letter = "K" }: { size?: string; letter?: string }) {
   return (
     <span className={`${size} flex shrink-0 items-center justify-center rounded-2xl text-xl font-extrabold text-white shadow-lg`} style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--grad-a)), rgb(var(--grad-b)))", boxShadow: "var(--glow)" }}>
-      K
+      {letter}
     </span>
   );
 }
 
-export default function Nav({ lead, name, role, lvl }: { lead: boolean; name: string; role: string; lvl: NavLevel }) {
+type OrgLite = { id: string; name: string; color: string };
+
+export default function Nav({ lead, name, role, lvl, org, orgs, owner }: { lead: boolean; name: string; role: string; lvl: NavLevel; org: OrgLite; orgs: OrgLite[]; owner: boolean }) {
   const path = usePathname();
   const groups: { title: string; items: Item[] }[] = [
     {
@@ -49,6 +52,7 @@ export default function Nav({ lead, name, role, lvl }: { lead: boolean; name: st
         { href: "/visits", label: "Visits", icon: "arrow" },
         { href: "/expenses", label: "Expenses", icon: "coins" },
         ...(lead ? [{ href: "/templates", label: "Templates", icon: "doc" as IconName }] : []),
+        ...(owner ? [{ href: "/organisations", label: "Organisations", icon: "board" as IconName }] : []),
       ],
     },
   ];
@@ -65,11 +69,8 @@ export default function Nav({ lead, name, role, lvl }: { lead: boolean; name: st
   return (
     <>
       {/* ---------- desktop sidebar ---------- */}
-      <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-line/70 bg-card/60 p-4 backdrop-blur-xl md:flex">
-        <Link href="/" className="mb-5 flex items-center gap-3 px-2 pt-1">
-          <Logo />
-          <span><span className="block text-xl font-extrabold leading-none tracking-tight">KalamDesk</span><span className="mt-1 block text-xs font-semibold text-mute">Robokalam · one calm place</span></span>
-        </Link>
+      <aside className="rail sticky top-0 hidden h-screen w-72 shrink-0 flex-col border-r border-[rgb(var(--side-line))] p-4 md:flex">
+        <div className="mb-5 pt-1"><OrgSwitcher current={org} orgs={orgs} canSwitch={owner} dark /></div>
 
         <nav className="-mx-1 flex-1 space-y-5 overflow-y-auto px-1 pb-3" aria-label="Main">
           {groups.map((g) => (
@@ -80,9 +81,8 @@ export default function Nav({ lead, name, role, lvl }: { lead: boolean; name: st
                   const on = active(i.href);
                   return (
                     <Link key={i.href} href={i.href} aria-current={on ? "page" : undefined}
-                      className={`group flex items-center gap-3 rounded-2xl px-2.5 py-2 text-[0.95rem] font-bold transition duration-150 ${on ? "text-white" : "text-ink/85 hover:bg-brand/10 hover:text-ink"}`}
-                      style={on ? { backgroundImage: "linear-gradient(135deg, rgb(var(--grad-a)), rgb(var(--grad-b)))", boxShadow: "var(--glow)" } : undefined}>
-                      <span className={`flex h-9 w-9 items-center justify-center rounded-xl transition ${on ? "bg-white/20" : "bg-line/60 group-hover:bg-brand/15 group-hover:text-brand"}`}><Icon name={i.icon} className="h-[1.15rem] w-[1.15rem]" /></span>
+                      className={`group flex items-center gap-3 rounded-xl px-2.5 py-1.5 text-[0.92rem] font-semibold transition duration-150 ${on ? "bg-white/[0.09] text-white" : "text-ink/70 hover:bg-white/[0.05] hover:text-ink"}`}>
+                      <span className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${on ? "text-white shadow-md" : "text-mute group-hover:text-ink"}`} style={on ? { backgroundImage: "linear-gradient(160deg, rgb(var(--grad-a)), rgb(var(--grad-b)))", boxShadow: "var(--glow)" } : undefined}><Icon name={i.icon} className="h-[1.05rem] w-[1.05rem]" /></span>
                       {i.label}
                     </Link>
                   );
@@ -93,9 +93,9 @@ export default function Nav({ lead, name, role, lvl }: { lead: boolean; name: st
         </nav>
 
         {/* level card */}
-        <div className="panel mt-2 p-4">
+        <div className="mt-2 rounded-2xl border border-[rgb(var(--side-line))] bg-white/[0.04] p-4">
           <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white" style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--accent)), rgb(var(--grad-b)))" }}>{initials}</span>
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white" style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--grad-a)), rgb(var(--grad-b)))" }}>{initials}</span>
             <div className="min-w-0">
               <div className="truncate font-extrabold leading-tight">{name}</div>
               <div className="text-xs font-semibold text-mute">{role.charAt(0) + role.slice(1).toLowerCase()}</div>

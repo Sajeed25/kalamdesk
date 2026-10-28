@@ -1,19 +1,20 @@
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { db, dbRaw } from "../src/lib/db";
+import { runInOrg } from "../src/lib/tenancy";
 import { syncScore } from "../src/lib/scoring";
 
-const db = new PrismaClient();
 const DEV_PASSWORD = "kalamdesk123"; // dev/demo only — change before real use
 const H = 3600 * 1000;
 const at = (hours: number) => new Date(Date.now() + hours * H);
 
-async function main() {
+/** Robokalam, the demo organisation with the full data set. Every query below is limited to it (src/lib/tenancy.ts). */
+async function seedRobokalam() {
   const hash = await bcrypt.hash(DEV_PASSWORD, 10);
   const names = ["Accounts", "BD", "Marketing", "Training", "Product", "HR", "Tech"];
   const colors = ["#0ea5e9", "#f97316", "#ec4899", "#22c55e", "#8b5cf6", "#eab308", "#64748b"];
   const dept: Record<string, string> = {};
   for (const [i, name] of names.entries()) {
-    dept[name] = (await db.department.upsert({ where: { name }, update: {}, create: { name, color: colors[i] } })).id;
+    dept[name] = ((await db.department.findFirst({ where: { name } })) ?? (await db.department.create({ data: { name, color: colors[i] } }))).id;
   }
 
   type P = [string, string, string, string, string, string?, string?, string?]; // name, email, role, dept, office, title, type, managerEmail
@@ -54,6 +55,7 @@ async function main() {
       },
     });
   }
+  await dbRaw.user.update({ where: { id: id["arjun"] }, data: { allOrgs: true } }); // Arjun is the group owner: he can switch between organisations
   for (const [, email, , , , , , mgr] of people) {
     if (!mgr) continue;
     await db.employeeProfile.update({ where: { userId: id[email.split("@")[0]] }, data: { managerId: id[mgr.split("@")[0]] } });
@@ -189,7 +191,54 @@ async function main() {
     });
   }
 
-  console.log(`Seeded. Log in as arjun@robokalam.test / ${DEV_PASSWORD}`);
 }
 
-main().finally(() => db.$disconnect());
+/** A second, completely separate organisation, used to prove that nothing leaks between organisations. */
+async function seedSamaritan() {
+  const hash = await bcrypt.hash(DEV_PASSWORD, 10);
+  const dept: Record<string, string> = {};
+  for (const [name, color] of [["Programs", "#0f766e"], ["Outreach", "#b45309"]] as const)
+    dept[name] = ((await db.department.findFirst({ where: { name } })) ?? (await db.department.create({ data: { name, color } }))).id;
+  const people: [string, string, string, string, string][] = [
+    ["Hope Mathew", "hope@samaritan.test", "FOUNDER", "Programs", "Director"],
+    ["Joel Samuel", "joel@samaritan.test", "MANAGER", "Outreach", "Outreach Lead"],
+    ["Asha Rani", "asha@samaritan.test", "EMPLOYEE", "Programs", "Case Worker"],
+    ["Peter Das", "peter@samaritan.test", "EMPLOYEE", "Outreach", "Field Coordinator"],
+  ];
+  const id: Record<string, string> = {};
+  for (const [name, email, role, d, title] of people) {
+    const u = await db.user.upsert({ where: { email }, update: {}, create: { name, email, role, passwordHash: hash, departmentId: dept[d], consentAt: new Date() } });
+    id[email.split("@")[0]] = u.id;
+    await db.employeeProfile.upsert({ where: { userId: u.id }, update: {}, create: { userId: u.id, office: "Hyderabad", title, joinedOn: new Date("2025-01-10") } });
+  }
+  if ((await db.task.count()) === 0) {
+    for (const [title, by, to, d, due] of [
+      ["Home visit: Ambedkar Nagar families", "joel", "peter", "Outreach", 6],
+      ["Quarterly donor report", "hope", "asha", "Programs", 30],
+      ["Plan food-drive volunteers", "hope", "joel", "Outreach", 52],
+    ] as const)
+      await db.task.create({
+        data: {
+          title, priority: "P2", complexity: 3, dueAt: at(due), departmentId: dept[d], creatorId: id[by],
+          assignees: { create: [{ userId: id[to] }] },
+          activity: { create: [{ actorId: id[by], action: "CREATED", detail: "" }] },
+        },
+      });
+  }
+  if ((await db.lead.count()) === 0)
+    await db.lead.create({ data: { name: "Mr. Thomas", organisation: "Grace Foundation", stage: "CONTACTED", ownerId: id["joel"], source: "Donor referral", notes: "Interested in sponsoring the food drive." } });
+}
+
+async function main() {
+  const orgs = [
+    { name: "Robokalam", slug: "robokalam", tagline: "Hands-on STEM for every school", color: "#4f46e5", seed: seedRobokalam },
+    { name: "Samaritan Stand-Up", slug: "samaritan", tagline: "Standing up for the people next door", color: "#0f766e", seed: seedSamaritan },
+  ];
+  for (const o of orgs) {
+    const org = (await dbRaw.organization.findUnique({ where: { slug: o.slug } })) ?? (await dbRaw.organization.create({ data: { name: o.name, slug: o.slug, tagline: o.tagline, color: o.color } }));
+    await runInOrg(org.id, o.seed);
+  }
+  console.log(`Seeded. Log in as arjun@robokalam.test (group owner) or hope@samaritan.test / ${DEV_PASSWORD}`);
+}
+
+main().finally(() => dbRaw.$disconnect());

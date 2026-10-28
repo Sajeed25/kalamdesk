@@ -4,6 +4,7 @@ import { authed } from "@/lib/api";
 import { db } from "@/lib/db";
 import { isFounder } from "@/lib/rbac";
 import { sendPasswordLink } from "@/lib/reset";
+import { assertDepartment, assertPeople } from "@/lib/orgGuard";
 import { HttpError } from "@/lib/tasks";
 import { toDate, userFields } from "@/lib/userSchema";
 
@@ -13,6 +14,9 @@ export const PATCH = authed<{ params: { id: string } }>(async (req, u, { params 
   const body = z.object({ ...userFields, active: z.boolean(), resendInvite: z.boolean() }).partial().parse(await req.json());
   const target = await db.user.findUnique({ where: { id: params.id } });
   if (!target) throw new HttpError(404, "Not found");
+  if (target.orgId !== u.orgId) throw new HttpError(403, "Group owners are managed by the owners themselves");
+  await assertDepartment(body.departmentId);
+  await assertPeople([body.managerId], "manager");
 
   if (body.resendInvite) {
     await sendPasswordLink(target.id, "invite");

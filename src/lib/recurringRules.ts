@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { db } from "./db";
 import { isLead } from "./rbac";
+import { assertDepartment } from "./orgGuard";
 import { teamIds, HttpError } from "./tasks";
 import { buildRRule, parseRRule } from "./recurrence";
 import { PRIORITIES } from "./constants";
@@ -29,6 +30,7 @@ export async function prepareRule(u: SessionUser, input: RuleInput) {
   const ids = Array.from(new Set(input.assigneeIds));
   const found = await db.user.count({ where: { id: { in: ids }, active: true } });
   if (found !== ids.length) throw new HttpError(400, "Unknown or inactive assignee");
+  await assertDepartment(input.departmentId);
   if (u.role === "MANAGER") {
     const allowed = new Set([u.id, ...(await teamIds(u.id))]);
     if (ids.some((i) => !allowed.has(i))) throw new HttpError(403, "Managers can only assign recurring work to their own team");
