@@ -3,6 +3,39 @@ import { db } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
+const startedAt = new Date().toISOString();
+
+/**
+ * Yes/no facts about the shape of DATABASE_URL: never the user, host, database name or password.
+ * Helps spot stray quotes/spaces, an unencoded password, or a missing Hostinger prefix.
+ */
+function inspectDatabaseUrl() {
+  const raw = process.env.DATABASE_URL ?? "";
+  const info: Record<string, unknown> = {
+    hasQuotesOrSpaces: raw !== raw.trim() || /^["']|["']$/.test(raw),
+    startsWithMysql: /^mysql:\/\//i.test(raw.trim()),
+  };
+  const body = raw.trim().replace(/^["']|["']$/g, "").replace(/^mysql:\/\//i, "");
+  const at = body.lastIndexOf("@");
+  if (at > -1) {
+    const cred = body.slice(0, at);
+    const rest = body.slice(at + 1);
+    const user = cred.split(":")[0];
+    const pass = cred.includes(":") ? cred.slice(cred.indexOf(":") + 1) : "";
+    const [hostPort, db = ""] = rest.split("/");
+    const [host, port = ""] = hostPort.split(":");
+    info.passwordNeedsEncoding = /[@#/?:]/.test(pass) || /%(?![0-9a-fA-F]{2})/.test(pass);
+    info.userLooksPrefixed = /^u\d+_/.test(user);
+    info.databaseLooksPrefixed = /^u\d+_/.test(db.split("?")[0]);
+    info.hostKind = host === "localhost" || host === "127.0.0.1" ? "localhost" : host.endsWith(".hstgr.io") ? "hostinger-remote" : "other";
+    info.port = port || "(default 3306)";
+    info.hasDatabaseName = db.split("?")[0].length > 0;
+  } else {
+    info.parsable = false;
+  }
+  return info;
+}
+
 /**
  * Setup check for a fresh deployment. Public, so it only reports yes/no flags:
  * no values, counts, paths or error text that could help an attacker.
@@ -33,6 +66,8 @@ export async function GET() {
     schemaReady: false,
     hasUsers: false,
     dbProblem: null as string | null,
+    serverStartedAt: startedAt,
+    databaseUrlCheck: inspectDatabaseUrl(),
   };
   try {
     await db.$queryRaw`SELECT 1`;
