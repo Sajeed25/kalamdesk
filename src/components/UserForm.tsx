@@ -14,6 +14,10 @@ export const EMPTY_USER: UserFormValues = {
   emergencyContact: "", employmentType: "FULL_TIME", managerId: "", joinedOn: "", internStart: "", internEnd: "", active: true,
 };
 
+function F({ label, children }: { label: string; children: React.ReactNode }) {
+  return <label className="block text-sm font-medium">{label}<div className="mt-1">{children}</div></label>;
+}
+
 export default function UserForm({ initial, departments, managers }: { initial: UserFormValues; departments: { id: string; name: string }[]; managers: { id: string; name: string }[] }) {
   const router = useRouter();
   const editing = !!initial.id;
@@ -46,7 +50,6 @@ export default function UserForm({ initial, departments, managers }: { initial: 
     setNote(res.ok ? "Invite sent." : "Could not send invite.");
   }
 
-  const F = ({ label, children }: { label: string; children: React.ReactNode }) => <label className="block text-sm font-medium">{label}<div className="mt-1">{children}</div></label>;
 
   return (
     <form onSubmit={submit} className="panel grid max-w-3xl gap-4 p-5 sm:grid-cols-2">

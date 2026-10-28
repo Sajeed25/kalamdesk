@@ -12,6 +12,10 @@ async function call(url: string, method: string, body?: object) {
 }
 const money = (n: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
 
+function L({ t, children }: { t: string; children: React.ReactNode }) {
+  return <label className="block text-xs font-medium text-mute">{t}<div className="mt-1 text-ink">{children}</div></label>;
+}
+
 function RuleForm({ initial, id, onDone }: { initial: Omit<RuleView, "id" | "summary">; id?: string; onDone: () => void }) {
   const router = useRouter();
   const [v, setV] = useState(initial);
@@ -24,7 +28,6 @@ function RuleForm({ initial, id, onDone }: { initial: Omit<RuleView, "id" | "sum
     router.refresh();
     onDone();
   }
-  const L = ({ t, children }: { t: string; children: React.ReactNode }) => <label className="block text-xs font-medium text-mute">{t}<div className="mt-1 text-ink">{children}</div></label>;
   return (
     <form onSubmit={submit} className="panel grid gap-3 p-4 sm:grid-cols-3">
       <div className="sm:col-span-3"><L t="Name"><input required value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} className="input" placeholder="e.g. Monthly star performer" /></L></div>

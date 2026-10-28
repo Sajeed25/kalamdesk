@@ -19,16 +19,16 @@ export default function DailyUpdateForm({ initial, submitted }: { initial: { fin
     setDone(true);
     router.refresh();
   }
-  const F = ({ k, label, hint }: { k: keyof typeof v; label: string; hint: string }) => (
+  const field = (k: keyof typeof v, label: string, hint: string) => (
     <label className="block text-sm font-medium">{label}
       <textarea rows={3} maxLength={2000} value={v[k]} onChange={(e) => { setV({ ...v, [k]: e.target.value }); setDone(false); }} placeholder={hint} className="input mt-1" />
     </label>
   );
   return (
     <form onSubmit={submit} className="panel space-y-4 p-4">
-      <F k="finished" label="What I finished today" hint="e.g. 20 calls, 2 school visits, invoice for Sunrise School" />
-      <F k="pending" label="What is still pending" hint="e.g. 3 follow-ups for tomorrow" />
-      <F k="obstacles" label="Any obstacle? (founders are told straight away)" hint="e.g. waiting for GST number from the school" />
+      {field("finished", "What I finished today", "e.g. 20 calls, 2 school visits, invoice for Sunrise School")}
+      {field("pending", "What is still pending", "e.g. 3 follow-ups for tomorrow")}
+      {field("obstacles", "Any obstacle? (founders are told straight away)", "e.g. waiting for GST number from the school")}
       {err && <p role="alert" className="text-sm text-red-600">{err}</p>}
       <div className="flex items-center gap-3">
         <button disabled={busy} className="btn btn-primary">{busy ? "Saving…" : done ? "Update again" : "Submit today's update"}</button>

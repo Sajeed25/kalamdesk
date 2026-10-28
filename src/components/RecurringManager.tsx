@@ -17,6 +17,10 @@ const BLANK: Omit<RuleView, "id" | "active" | "schedule" | "next" | "assigneeNam
   priority: "P3", location: "", departmentId: "", assigneeIds: [],
 };
 
+function L({ t, children }: { t: string; children: React.ReactNode }) {
+  return <label className="block text-sm font-medium">{t}<div className="mt-1">{children}</div></label>;
+}
+
 function RuleForm({ initial, id, people, departments, onDone }: { initial: typeof BLANK; id?: string; people: Opt[]; departments: Opt[]; onDone: () => void }) {
   const router = useRouter();
   const [v, setV] = useState(initial);
@@ -36,7 +40,6 @@ function RuleForm({ initial, id, people, departments, onDone }: { initial: typeo
     router.refresh();
     onDone();
   }
-  const L = ({ t, children }: { t: string; children: React.ReactNode }) => <label className="block text-sm font-medium">{t}<div className="mt-1">{children}</div></label>;
 
   return (
     <form onSubmit={submit} className="panel grid gap-4 p-4 sm:grid-cols-2">

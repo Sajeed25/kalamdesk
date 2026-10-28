@@ -7,6 +7,10 @@ import { fromIstInputValue } from "@/lib/time";
 type Opt = { id: string; name: string };
 
 /** Full task form: the quick-add bar covers the common case, this sets every field. */
+function L({ t, children }: { t: string; children: React.ReactNode }) {
+  return <label className="block text-sm font-medium">{t}<div className="mt-1">{children}</div></label>;
+}
+
 export default function TaskForm({ people, departments, meId, canAssign }: { people: Opt[]; departments: Opt[]; meId: string; canAssign: boolean }) {
   const router = useRouter();
   const [assignees, setAssignees] = useState<string[]>([meId]);
@@ -44,7 +48,6 @@ export default function TaskForm({ people, departments, meId, canAssign }: { peo
     router.push(`/tasks/${(await res.json()).task.id}`);
   }
 
-  const L = ({ t, children }: { t: string; children: React.ReactNode }) => <label className="block text-sm font-medium">{t}<div className="mt-1">{children}</div></label>;
 
   return (
     <form onSubmit={submit} className="panel grid max-w-3xl gap-4 p-5 sm:grid-cols-2">

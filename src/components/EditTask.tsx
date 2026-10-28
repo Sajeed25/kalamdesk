@@ -11,6 +11,10 @@ export type EditableTask = {
   assigneeIds: string[];
 };
 
+function L({ t, children }: { t: string; children: React.ReactNode }) {
+  return <label className="block text-sm font-medium">{t}<div className="mt-1">{children}</div></label>;
+}
+
 export default function EditTask({ task, people, canAssign }: { task: EditableTask; people: Person[]; canAssign: boolean }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -44,7 +48,6 @@ export default function EditTask({ task, people, canAssign }: { task: EditableTa
 
   if (!open) return <button onClick={() => setOpen(true)} className="btn">Edit task</button>;
 
-  const L = ({ t, children }: { t: string; children: React.ReactNode }) => <label className="block text-sm font-medium">{t}<div className="mt-1">{children}</div></label>;
   return (
     <form onSubmit={submit} className="panel grid gap-4 p-4 sm:grid-cols-2">
       <div className="sm:col-span-2"><L t="Title"><input name="title" required maxLength={200} defaultValue={task.title} className="input" /></L></div>
