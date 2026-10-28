@@ -24,13 +24,13 @@ export default async function Snapshot({ params }: { params: { slug: string } })
       <Link href="/snapshots" className="text-sm text-mute hover:underline">← Published dashboards</Link>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">{snap.label}</h1>
+          <h1 className="page-title">{snap.label}</h1>
           <p className="text-sm text-mute">{payload.scope} · a frozen copy published {fmtDateTime(payload.generatedAt)} by {payload.generatedBy}</p>
         </div>
         <a href={`/api/snapshots/${snap.shareSlug}/pdf`} className="btn btn-primary">Download PDF</a>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-        {tiles.map((t) => <div key={t.label} className="panel p-4"><div className="text-xs uppercase tracking-wide text-mute">{t.label}</div><div className="mt-1 text-3xl font-bold">{t.value}</div></div>)}
+        {tiles.map((t) => <div key={t.label} className="stat"><div className="eyebrow">{t.label}</div><div className="stat-value mt-2">{t.value}</div></div>)}
       </div>
       <DashboardCharts d={d} />
       <section className="panel p-4">

@@ -50,7 +50,7 @@ export default function TaskForm({ people, departments, meId, canAssign }: { peo
 
 
   return (
-    <form onSubmit={submit} className="panel grid max-w-3xl gap-4 p-5 sm:grid-cols-2">
+    <form onSubmit={submit} className="panel grid grid-cols-1 max-w-3xl gap-4 p-5 sm:grid-cols-2">
       <div className="sm:col-span-2"><L t="Title"><input name="title" required maxLength={200} className="input" autoFocus /></L></div>
       <div className="sm:col-span-2"><L t="Description"><textarea name="description" rows={4} className="input" /></L></div>
       <L t="Priority">

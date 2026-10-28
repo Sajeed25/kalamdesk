@@ -27,7 +27,7 @@ export default async function Bank({ params }: { params: { id: string } }) {
     <div className="mx-auto max-w-3xl space-y-4">
       <Link href={`/people/${person.id}/edit`} className="text-sm text-mute hover:underline">← {person.name}</Link>
       <div>
-        <h1 className="text-2xl font-bold">Bank &amp; ID details</h1>
+        <h1 className="page-title">Bank &amp; ID details</h1>
         <p className="text-sm text-mute">Encrypted at rest, founder-only, masked by default. Never included in emails, exports or logs.</p>
       </div>
       <BankDetails userId={person.id} masked={masked} />

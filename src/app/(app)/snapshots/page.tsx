@@ -14,7 +14,7 @@ export default async function Snapshots() {
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <div>
-        <h1 className="text-2xl font-bold">Published dashboards</h1>
+        <h1 className="page-title">Published dashboards</h1>
         <p className="text-sm text-mute">Frozen copies of the team dashboard, shared by the founders. {isFounder(u) ? "Publish a new one from the Dashboard page." : ""}</p>
       </div>
       {snaps.map((s) => (

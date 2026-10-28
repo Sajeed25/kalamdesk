@@ -28,13 +28,13 @@ export default async function Incentives({ searchParams }: { searchParams: { mon
     ]);
     return (
       <div className="mx-auto max-w-3xl space-y-6">
-        <div><h1 className="text-2xl font-bold">Incentives</h1><p className="text-sm text-mute">Your approved incentives and how they are earned.</p></div>
+        <div><h1 className="page-title">Incentives</h1><p className="text-sm text-mute">Your approved incentives and how they are earned.</p></div>
         <div className="grid grid-cols-2 gap-3">
-          <div className="panel p-4"><div className="text-xs uppercase text-mute">Total approved</div><div className="text-2xl font-bold">{inr(mine.reduce((s, a) => s + a.amountInr, 0))}</div></div>
-          <div className="panel p-4"><div className="text-xs uppercase text-mute">Paid so far</div><div className="text-2xl font-bold">{inr(mine.filter((a) => a.paid).reduce((s, a) => s + a.amountInr, 0))}</div></div>
+          <div className="panel p-4"><div className="text-xs uppercase text-mute">Total approved</div><div className="page-title">{inr(mine.reduce((s, a) => s + a.amountInr, 0))}</div></div>
+          <div className="panel p-4"><div className="text-xs uppercase text-mute">Paid so far</div><div className="page-title">{inr(mine.filter((a) => a.paid).reduce((s, a) => s + a.amountInr, 0))}</div></div>
         </div>
         <section className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-mute">Your history</h2>
+          <h2 className="eyebrow">Your history</h2>
           {mine.map((a) => (
             <div key={a.id} className="panel flex items-center justify-between gap-3 p-3 text-sm">
               <div><div className="font-medium">{a.month}</div><div className="text-mute">{a.reason}</div></div>
@@ -44,7 +44,7 @@ export default async function Incentives({ searchParams }: { searchParams: { mon
           {mine.length === 0 && <div className="panel p-6 text-center text-sm text-mute">Nothing yet. Keep an eye on the rules below.</div>}
         </section>
         <section className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-mute">How to earn them</h2>
+          <h2 className="eyebrow">How to earn them</h2>
           {rules.map((r) => <div key={r.id} className="panel p-3 text-sm"><b>{r.name}</b> · {inr(r.amountInr)}<div className="text-mute">{summarize(r)}</div></div>)}
           {rules.length === 0 && <p className="text-sm text-mute">No incentive rules are active right now.</p>}
         </section>
@@ -66,7 +66,7 @@ export default async function Incentives({ searchParams }: { searchParams: { mon
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><h1 className="text-2xl font-bold">Incentives</h1><p className="text-sm text-mute">Rules decide who is eligible each month. You approve every award before it counts.</p></div>
+        <div><h1 className="page-title">Incentives</h1><p className="text-sm text-mute">Rules decide who is eligible each month. You approve every award before it counts.</p></div>
         <div className="flex items-center gap-2">
           <Link href={`/incentives?month=${shiftMonth(month, -1)}`} className="btn" aria-label="Previous month">←</Link>
           <span className="min-w-20 text-center font-semibold">{month}</span>

@@ -42,7 +42,7 @@ function RuleForm({ initial, id, people, departments, onDone }: { initial: typeo
   }
 
   return (
-    <form onSubmit={submit} className="panel grid gap-4 p-4 sm:grid-cols-2">
+    <form onSubmit={submit} className="panel grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
       <div className="sm:col-span-2"><L t="Activity"><input required maxLength={200} value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} className="input" placeholder="e.g. School visit — training session" /></L></div>
       <L t="Repeats">
         <select value={v.freq} onChange={(e) => setV({ ...v, freq: e.target.value })} className="input">
@@ -56,7 +56,7 @@ function RuleForm({ initial, id, people, departments, onDone }: { initial: typeo
           <legend className="mb-1 text-sm font-medium">On</legend>
           <div className="flex flex-wrap gap-2">
             {DAYS.map(([label, n]) => (
-              <label key={n} className={`btn cursor-pointer ${v.days.includes(n) ? "!bg-brand !text-white" : ""}`}>
+              <label key={n} className={`btn cursor-pointer ${v.days.includes(n) ? "btn-primary" : ""}`}>
                 <input type="checkbox" className="sr-only" checked={v.days.includes(n)} onChange={() => setV({ ...v, days: toggle(v.days, n) })} />{label}
               </label>
             ))}

@@ -39,7 +39,7 @@ export default function ChecklistAndFiles({ taskId, items, files, canEdit }: { t
   return (
     <div className="space-y-6">
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-mute">Checklist {items.length > 0 && `· ${done}/${items.length}`}</h2>
+        <h2 className="mb-2 eyebrow">Checklist {items.length > 0 && `· ${done}/${items.length}`}</h2>
         <ul className="space-y-1">
           {items.map((i) => (
             <li key={i.id} className="flex items-center gap-2 text-sm">
@@ -59,7 +59,7 @@ export default function ChecklistAndFiles({ taskId, items, files, canEdit }: { t
       </section>
 
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-mute">Attachments · {files.length}</h2>
+        <h2 className="mb-2 eyebrow">Attachments · {files.length}</h2>
         <ul className="space-y-1 text-sm">
           {files.map((f) => (
             <li key={f.id} className="flex items-center gap-2">

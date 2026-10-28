@@ -39,7 +39,7 @@ export function SubmitReferral({ programs }: { programs: { id: string; name: str
   }
   if (programs.length === 0) return <p className="panel p-4 text-sm text-mute">No referral program is open right now.</p>;
   return (
-    <form onSubmit={submit} className="panel grid gap-3 p-4 sm:grid-cols-2">
+    <form onSubmit={submit} className="panel grid grid-cols-1 gap-3 p-4 sm:grid-cols-2">
       <label className="block text-sm font-medium sm:col-span-2">Program
         <select name="programId" required className="input mt-1">{programs.map((p) => <option key={p.id} value={p.id}>{p.name} · {p.reward}</option>)}</select>
       </label>
@@ -83,7 +83,7 @@ function ProgramForm({ initial, id, onDone }: { initial: { name: string; reward:
     router.refresh(); onDone();
   }
   return (
-    <form onSubmit={submit} className="panel grid gap-3 p-4 sm:grid-cols-2">
+    <form onSubmit={submit} className="panel grid grid-cols-1 gap-3 p-4 sm:grid-cols-2">
       <label className="block text-xs font-medium text-mute sm:col-span-2">Program name<input required value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} className="input mt-1 text-ink" placeholder="Refer a school for 21C Lab" /></label>
       <label className="block text-xs font-medium text-mute">Reward (as shown to staff)<input required value={v.reward} onChange={(e) => setV({ ...v, reward: e.target.value })} className="input mt-1 text-ink" placeholder="₹2,000 per converted school" /></label>
       <label className="block text-xs font-medium text-mute">Amount credited on conversion (₹, optional)<input type="number" min={1} value={v.rewardInr ?? ""} onChange={(e) => setV({ ...v, rewardInr: e.target.value ? Number(e.target.value) : null })} className="input mt-1 text-ink" /></label>
@@ -100,7 +100,7 @@ export function ProgramAdmin({ programs }: { programs: ProgramView[] }) {
   async function toggle(p: ProgramView) { await call(`/api/referrals/programs/${p.id}`, "PATCH", { active: !p.active }); router.refresh(); }
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between"><h2 className="text-lg font-semibold">Programs</h2>{editing === null && <button onClick={() => setEditing("new")} className="btn">+ Open a program</button>}</div>
+      <div className="flex items-center justify-between"><h2 className="section-title">Programs</h2>{editing === null && <button onClick={() => setEditing("new")} className="btn">+ Open a program</button>}</div>
       {editing === "new" && <ProgramForm initial={{ name: "", reward: "", rewardInr: null, validUntil: "", active: true }} onDone={() => setEditing(null)} />}
       {programs.map((p) => editing === p.id ? (
         <ProgramForm key={p.id} id={p.id} initial={p} onDone={() => setEditing(null)} />

@@ -13,7 +13,7 @@ export default async function Settings() {
   const profile = await db.employeeProfile.findUnique({ where: { userId: u.id }, select: { phone: true, whatsappOptIn: true } });
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <h1 className="page-title">Settings</h1>
       <p className="text-sm text-mute">Signed in as {u.name} ({u.email})</p>
       <div className="flex flex-wrap items-start gap-4">
         <ChangePasswordForm />

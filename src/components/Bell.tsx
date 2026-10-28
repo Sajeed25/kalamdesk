@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { fmtRelative } from "@/lib/time";
+import Icon from "./Icon";
 
 type N = { id: string; title: string; body: string; url: string; readAt: string | null; createdAt: string };
 
@@ -33,18 +34,18 @@ export default function Bell() {
 
   return (
     <div className="relative">
-      <button onClick={toggle} aria-label="Notifications" className="btn relative">
-        🔔
-        {unread > 0 && <span className="absolute -right-1 -top-1 rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">{unread}</span>}
+      <button onClick={toggle} aria-label={unread ? `Notifications, ${unread} new` : "Notifications"} className="btn relative !px-3">
+        <Icon name="bell" className="h-5 w-5" />
+        {unread > 0 && <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[11px] font-extrabold text-white shadow-md" style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--accent)), rgb(244 63 94))" }}>{unread}</span>}
       </button>
       {open && (
-        <div className="panel absolute right-0 mt-2 max-h-96 w-80 max-w-[90vw] overflow-auto shadow-xl">
-          {items.length === 0 && <p className="p-4 text-sm text-mute">Nothing yet. You&apos;re all caught up.</p>}
+        <div className="panel absolute right-0 mt-3 max-h-[28rem] w-96 max-w-[90vw] overflow-auto p-1.5 shadow-2xl">
+          {items.length === 0 && <p className="p-5 text-center text-sm font-semibold text-mute">All caught up. Nice! ✨</p>}
           {items.map((n) => (
-            <Link key={n.id} href={n.url || "#"} onClick={() => setOpen(false)} className={`block border-b border-line p-3 text-sm last:border-0 hover:bg-line/40 ${n.readAt ? "" : "bg-brand/5"}`}>
-              <div className="font-medium">{n.title}</div>
-              {n.body && <div className="text-xs text-mute">{n.body}</div>}
-              <div className="mt-0.5 text-[11px] text-mute">{fmtRelative(n.createdAt)}</div>
+            <Link key={n.id} href={n.url || "#"} onClick={() => setOpen(false)} className={`block rounded-2xl p-3 text-sm transition hover:bg-brand/10 ${n.readAt ? "" : "bg-brand/5"}`}>
+              <div className="font-bold">{n.title}</div>
+              {n.body && <div className="mt-0.5 text-xs text-mute">{n.body}</div>}
+              <div className="mt-1 text-[11px] font-semibold text-mute">{fmtRelative(n.createdAt)}</div>
             </Link>
           ))}
         </div>

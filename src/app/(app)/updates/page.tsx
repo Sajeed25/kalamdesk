@@ -32,7 +32,7 @@ export default async function Updates({ searchParams }: { searchParams: { date?:
     <div className="mx-auto max-w-3xl space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h1 className="text-2xl font-bold">Stand-ups</h1>
+          <h1 className="page-title">Stand-ups</h1>
           <p className="text-sm text-mute">{updates.length} of {people.length} submitted for {date}{date === today ? " (today)" : ""}</p>
         </div>
         <div className="flex gap-2">

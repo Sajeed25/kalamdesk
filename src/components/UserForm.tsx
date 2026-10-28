@@ -52,7 +52,7 @@ export default function UserForm({ initial, departments, managers }: { initial: 
 
 
   return (
-    <form onSubmit={submit} className="panel grid max-w-3xl gap-4 p-5 sm:grid-cols-2">
+    <form onSubmit={submit} className="panel grid grid-cols-1 max-w-3xl gap-4 p-5 sm:grid-cols-2">
       <F label="Full name"><input required value={v.name} onChange={set("name")} className="input" /></F>
       <F label="Official email">
         <input required type="email" value={v.email} onChange={set("email")} disabled={editing} className="input disabled:opacity-60" />

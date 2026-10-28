@@ -26,21 +26,21 @@ export default async function Person({ params }: { params: { id: string } }) {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <div className="flex items-center gap-3"><h1 className="text-2xl font-bold">{person.name}</h1>{u.role === "FOUNDER" && <Link href={`/people/${person.id}/edit`} className="btn">Edit</Link>}</div>
+        <div className="flex items-center gap-3"><h1 className="page-title">{person.name}</h1>{u.role === "FOUNDER" && <Link href={`/people/${person.id}/edit`} className="btn">Edit</Link>}</div>
         <p className="text-sm text-mute">{person.profile?.title} · {person.department?.name} · {person.profile?.office}</p>
         {isLead(u) && <p className="text-sm text-mute">{person.email} · {person.profile?.phone ?? "no phone"}</p>}
       </div>
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-mute">Open · {open.length}</h2>
+        <h2 className="eyebrow">Open · {open.length}</h2>
         {open.map((t) => <TaskRow key={t.id} t={t} />)}
         {open.length === 0 && <p className="text-sm text-mute">No open tasks.</p>}
       </section>
       <section className="space-y-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-mute">Recently done · {done.length}</h2>
+        <h2 className="eyebrow">Recently done · {done.length}</h2>
         {done.slice(0, 5).map((t) => <TaskRow key={t.id} t={t} />)}
       </section>
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-mute">Recent activity</h2>
+        <h2 className="mb-2 eyebrow">Recent activity</h2>
         <ul className="space-y-1 text-sm">
           {history.map((h) => (
             <li key={h.id} className="text-mute"><span className="text-ink">{h.task.title}</span> · {h.action.toLowerCase()} {h.detail} · {fmtDateTime(h.createdAt)}</li>

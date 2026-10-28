@@ -23,12 +23,12 @@ export default async function Dashboard({ searchParams }: { searchParams: { peri
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <h1 className="page-title">Dashboard</h1>
           <p className="text-sm text-mute">{d.label}{u.role === "MANAGER" ? " · your team" : " · whole company"}</p>
         </div>
-        <div className="flex gap-2">
-          <Link href="/dashboard?period=week" className={`btn ${period === "week" ? "!bg-brand !text-white" : ""}`}>Weekly</Link>
-          <Link href="/dashboard?period=month" className={`btn ${period === "month" ? "!bg-brand !text-white" : ""}`}>Monthly</Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/dashboard?period=week" className={`btn ${period === "week" ? "btn-primary" : ""}`}>Weekly</Link>
+          <Link href="/dashboard?period=month" className={`btn ${period === "month" ? "btn-primary" : ""}`}>Monthly</Link>
           <a href={`/api/export/metrics?period=${period}`} className="btn">Export CSV</a>
           {isFounder(u) && <PublishSnapshot period={period} />}
           <Link href="/snapshots" className="btn">Published</Link>
@@ -37,9 +37,9 @@ export default async function Dashboard({ searchParams }: { searchParams: { peri
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {tiles.map((t) => (
-          <div key={t.label} className="panel p-4">
-            <div className="text-xs uppercase tracking-wide text-mute">{t.label}</div>
-            <div className={`mt-1 text-3xl font-bold ${t.warn ? "text-red-600" : ""}`}>{t.value}</div>
+          <div key={t.label} className="stat">
+            <div className="eyebrow">{t.label}</div>
+            <div className={`stat-value mt-2 ${t.warn ? "text-red-600" : ""}`}>{t.value}</div>
           </div>
         ))}
       </div>

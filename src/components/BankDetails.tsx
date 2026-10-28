@@ -130,7 +130,7 @@ export default function BankDetails({ userId, masked }: { userId: string; masked
         {masked.updatedAt && <p className="mt-3 text-xs text-mute">Last changed {new Date(masked.updatedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}</p>}
       </section>
 
-      <form onSubmit={save} className="panel grid gap-4 p-4 sm:grid-cols-2" autoComplete="off">
+      <form onSubmit={save} className="panel grid grid-cols-1 gap-4 p-4 sm:grid-cols-2" autoComplete="off">
         <h2 className="font-semibold sm:col-span-2">Add or replace details <span className="text-xs font-normal text-mute">(leave a box empty to keep what is saved)</span></h2>
         <label className="block text-sm font-medium">Account holder name<input name="accountHolder" maxLength={100} className="input mt-1" /></label>
         <label className="block text-sm font-medium">Bank name<input name="bankName" maxLength={100} className="input mt-1" /></label>

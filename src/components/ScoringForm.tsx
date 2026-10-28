@@ -56,7 +56,7 @@ export default function ScoringForm({ values, defaults }: { values: Record<strin
         <fieldset key={g.title} className="panel p-4">
           <legend className="px-1 text-sm font-semibold">{g.title}</legend>
           <p className="mb-3 text-xs text-mute">{g.hint}</p>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {g.fields.map((f) => (
               <label key={f.key} className="block text-xs font-medium text-mute">{f.label}
                 <input inputMode="decimal" value={v[f.key] ?? ""} onChange={(e) => setV({ ...v, [f.key]: e.target.value })} className="input mt-1 text-ink" />

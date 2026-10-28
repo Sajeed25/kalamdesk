@@ -13,7 +13,7 @@ export default async function NewPerson() {
   ]);
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Add person</h1>
+      <h1 className="page-title">Add person</h1>
       <UserForm initial={EMPTY_USER} departments={departments} managers={managers} />
     </div>
   );

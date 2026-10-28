@@ -49,7 +49,7 @@ export default function EditTask({ task, people, canAssign }: { task: EditableTa
   if (!open) return <button onClick={() => setOpen(true)} className="btn">Edit task</button>;
 
   return (
-    <form onSubmit={submit} className="panel grid gap-4 p-4 sm:grid-cols-2">
+    <form onSubmit={submit} className="panel grid grid-cols-1 gap-4 p-4 sm:grid-cols-2">
       <div className="sm:col-span-2"><L t="Title"><input name="title" required maxLength={200} defaultValue={task.title} className="input" /></L></div>
       <div className="sm:col-span-2"><L t="Description"><textarea name="description" rows={4} defaultValue={task.description} className="input" /></L></div>
       <L t="Priority">

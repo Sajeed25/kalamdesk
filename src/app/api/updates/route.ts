@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { istDateKey } from "@/lib/time";
 import { HttpError } from "@/lib/tasks";
 import { notifyMany } from "@/lib/notify";
+import { standupStreak } from "@/lib/gamify";
 
 const schema = z.object({
   finished: z.string().trim().max(2000).default(""),
@@ -27,5 +28,6 @@ export const POST = authed(async (req, u) => {
     const founders = await db.user.findMany({ where: { role: "FOUNDER", active: true }, select: { id: true } });
     await notifyMany(founders.map((f) => f.id), { kind: "BLOCKED", title: `${u.name} reported an obstacle`, body: b.obstacles.slice(0, 200), url: "/updates", email: false }, u.id);
   }
-  return NextResponse.json({ update: row });
+  const streak = await standupStreak(u.id);
+  return NextResponse.json({ update: row, streak: streak.count });
 });

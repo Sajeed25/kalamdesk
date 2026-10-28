@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { confetti, toast } from "@/lib/celebrate";
 
 /** The 30-second end-of-day stand-up. Submitting again today replaces the earlier version. */
 export default function DailyUpdateForm({ initial, submitted }: { initial: { finished: string; pending: string; obstacles: string }; submitted: boolean }) {
@@ -15,8 +16,11 @@ export default function DailyUpdateForm({ initial, submitted }: { initial: { fin
     setBusy(true); setErr("");
     const res = await fetch("/api/updates", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(v) });
     setBusy(false);
-    if (!res.ok) return setErr((await res.json().catch(() => ({}))).error ?? "Could not save");
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) return setErr(d.error ?? "Could not save");
     setDone(true);
+    confetti();
+    toast(d.streak > 1 ? `Stand-up in! ${d.streak}-day streak 🔥` : "Stand-up in! Great start 🔥");
     router.refresh();
   }
   const field = (k: keyof typeof v, label: string, hint: string) => (

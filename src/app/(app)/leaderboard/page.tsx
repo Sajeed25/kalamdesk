@@ -33,7 +33,7 @@ export default async function Leaderboard({ searchParams }: { searchParams: { pe
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Scores</h1>
+          <h1 className="page-title">Scores</h1>
           <p className="text-sm text-mute">Hover a score to see exactly how it was earned.</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -42,21 +42,43 @@ export default async function Leaderboard({ searchParams }: { searchParams: { pe
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {(["week", "month", "all"] as const).map((p, i) => (
-          <div key={p} className="panel p-4">
-            <div className="text-xs uppercase tracking-wide text-mute">Your points · {TABS[i][1].toLowerCase()}</div>
-            <div className="mt-1 text-3xl font-bold">{mine[i].points}</div>
-            <div className="text-xs text-mute">{mine[i].completed} of {mine[i].assigned} tasks done · on time {pct(mine[i].onTimePct)}</div>
+          <div key={p} className="stat rise" style={{ ["--i" as string]: i }}>
+            <div className="eyebrow">Your points · {TABS[i][1].toLowerCase()}</div>
+            <div className="stat-value grad-text mt-2">{mine[i].points}</div>
+            <div className="mt-2 text-sm font-semibold text-mute">{mine[i].completed} of {mine[i].assigned} tasks done · on time {pct(mine[i].onTimePct)}</div>
           </div>
         ))}
       </div>
 
+      {rows.length >= 2 && rows[0].points > 0 && (
+        <section aria-label="Top three" className="grid grid-cols-3 items-end gap-3 sm:gap-5">
+          {[1, 0, 2].filter((i) => rows[i]).map((i) => {
+            const r = rows[i];
+            const medal = [
+              { bg: "from-amber-300 to-yellow-500", h: "pt-10 pb-6", n: "1st" },
+              { bg: "from-slate-300 to-slate-400", h: "pt-6 pb-5", n: "2nd" },
+              { bg: "from-orange-300 to-amber-700", h: "pt-4 pb-4", n: "3rd" },
+            ][i];
+            return (
+              <div key={r.userId} className={`panel rise text-center ${medal.h} px-2`} style={{ ["--i" as string]: i + 3 }}>
+                <span className={`mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br ${medal.bg} text-sm font-extrabold text-slate-900 shadow-lg sm:h-14 sm:w-14`}>{medal.n}</span>
+                <div className="mt-3 truncate px-1 text-base font-extrabold tracking-tight sm:text-lg">{r.name}</div>
+                <div className="truncate text-xs font-semibold text-mute">{r.department ?? "—"}</div>
+                <div className="grad-text mt-1 text-3xl font-extrabold sm:text-4xl">{r.points}</div>
+                <div className="text-[11px] font-bold uppercase tracking-widest text-mute">points</div>
+              </div>
+            );
+          })}
+        </section>
+      )}
+
       <div className="flex flex-wrap items-center gap-2">
-        {TABS.map(([p, label]) => <Link key={p} href={href({ period: p })} className={`btn ${period === p ? "!bg-brand !text-white" : ""}`}>{label}</Link>)}
+        {TABS.map(([p, label]) => <Link key={p} href={href({ period: p })} className={`btn ${period === p ? "btn-primary" : ""}`}>{label}</Link>)}
         <span className="mx-1 text-line">|</span>
-        <Link href={href({ group: "employees" })} className={`btn ${group === "EMPLOYEE" ? "!bg-brand !text-white" : ""}`}>Employees</Link>
-        <Link href={href({ group: "interns" })} className={`btn ${group === "INTERN" ? "!bg-brand !text-white" : ""}`}>Interns</Link>
+        <Link href={href({ group: "employees" })} className={`btn ${group === "EMPLOYEE" ? "btn-primary" : ""}`}>Employees</Link>
+        <Link href={href({ group: "interns" })} className={`btn ${group === "INTERN" ? "btn-primary" : ""}`}>Interns</Link>
         <form className="ml-auto">
           <input type="hidden" name="period" value={period} />
           <input type="hidden" name="group" value={group === "INTERN" ? "interns" : "employees"} />

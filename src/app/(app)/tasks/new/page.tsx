@@ -8,7 +8,7 @@ export default async function NewTask() {
   const { people, departments } = await filterOptions();
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">New task</h1>
+      <h1 className="page-title">New task</h1>
       <TaskForm people={people} departments={departments} meId={u.id} canAssign={isLead(u)} />
     </div>
   );

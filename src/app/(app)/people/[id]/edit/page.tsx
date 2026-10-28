@@ -26,7 +26,7 @@ export default async function EditPerson({ params }: { params: { id: string } })
   };
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-3"><h1 className="text-2xl font-bold">Edit {p.name}</h1><a href={`/people/${p.id}/bank`} className="btn">Bank &amp; ID details</a></div>
+      <div className="flex flex-wrap items-center gap-3"><h1 className="page-title">Edit {p.name}</h1><a href={`/people/${p.id}/bank`} className="btn">Bank &amp; ID details</a></div>
       <UserForm initial={initial} departments={departments} managers={managers} />
     </div>
   );

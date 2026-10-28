@@ -22,14 +22,14 @@ export default async function Referrals() {
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
-      <div><h1 className="text-2xl font-bold">Referrals</h1><p className="text-sm text-mute">Bring in schools, partners or candidates and earn the program reward.</p></div>
+      <div><h1 className="page-title">Referrals</h1><p className="text-sm text-mute">Bring in schools, partners or candidates and earn the program reward.</p></div>
 
       {founder && <ProgramAdmin programs={views} />}
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Refer someone</h2>
+        <h2 className="section-title">Refer someone</h2>
         {!founder && open.length > 0 && (
-          <div className="grid gap-2 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {open.map((p) => <div key={p.id} className="panel p-3 text-sm"><b>{p.name}</b><div className="text-mute">{p.reward}{p.validUntil && ` · until ${p.validUntil.toISOString().slice(0, 10)}`}</div></div>)}
           </div>
         )}
@@ -37,7 +37,7 @@ export default async function Referrals() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">{founder ? "All referrals" : "Your referrals"} <span className="text-sm font-normal text-mute">({refs.length})</span></h2>
+        <h2 className="section-title">{founder ? "All referrals" : "Your referrals"} <span className="text-sm font-normal text-mute">({refs.length})</span></h2>
         {refs.map((r) => (
           <div key={r.id} className="panel space-y-2 p-3 text-sm">
             <div className="flex flex-wrap items-start justify-between gap-2">

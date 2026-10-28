@@ -33,7 +33,7 @@ export default async function List({ searchParams }: { searchParams: SP }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="text-2xl font-bold">All tasks <span className="text-base font-normal text-mute">({tasks.length})</span></h1>
+        <h1 className="page-title">All tasks <span className="text-base font-normal text-mute">({tasks.length})</span></h1>
         <Filters {...opts} current={searchParams} />
       </div>
       <div className="panel overflow-x-auto">

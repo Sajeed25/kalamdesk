@@ -243,3 +243,15 @@ Only new assignments, blockers, sent-back work, approvals and reminders are sent
 - ID proofs are stored as an encrypted number only. Uploading document scans (offer letters, ID images) is not built.
 - Two-factor sign-in (authenticator app) and Google sign-in are not built yet. They are the next security step, especially for founder accounts that can reveal bank details.
 - Daily database backups are not done by the app. Turn them on in your hosting panel (Hostinger offers backups), and back up `FIELD_ENCRYPTION_KEY` separately.
+
+## Look and feel, and motivation features
+
+The interface uses a bold, large, rounded design system (see `src/app/globals.css`): bigger type, glass header, gradient accents, and light and dark themes that follow the device. It is responsive down to phones, with a floating bottom bar that scrolls sideways.
+
+Features meant to make people want to fill things in, all computed from existing data (no extra database tables):
+
+- **My Day** opens with a greeting, a daily progress ring, a **Focus now** card for the most important task, and a one-tap check button on every task. Completing a task fires confetti and a toast showing the points just earned.
+- **Stand-up streak:** consecutive working days (Mon to Sat; Sundays never break it) with a daily update. The nudge card appears until today's update is in, and warns when a streak is at risk.
+- **Levels:** lifetime points become levels (Rookie, Explorer, Achiever, Pro, Champion, Star, Legend, Icon). Level n starts at 30 x (n-1)^2 points. The sidebar shows progress to the next level.
+- **Scores** shows a podium for the top three. Empty states are written to encourage, not to scold.
+- Animations are skipped for people who ask their device for reduced motion.

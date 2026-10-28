@@ -56,7 +56,7 @@ export default function DashboardCharts({ d }: { d: DashboardData }) {
   const old = d.ageing[2].count + d.ageing[3].count;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <Card
         title="Completion trend"
         takeaway={`${totalDone} tasks completed and ${totalNew} created in ${d.label.toLowerCase()}.`}

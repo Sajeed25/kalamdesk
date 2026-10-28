@@ -46,7 +46,7 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
           {t.department && <span className="chip bg-line">{t.department.name}</span>}
         </div>
         <div className="flex flex-wrap items-start justify-between gap-2">
-          <h1 className="text-2xl font-bold">{t.title}</h1>
+          <h1 className="page-title">{t.title}</h1>
         </div>
       </div>
 
@@ -80,7 +80,7 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
       <TaskActions id={t.id} canReview={canReview(u)} inReview={t.status === "IN_REVIEW"} selfInitiated={t.selfInitiated} accepted={t.initiativeAccepted} />
 
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-mute">Comments</h2>
+        <h2 className="mb-2 eyebrow">Comments</h2>
         <ul className="space-y-2">
           {t.comments.map((c) => (
             <li key={c.id} className="panel p-3 text-sm"><b>{c.author.name}</b> <span className="text-xs text-mute">{fmtDateTime(c.createdAt)}</span><p className="mt-1 whitespace-pre-wrap">{c.body}</p></li>
@@ -90,7 +90,7 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
       </section>
 
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-mute">Activity</h2>
+        <h2 className="mb-2 eyebrow">Activity</h2>
         <ul className="space-y-1 text-sm text-mute">
           {t.activity.map((a) => (
             <li key={a.id}>{fmtDateTime(a.createdAt)} · {a.actor.name} · {a.action.toLowerCase()} {a.detail}</li>

@@ -2,9 +2,10 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { STATUSES, STATUS_LABEL } from "@/lib/constants";
+import { confetti, doneMessage, toast } from "@/lib/celebrate";
 
 /** Shared client helper: PATCH a task, asking for a reason/proof when the rules require it. */
-export async function changeStatus(id: string, status: string, requiresProof = false): Promise<string | null> {
+export async function changeStatus(id: string, status: string, requiresProof = false, origin?: { x: number; y: number }): Promise<string | null> {
   const body: Record<string, unknown> = { status };
   if (status === "BLOCKED") {
     const reason = window.prompt("What is blocking you? (required)");
@@ -17,7 +18,14 @@ export async function changeStatus(id: string, status: string, requiresProof = f
     body.proofNote = note.trim();
   }
   const res = await fetch(`/api/tasks/${id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  return res.ok ? null : (await res.json()).error ?? "Could not update";
+  const d = await res.json().catch(() => ({}));
+  if (!res.ok) return d.error ?? "Could not update";
+  if (status === "DONE") {
+    // every route to Done (dropdown, drag, check button) celebrates the same way
+    confetti(origin);
+    toast(doneMessage(d.points ?? 0));
+  }
+  return null;
 }
 
 export default function StatusMenu({ id, status, requiresProof = false }: { id: string; status: string; requiresProof?: boolean }) {
@@ -30,7 +38,7 @@ export default function StatusMenu({ id, status, requiresProof = false }: { id: 
   }
   return (
     <span>
-      <select value={status} onChange={onChange} className="input !w-auto !py-1 text-xs" aria-label="Status">
+      <select value={status} onChange={onChange} className="input !w-auto !rounded-xl !py-2 !text-sm font-semibold" aria-label="Status">
         {STATUSES.map((s) => (
           <option key={s} value={s}>{STATUS_LABEL[s]}</option>
         ))}

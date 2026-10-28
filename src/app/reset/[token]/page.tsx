@@ -8,7 +8,7 @@ export default async function Reset({ params }: { params: { token: string } }) {
   const valid = await tokenValid(params.token);
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-4">
-      <h1 className="mb-6 text-2xl font-bold">Choose a password</h1>
+      <h1 className="page-title mb-6">Choose a password</h1>
       {valid ? (
         <ResetForm token={params.token} />
       ) : (

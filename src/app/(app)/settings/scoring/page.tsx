@@ -13,7 +13,7 @@ export default async function ScoringSettings() {
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <Link href="/leaderboard" className="text-sm text-mute hover:underline">← Scores</Link>
-      <h1 className="text-2xl font-bold">Scoring settings</h1>
+      <h1 className="page-title">Scoring settings</h1>
       <p className="text-sm text-mute">Every weight the score uses is editable here. Changes apply to tasks completed from now on; points already earned keep the explanation they were scored with.</p>
       <ScoringForm values={await getSettings()} defaults={DEFAULTS} />
     </div>

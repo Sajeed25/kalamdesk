@@ -29,7 +29,7 @@ function RuleForm({ initial, id, onDone }: { initial: Omit<RuleView, "id" | "sum
     onDone();
   }
   return (
-    <form onSubmit={submit} className="panel grid gap-3 p-4 sm:grid-cols-3">
+    <form onSubmit={submit} className="panel grid grid-cols-1 gap-3 p-4 sm:grid-cols-3">
       <div className="sm:col-span-3"><L t="Name"><input required value={v.name} onChange={(e) => setV({ ...v, name: e.target.value })} className="input" placeholder="e.g. Monthly star performer" /></L></div>
       <L t="Type"><select value={v.kind} onChange={(e) => setV({ ...v, kind: e.target.value, audience: e.target.value === "TOP_N" && v.audience === "ALL" ? "EMPLOYEE" : v.audience })} className="input"><option value="THRESHOLD">Meets targets (points + on-time %)</option><option value="TOP_N">Top N by points</option></select></L>
       <L t="Who"><select value={v.audience} onChange={(e) => setV({ ...v, audience: e.target.value })} className="input">{v.kind === "THRESHOLD" && <option value="ALL">Employees and interns</option>}<option value="EMPLOYEE">Employees and managers</option><option value="INTERN">Interns</option></select></L>
@@ -90,7 +90,7 @@ export default function IncentiveAdmin({ month, rules, awards, people }: { month
     <div className="space-y-6">
       <section className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">Rules</h2>
+          <h2 className="section-title">Rules</h2>
           {editing === null && <button onClick={() => setEditing("new")} className="btn">+ Add rule</button>}
         </div>
         {editing === "new" && <RuleForm initial={BLANK} onDone={() => setEditing(null)} />}
@@ -109,7 +109,7 @@ export default function IncentiveAdmin({ month, rules, awards, people }: { month
 
       <section className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">Awards for {month}</h2>
+          <h2 className="section-title">Awards for {month}</h2>
           <div className="flex gap-2">
             <button onClick={() => setManual(!manual)} className="btn">+ Manual award</button>
             <button onClick={calculate} disabled={busy} className="btn btn-primary">{busy ? "Calculating…" : `Calculate for ${month}`}</button>
@@ -117,7 +117,7 @@ export default function IncentiveAdmin({ month, rules, awards, people }: { month
         </div>
         {msg && <p role="alert" className={`text-sm ${msg.ok ? "text-emerald-700 dark:text-emerald-400" : "text-red-600"}`}>{msg.text}</p>}
         {manual && (
-          <form onSubmit={addManual} className="panel grid gap-3 p-4 sm:grid-cols-4">
+          <form onSubmit={addManual} className="panel grid grid-cols-1 gap-3 p-4 sm:grid-cols-4">
             <select name="userId" required className="input"><option value="">Person…</option>{people.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</select>
             <input name="amount" type="number" min={1} required placeholder="Amount ₹" className="input" />
             <input name="reason" required minLength={3} maxLength={400} placeholder="Reason" className="input sm:col-span-2" />

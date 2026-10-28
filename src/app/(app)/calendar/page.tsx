@@ -59,7 +59,7 @@ export default async function Calendar({ searchParams }: { searchParams: TaskFil
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="flex items-center gap-2">
           <Link href={link(-1)} className="btn" aria-label="Previous month">←</Link>
-          <h1 className="min-w-44 text-center text-2xl font-bold">{MONTHS[mo]} {y}</h1>
+          <h1 className="page-title min-w-44 text-center">{MONTHS[mo]} {y}</h1>
           <Link href={link(1)} className="btn" aria-label="Next month">→</Link>
         </div>
         <Filters {...opts} current={searchParams} />

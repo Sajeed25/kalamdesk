@@ -42,7 +42,7 @@ export default async function Recurring() {
   return (
     <div className="mx-auto max-w-3xl space-y-4">
       <div>
-        <h1 className="text-2xl font-bold">Recurring activities</h1>
+        <h1 className="page-title">Recurring activities</h1>
         <p className="text-sm text-mute">Each occurrence is created as a task ahead of time. Not done by the end of its day = missed (counts against the person&apos;s score).</p>
       </div>
       <RecurringManager rules={rules} people={people} departments={departments} />

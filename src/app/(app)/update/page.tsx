@@ -14,13 +14,13 @@ export default async function Update() {
   return (
     <div className="mx-auto max-w-2xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Daily update</h1>
+        <h1 className="page-title">Daily update</h1>
         <p className="text-sm text-mute">Takes about 30 seconds. Founders see who has not updated on the desk.</p>
       </div>
       <DailyUpdateForm initial={{ finished: todays?.finished ?? "", pending: todays?.pending ?? "", obstacles: todays?.obstacles ?? "" }} submitted={!!todays} />
       {past.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-mute">Your recent updates</h2>
+          <h2 className="eyebrow">Your recent updates</h2>
           {past.map((p) => (
             <div key={p.id} className="panel p-3 text-sm">
               <div className="mb-1 font-medium">{p.forDate}</div>
