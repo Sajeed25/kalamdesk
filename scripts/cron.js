@@ -1,7 +1,7 @@
 // Scheduler entry point for hosts that run a Node script on a cron (e.g. Hostinger).
 // Schedule ONE job every 15 minutes:   scripts/cron.js
 //
-// Each run: sends due/overdue reminders, and calls the morning (8:30 AM IST) and evening (7:00 PM IST)
+// Each run: sends due/overdue reminders, creates upcoming recurring tasks, closes missed ones, applies penalties, and calls the morning (8:30 AM IST) and evening (7:00 PM IST)
 // digests once their time has passed. The digests are idempotent per day on the server, so extra
 // calls never send duplicates. The server's own timezone does not matter: IST is computed here.
 //
@@ -19,9 +19,12 @@ if (!secret || !base) {
 const ist = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
 const minutes = ist.getUTCHours() * 60 + ist.getUTCMinutes();
 
-const jobs = [["reminders", "/api/cron/reminders"]];
+const jobs = [["reminders", "/api/cron/reminders"], ["recurring + penalties", "/api/cron/recurring"]];
 if (minutes >= 8 * 60 + 30 && minutes < 12 * 60) jobs.push(["morning digest", "/api/cron/digest?type=morning"]);
 if (minutes >= 19 * 60) jobs.push(["evening digest", "/api/cron/digest"]);
+// Monday 9 AM IST: last week's summary. 1st of the month 9 AM IST: last month's. Both are once-only on the server.
+if (minutes >= 9 * 60 && ist.getUTCDay() === 1) jobs.push(["weekly summary", "/api/cron/summary?type=weekly"]);
+if (minutes >= 9 * 60 && ist.getUTCDate() === 1) jobs.push(["monthly summary", "/api/cron/summary?type=monthly"]);
 
 (async () => {
   let failed = false;

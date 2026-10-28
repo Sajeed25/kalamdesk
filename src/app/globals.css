@@ -22,3 +22,17 @@ body { @apply bg-paper text-ink antialiased; font-family: ui-sans-serif, system-
 @keyframes soft-pulse { 0%,100% { box-shadow: 0 0 0 0 rgb(239 68 68 / 0.0) } 50% { box-shadow: 0 0 0 3px rgb(239 68 68 / 0.25) } }
 .overdue-pulse { animation: soft-pulse 2.4s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) { .overdue-pulse { animation: none; } }
+
+/* Chart tokens (validated palette: categorical slots 1-2, critical status). Light/dark selected, not flipped. */
+.viz-root {
+  --viz-surface: #fcfcfb; --viz-ink: #0b0b0b; --viz-ink2: #52514e; --viz-muted: #898781;
+  --viz-grid: #e1e0d9; --viz-axis: #c3c2b7;
+  --series-1: #2a78d6; --series-2: #eb6834; --viz-critical: #d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  .viz-root {
+    --viz-surface: #1a1a19; --viz-ink: #f0efec; --viz-ink2: #c3c2b7; --viz-muted: #898781;
+    --viz-grid: #2c2c2a; --viz-axis: #383835;
+    --series-1: #3987e5; --series-2: #d95926; --viz-critical: #d03b3b;
+  }
+}

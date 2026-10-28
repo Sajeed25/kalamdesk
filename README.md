@@ -23,7 +23,11 @@ Person-first daily operations and task tracker for Robokalam (Hyderabad / Warang
 | Department admin (founder): add, rename, recolour, delete-if-unused | done |
 | Task checklist, file attachments (images, PDF, Office, CSV; 10 MB), full new-task form, month Calendar view | done |
 | Light/dark mode, mobile bottom-nav, PWA manifest | done |
-| Recurring tasks + check-in, daily stand-up, scoring/leaderboards, dashboards | Phase 2 (schema ready) |
+| Recurring tasks (daily / weekdays / chosen weekdays / monthly), generated ahead of time, one task per person; Missed when not done by end of day | done (Phase 2) |
+| Field check-in with server timestamp and optional GPS | done (Phase 2) |
+| Daily stand-up (finished / pending / obstacle), obstacles alert founders, missing updates flagged on the Desk, stand-up review page | done (Phase 2) |
+| Scoring with editable weights, penalties, impact stars, initiative bonus, explainable on hover; weekly / monthly / all-time leaderboards for employees and interns, by department | done (Phase 2) |
+| Weekly and monthly dashboards (Recharts), CSV export, Monday and 1st-of-month summary emails | done (Phase 2) |
 | Incentives, referrals, encrypted bank details, snapshots, WhatsApp | Phase 3 (schema ready) |
 
 ## Architecture
@@ -125,7 +129,7 @@ On Vercel, put these in `vercel.json` `crons` (Vercel sends the secret as `Autho
 4. **Managers' scope = people whose profile lists them as `managerId`.** Founders see everyone.
 5. **Health dot rules** (`src/lib/desk.ts`): red = 2+ overdue or any overdue P1; amber = 1 overdue, any blocked, or no activity in 24h with open work; else green. Easy to change.
 6. **Attachments** use a local-disk driver (`UPLOAD_DIR`). On Vercel or multiple servers, swap `src/lib/storage.ts` for an S3-compatible bucket (the interface is three functions). The file type check uses the browser-declared type; downloads are forced as attachments with `nosniff`, so uploads can never render as pages. Add content sniffing before opening uploads to untrusted users.
-6b. **Still missing:** bulk actions on the list, editing location / estimate / tags / proof-required after creation (the form sets them at creation), per-person calendar. Schema tables exist.
+6b. **Still missing:** bulk actions on the list, editing location / estimate / tags / proof-required after creation (the form sets them at creation), per-person calendar, a reminder nudge for missing stand-ups (they are flagged on the Desk and in the 7 PM digest). Schema tables exist.
 7. UI uses Tailwind with small custom components rather than the full shadcn/ui library.
 
 ## Security notes
@@ -162,3 +166,28 @@ In hPanel → Advanced → Cron Jobs, choose **Node.js** and create **one** job:
 1. **Create the tables:** hPanel > Databases > Management > open **phpMyAdmin** for your database > **Import** tab > choose `prisma/mysql-init.sql` from this repo > Go. (Or open the **SQL** tab and paste its contents.) Run it once on an empty database. After future schema changes, regenerate it with `npm run db:sql` and apply only the new parts.
 2. **Create the first admin:** in the Node.js app's environment variables set `BOOTSTRAP_FOUNDER_EMAIL`, `BOOTSTRAP_FOUNDER_NAME` and `BOOTSTRAP_FOUNDER_PASSWORD` (10+ characters), then restart. On start-up, if the database has no users, the app creates that founder and the default departments. Sign in, then **delete these three variables**.
 3. Open `/api/health` and confirm `"ok": true`.
+
+## Phase 2: how it works
+
+**No database change.** Phase 2 uses tables that already exist, so a live MySQL database needs no new SQL. Just redeploy.
+
+**Scheduler.** The single `scripts/cron.js` job (every 15 minutes) now also: creates upcoming recurring tasks, closes missed ones, applies the daily overdue penalty, and sends the weekly (Monday 9 AM IST) and monthly (1st, 9 AM IST) summaries. Nothing to add on Hostinger if the job already exists. Vercel users: `vercel.json` lists the extra routes.
+
+**Recurring activities** (founders and managers, *Recurring* in the menu). Rule examples: every Tuesday 10:00; every Saturday and Sunday 09:30; day 1 of every month; every weekday. Each occurrence is created as a task N hours ahead (default 12) for each assignee separately. If it is not Done by the end of that IST day it becomes **Missed**: the task is closed (Cancelled, logged), the person gets the missed-activity penalty once, and they are notified. Done after its time but the same day is **Late**. Managers can only assign recurring work to their own team.
+
+**Scoring** (weights editable by founders in Scores > Scoring settings):
+
+| Part | Default |
+|---|---|
+| Base points | P1 10, P2 7, P3 5, P4 3 |
+| Complexity multiplier 1 to 5 | 1.0, 1.2, 1.5, 1.8, 2.2 |
+| Timeliness | on time 1.0, late under 24h 0.7, later 0.4 |
+| Founder impact rating | 2 points per star (0 to 5 stars, set when approving) |
+| Initiative | +2 for self-initiated work a founder accepted |
+| Penalties | missed recurring -3; open task overdue over 3 days with no Blocked reason -2 |
+
+Rules worth knowing: points are earned when a task becomes Done, and removed if it is reopened or sent back (so they can be re-earned, never double counted). Changing a done task's priority or complexity re-scores it. A task with several assignees gives each person the full points. Blocked tasks are never penalised, so raising a blocker early is always safe. Weight changes apply to tasks completed afterwards; past events keep the explanation they were scored with. Hover any score to see its last events.
+
+**Who sees what.** Everyone sees the ranking and points. Detailed metrics (on-time %, P1/P2 rate, blockers, recurring %) are shown to founders for everyone, to managers for their team, and to each person for themselves. Founders are not ranked. CSV export is for founders and managers (managers get their team only).
+
+**Phase 2 assumptions to confirm:** a missed recurring task is closed as Cancelled (and shown outlined in red on the Calendar) so it stops cluttering My Day; employees and managers share one leaderboard while interns have their own; metrics count a task in the period of its due date (or creation date when it has none).

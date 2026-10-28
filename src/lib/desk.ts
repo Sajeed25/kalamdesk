@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { endOfIstDay, startOfIstDay } from "./time";
+import { endOfIstDay, istDateKey, toIstParts, startOfIstDay } from "./time";
 import { teamIds } from "./tasks";
 import type { SessionUser } from "./auth";
 
@@ -17,6 +17,7 @@ export type PersonSummary = {
   blocked: number;
   openCount: number;
   lastUpdate: Date | null;
+  updatedToday: boolean;
   health: Health;
 };
 
@@ -46,6 +47,8 @@ export async function deskSummaries(viewer: SessionUser): Promise<PersonSummary[
     _max: { createdAt: true },
   });
   const lastBy = new Map(acts.map((a) => [a.actorId, a._max.createdAt]));
+  const updated = new Set((await db.dailyUpdate.findMany({ where: { userId: { in: ids }, forDate: istDateKey(now) }, select: { userId: true } })).map((x) => x.userId));
+  const afterSix = toIstParts(now).h >= 18;
 
   return users.map((u) => {
     const mine = open.filter((o) => o.userId === u.id).map((o) => o.task);
@@ -60,7 +63,7 @@ export async function deskSummaries(viewer: SessionUser): Promise<PersonSummary[
 
     let health: Health = "GREEN";
     if (overdueTasks.length >= 2 || overdueTasks.some((t) => t.priority === "P1")) health = "RED";
-    else if (overdueTasks.length === 1 || blocked > 0 || stale) health = "AMBER";
+    else if (overdueTasks.length === 1 || blocked > 0 || stale || (afterSix && !updated.has(u.id))) health = "AMBER";
 
     return {
       id: u.id,
@@ -74,6 +77,7 @@ export async function deskSummaries(viewer: SessionUser): Promise<PersonSummary[
       blocked,
       openCount: mine.length,
       lastUpdate,
+      updatedToday: updated.has(u.id),
       health,
     };
   });

@@ -10,6 +10,7 @@ import StatusMenu from "@/components/StatusMenu";
 import TaskActions from "@/components/TaskActions";
 import ChecklistAndFiles from "@/components/ChecklistAndFiles";
 import EditTask from "@/components/EditTask";
+import CheckIn from "@/components/CheckIn";
 import { toIstInputValue } from "@/lib/time";
 import { PriorityChip, isOverdue } from "@/components/TaskRow";
 
@@ -25,6 +26,7 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
       activity: { include: { actor: { select: { name: true } } }, orderBy: { createdAt: "desc" } },
       checklist: { orderBy: { position: "asc" } },
       attachments: { orderBy: { createdAt: "asc" } },
+      instances: true,
     },
   });
   if (!t) notFound();
@@ -63,6 +65,15 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
       {canEditFields && <EditTask task={{ id: t.id, title: t.title, description: t.description, priority: t.priority, complexity: t.complexity, dueInput: toIstInputValue(t.dueAt), assigneeIds: t.assignees.map((a) => a.userId) }} people={people} canAssign={canAssignOthers(u)} />}
 
       {t.description && <p className="whitespace-pre-wrap text-sm">{t.description}</p>}
+
+      {t.instances[0] && (
+        <CheckIn
+          instanceId={t.instances[0].id}
+          checkedInAt={t.instances[0].checkInAt?.toISOString() ?? null}
+          outcome={t.instances[0].outcome}
+          canCheckIn={t.assignees.some((a) => a.userId === u.id)}
+        />
+      )}
 
       <ChecklistAndFiles taskId={t.id} canEdit={canEdit} items={t.checklist} files={t.attachments.map((a) => ({ id: a.id, fileName: a.fileName, sizeBytes: a.sizeBytes }))} />
 

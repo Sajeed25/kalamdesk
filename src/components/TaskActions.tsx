@@ -12,6 +12,7 @@ export default function TaskActions({ id, canReview, inReview, selfInitiated, ac
   const router = useRouter();
   const [err, setErr] = useState("");
   const [comment, setComment] = useState("");
+  const [stars, setStars] = useState(0);
 
   async function run(body: object) {
     setErr((await patch(id, body)) ?? "");
@@ -29,7 +30,12 @@ export default function TaskActions({ id, canReview, inReview, selfInitiated, ac
       {canReview && inReview && (
         <div className="panel flex flex-wrap items-center gap-2 p-3">
           <span className="text-sm font-medium">Review:</span>
-          <button className="btn btn-primary" onClick={() => run({ review: "APPROVED" })}>Approve</button>
+          <label className="flex items-center gap-1 text-xs text-mute">Impact
+            <select value={stars} onChange={(e) => setStars(Number(e.target.value))} className="input !w-auto !py-1 text-xs" aria-label="Founder impact rating">
+              {[0, 1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n === 0 ? "No rating" : "★".repeat(n)}</option>)}
+            </select>
+          </label>
+          <button className="btn btn-primary" onClick={() => run({ review: "APPROVED", impactStars: stars })}>Approve</button>
           <button className="btn" onClick={() => { const n = window.prompt("What needs fixing?") ?? ""; run({ review: "SENT_BACK", reviewNote: n }); }}>Send back</button>
         </div>
       )}

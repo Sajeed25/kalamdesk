@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import { syncScore } from "../src/lib/scoring";
 
 const db = new PrismaClient();
 const DEV_PASSWORD = "kalamdesk123"; // dev/demo only — change before real use
@@ -89,6 +90,52 @@ async function main() {
       });
     }
   }
+  // ---- Phase 2 demo data: recurring rules, scored history, stand-ups ----
+  if ((await db.recurringRule.count()) === 0) {
+    await db.recurringRule.createMany({
+      data: [
+        { title: "School visit: Vagdevi High School", rrule: "WEEKLY;BYDAY=TU;AT=10:00", leadHours: 14, priority: "P2", location: "Vagdevi High School, Hanamkonda", departmentId: dept["Training"], assigneeIds: id["anil"], creatorId: id["suresh"] },
+        { title: "Weekly BD report", rrule: "WEEKLY;BYDAY=MO;AT=09:30", leadHours: 12, priority: "P3", departmentId: dept["BD"], assigneeIds: [id["ravi"], id["divya"]].join(","), creatorId: id["kiran"] },
+        { title: "Month-start invoicing", rrule: "MONTHLY;BYMONTHDAY=1;AT=09:00", leadHours: 24, priority: "P2", departmentId: dept["Accounts"], assigneeIds: id["pooja"], creatorId: id["arjun"] },
+      ],
+    });
+    const history: { title: string; by: string; to: string; p: string; c: number; daysAgo: number; lateH: number; stars?: number; self?: boolean }[] = [
+      { title: "Update fee tracker", by: "arjun", to: "pooja", p: "P3", c: 2, daysAgo: 2, lateH: 0 },
+      { title: "Reconcile September receipts", by: "arjun", to: "pooja", p: "P2", c: 4, daysAgo: 5, lateH: 0, stars: 4 },
+      { title: "Cold-call 40 schools", by: "kiran", to: "ravi", p: "P2", c: 2, daysAgo: 1, lateH: 0 },
+      { title: "Demo follow-ups", by: "kiran", to: "divya", p: "P2", c: 3, daysAgo: 3, lateH: 10 },
+      { title: "Draft franchise FAQ", by: "meera", to: "divya", p: "P3", c: 3, daysAgo: 8, lateH: 40 },
+      { title: "Robotics kit inventory", by: "suresh", to: "anil", p: "P3", c: 2, daysAgo: 4, lateH: 0 },
+      { title: "Teacher training deck", by: "suresh", to: "lavanya", p: "P2", c: 3, daysAgo: 6, lateH: 0 },
+      { title: "Instagram carousel: Diwali offer", by: "meera", to: "sneha", p: "P2", c: 3, daysAgo: 2, lateH: 0, stars: 5 },
+      { title: "Brochure photo edits", by: "sneha", to: "harsha", p: "P3", c: 1, daysAgo: 3, lateH: 0 },
+      { title: "Fix login redirect bug", by: "arjun", to: "imran", p: "P1", c: 4, daysAgo: 1, lateH: 0, stars: 3 },
+      { title: "Lead sheet clean-up", by: "nikhil", to: "nikhil", p: "P3", c: 1, daysAgo: 2, lateH: 0, self: true },
+      { title: "Referral poster draft", by: "harsha", to: "harsha", p: "P4", c: 2, daysAgo: 9, lateH: 0, self: true },
+    ];
+    for (const h of history) {
+      const dueAt = at(-h.daysAgo * 24);
+      const task = await db.task.create({
+        data: {
+          title: h.title, priority: h.p, complexity: h.c, dueAt, status: "DONE", completedAt: new Date(dueAt.getTime() + h.lateH * H),
+          creatorId: id[h.by], selfInitiated: !!h.self, initiativeAccepted: !!h.self && h.to === "nikhil",
+          reviewState: h.stars ? "APPROVED" : null, impactStars: h.stars ?? null,
+          assignees: { create: [{ userId: id[h.to] }] },
+          activity: { create: [{ actorId: id[h.by], action: "CREATED", detail: "" }] },
+        },
+      });
+      await syncScore(task.id);
+    }
+    const today = new Date(Date.now() + 5.5 * H).toISOString().slice(0, 10);
+    for (const [who, finished, obstacles] of [
+      ["pooja", "Invoice for Sunrise School sent; 6 receipts matched", ""],
+      ["ravi", "28 calls, 4 warm leads", ""],
+      ["anil", "Robotics session at Vagdevi, 32 students", "Projector was not working"],
+      ["sneha", "Brochure layout v2", ""],
+    ] as const)
+      await db.dailyUpdate.upsert({ where: { userId_forDate: { userId: id[who], forDate: today } }, update: {}, create: { userId: id[who], forDate: today, finished, obstacles } });
+  }
+
   console.log(`Seeded. Log in as arjun@robokalam.test / ${DEV_PASSWORD}`);
 }
 

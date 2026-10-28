@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { db } from "./db";
 import { notifyMany } from "./notify";
+import { onTaskSaved } from "./recurring";
 import { canAssignOthers, canReview, isLead } from "./rbac";
 import { STATUS_LABEL, STATUSES, PRIORITIES } from "./constants";
 import type { SessionUser } from "./auth";
@@ -261,6 +262,16 @@ export async function updateTask(u: SessionUser, id: string, input: z.infer<type
     include: taskInclude,
   });
   await Promise.allSettled(after.map((f) => f()));
+  // Keep scoring and recurring-instance state in step. Never fail the user's save over it.
+  try {
+    await onTaskSaved(task, updated);
+    if (input.acceptInitiative === false) {
+      await db.scoreEvent.deleteMany({ where: { taskId: id, kind: "INITIATIVE" } });
+      await db.jobRun.deleteMany({ where: { kind: "score-INITIATIVE", key: { startsWith: `${id}:` } } });
+    }
+  } catch (e) {
+    console.error("[score] sync failed for task", id, e instanceof Error ? e.message : e);
+  }
   return updated;
 }
 

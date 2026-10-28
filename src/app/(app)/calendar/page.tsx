@@ -29,7 +29,7 @@ export default async function Calendar({ searchParams }: { searchParams: TaskFil
     filterOptions(),
     (async () =>
       db.task.findMany({
-        where: { AND: [await filteredWhere(u, searchParams), { dueAt: { gte: from, lt: to } }, { status: { not: "CANCELLED" } }] },
+        where: { AND: [await filteredWhere(u, searchParams), { dueAt: { gte: from, lt: to } }, { OR: [{ status: { not: "CANCELLED" } }, { recurringRuleId: { not: null } }] }] },
         include: taskInclude,
         orderBy: [{ dueAt: "asc" }],
       }))(),
@@ -79,8 +79,8 @@ export default async function Calendar({ searchParams }: { searchParams: TaskFil
                     <div className={`mb-1 text-xs ${isToday(d) ? "inline-block rounded-full bg-brand px-1.5 font-bold text-white" : "text-mute"}`}>{d}</div>
                     <div className="space-y-0.5">
                       {items.slice(0, 3).map((t) => (
-                        <Link key={t.id} href={`/tasks/${t.id}`} title={`${t.title} — ${t.assignees.map((a) => a.user.name).join(", ")}`}
-                          className={`block truncate rounded px-1 py-0.5 text-[11px] leading-tight ${CHIP[t.priority]} ${t.status === "DONE" ? "line-through opacity-60" : ""}`}>
+                        <Link key={t.id} href={`/tasks/${t.id}`} title={`${t.status === "CANCELLED" ? "MISSED: " : ""}${t.title} — ${t.assignees.map((a) => a.user.name).join(", ")}`}
+                          className={`block truncate rounded px-1 py-0.5 text-[11px] leading-tight ${CHIP[t.priority]} ${t.status === "DONE" ? "line-through opacity-60" : ""} ${t.status === "CANCELLED" ? "ring-1 ring-red-500/60" : ""}`}>
                           {t.title}
                         </Link>
                       ))}
@@ -93,7 +93,7 @@ export default async function Calendar({ searchParams }: { searchParams: TaskFil
           })}
         </div>
       </div>
-      <p className="text-xs text-mute">Shows tasks by due date (IST). Recurring activities will appear here in Phase 2.</p>
+      <p className="text-xs text-mute">Shows tasks by due date (IST). Recurring activities appear here too; a red outline marks one that was missed.</p>
     </div>
   );
 }

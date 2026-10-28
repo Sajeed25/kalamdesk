@@ -70,7 +70,7 @@ export default async function Desk() {
               {p.today.length === 0 && <li className="text-xs text-mute">Nothing due today</li>}
               {p.today.length > 3 && <li className="text-xs text-mute">+{p.today.length - 3} more today</li>}
             </ul>
-            <div className="mt-3 text-[11px] text-mute">Last update {fmtRelative(p.lastUpdate)}</div>
+            <div className="mt-3 flex items-center justify-between text-[11px] text-mute"><span>Last activity {fmtRelative(p.lastUpdate)}</span><span className={p.updatedToday ? "text-emerald-700 dark:text-emerald-400" : ""}>{p.updatedToday ? "Stand-up ✓" : "No stand-up yet"}</span></div>
           </Link>
         ))}
       </div>

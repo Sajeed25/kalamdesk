@@ -35,6 +35,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ type, sent });
   }
 
+  const obstacles = await db.dailyUpdate.findMany({ where: { forDate: key, NOT: { obstacles: "" } }, include: { user: { select: { name: true } } } });
   const [doneToday, summaries, founders] = await Promise.all([
     db.task.findMany({ where: { completedAt: { gte: from } }, include: { assignees: { include: { user: true } } } }),
     deskSummaries({ id: "", role: "FOUNDER" } as never),
@@ -44,7 +45,8 @@ export async function GET(req: Request) {
     `<b>Done today:</b> ${doneToday.length}`,
     `<b>Overdue:</b> ${summaries.reduce((s, p) => s + p.overdue, 0)} across ${summaries.filter((p) => p.overdue).length} people`,
     `<b>Blocked:</b> ${summaries.filter((p) => p.blocked).map((p) => `${escapeHtml(p.name)} (${p.blocked})`).join(", ") || "none"}`,
-    `<b>No update in 24h (with open work):</b> ${summaries.filter((p) => p.openCount && (!p.lastUpdate || now.getTime() - p.lastUpdate.getTime() > 864e5)).map((p) => escapeHtml(p.name)).join(", ") || "none"}`,
+    `<b>No stand-up today:</b> ${summaries.filter((p) => !p.updatedToday).map((p) => escapeHtml(p.name)).join(", ") || "everyone submitted"}`,
+    `<b>Obstacles reported:</b> ${obstacles.map((o) => `${escapeHtml(o.user.name)}: ${escapeHtml(o.obstacles.slice(0, 120))}`).join("<br>") || "none"}`,
   ];
   for (const f of founders) {
     await sendEmail(f.email, `Daily digest · ${key}`, emailTemplate({ heading: "Today at Robokalam", lines, ctaLabel: "Open Founder's Desk", ctaUrl: appUrl("/desk") }));
