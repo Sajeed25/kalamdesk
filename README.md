@@ -156,3 +156,9 @@ In hPanel → Advanced → Cron Jobs, choose **Node.js** and create **one** job:
 - Schedule: every 15 minutes (`*/15 * * * *`)
 
 `CRON_SECRET` and `APP_URL` must be in the `.env` file the cron prefix loads (`--env-file=…`). The script sends reminders every run, the 8:30 AM IST digest once that time has passed, and the 7 PM IST founder digest once that time has passed. IST is computed inside the script, so the server's timezone doesn't matter, and the server makes each digest idempotent per day.
+
+## Setup without a terminal (Hostinger shared hosting)
+
+1. **Create the tables:** hPanel > Databases > Management > open **phpMyAdmin** for your database > **Import** tab > choose `prisma/mysql-init.sql` from this repo > Go. (Or open the **SQL** tab and paste its contents.) Run it once on an empty database. After future schema changes, regenerate it with `npm run db:sql` and apply only the new parts.
+2. **Create the first admin:** in the Node.js app's environment variables set `BOOTSTRAP_FOUNDER_EMAIL`, `BOOTSTRAP_FOUNDER_NAME` and `BOOTSTRAP_FOUNDER_PASSWORD` (10+ characters), then restart. On start-up, if the database has no users, the app creates that founder and the default departments. Sign in, then **delete these three variables**.
+3. Open `/api/health` and confirm `"ok": true`.
