@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { cryptoConfigured } from "@/lib/crypto";
+import { whatsappConfigured } from "@/lib/whatsapp";
 
 export const dynamic = "force-dynamic";
 
@@ -66,6 +68,9 @@ export async function GET() {
     schemaReady: false,
     hasUsers: false,
     dbProblem: null as string | null,
+    phase3Schema: null as boolean | null,
+    encryptionKeyOk: cryptoConfigured(),
+    whatsappConfigured: whatsappConfigured(),
     serverStartedAt: startedAt,
     databaseUrlCheck: inspectDatabaseUrl(),
   };
@@ -74,11 +79,14 @@ export async function GET() {
     out.dbReachable = true;
     out.hasUsers = (await db.user.count()) > 0;
     out.schemaReady = true;
+    // Phase 3 added columns. If this fails, run prisma/phase3-upgrade.sql before using the new features.
+    try { await db.incentiveRule.count(); await db.employeeProfile.findFirst({ select: { whatsappOptIn: true } }); out.phase3Schema = true; } catch { out.phase3Schema = false; }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[health]", msg);
     out.dbProblem = classify(msg);
   }
-  const ok = out.sessionSecretOk && out.dbReachable && out.schemaReady && out.hasUsers;
+  // phase3Schema === false means the upgrade SQL was not run: the app is broken until it is.
+  const ok = out.sessionSecretOk && out.dbReachable && out.schemaReady && out.hasUsers && out.phase3Schema !== false;
   return NextResponse.json({ ok, ...out }, { status: ok ? 200 : 503 });
 }

@@ -71,6 +71,7 @@ model EmployeeProfile {
   managerId        String?
   manager          User?    @relation("ReportingManager", fields: [managerId], references: [id])
   title            String?
+  whatsappOptIn    Boolean  @default(false) // explicit consent; WhatsApp alerts are never sent without it
 }
 
 // Phase 3: every column holds AES-256-GCM ciphertext (see src/lib/crypto.ts). Admin only.
@@ -82,6 +83,8 @@ model EmployeeSensitive {
   ifscEnc           String? @db.Text
   bankNameEnc       String? @db.Text
   upiIdEnc          String? @db.Text
+  idType            String? // PAN | AADHAAR | PASSPORT | OTHER (the type is not secret; the number is)
+  idNumberEnc       String? @db.Text
   last4             String? // the only part ever shown by default
   updatedAt         DateTime @updatedAt
 }
@@ -252,6 +255,9 @@ model IncentiveRule {
   minOnTimePct Float @default(0)
   amountInr Int
   active    Boolean @default(true)
+  kind      String  @default("THRESHOLD") // THRESHOLD (points + on-time %) | TOP_N (fixed reward for the top N)
+  topN      Int?
+  audience  String  @default("ALL") // ALL | EMPLOYEE | INTERN
   awards    IncentiveAward[]
 }
 
@@ -266,6 +272,7 @@ model IncentiveAward {
   reason    String @db.VarChar(500)
   approved  Boolean  @default(false)
   paid      Boolean  @default(false)
+  referralId String? // set when the award is a referral reward
   createdAt DateTime @default(now())
 }
 
@@ -273,6 +280,7 @@ model ReferralProgram {
   id          String   @id @default(cuid())
   name        String
   reward      String
+  rewardInr   Int? // amount credited to the referrer's incentives when a referral converts
   validUntil  DateTime?
   active      Boolean  @default(true)
   referrals   Referral[]

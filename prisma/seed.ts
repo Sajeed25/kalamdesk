@@ -136,6 +136,26 @@ async function main() {
       await db.dailyUpdate.upsert({ where: { userId_forDate: { userId: id[who], forDate: today } }, update: {}, create: { userId: id[who], forDate: today, finished, obstacles } });
   }
 
+  // ---- Phase 3 demo data: incentive rules + a referral program. (No bank details are ever seeded.) ----
+  if ((await db.incentiveRule.count()) === 0) {
+    await db.incentiveRule.createMany({
+      data: [
+        { name: "Consistent performer", kind: "THRESHOLD", audience: "ALL", minPoints: 40, minOnTimePct: 90, amountInr: 1000 },
+        { name: "Top 3 employees", kind: "TOP_N", audience: "EMPLOYEE", topN: 3, amountInr: 2000 },
+        { name: "Top intern", kind: "TOP_N", audience: "INTERN", topN: 1, amountInr: 1000 },
+      ],
+    });
+    await db.referralProgram.createMany({
+      data: [
+        { name: "Refer a school for 21C Lab", reward: "Rs 2,000 per converted school", rewardInr: 2000 },
+        { name: "Refer a franchise partner", reward: "Rs 5,000 on signing", rewardInr: 5000 },
+        { name: "Refer a candidate", reward: "Rs 1,000 after 3 months", rewardInr: 1000 },
+      ],
+    });
+    const prog = await db.referralProgram.findFirst({ where: { name: { contains: "school" } } });
+    if (prog) await db.referral.create({ data: { programId: prog.id, referrerId: id["ravi"], name: "Mrs. Lakshmi", contact: "+91 98765 43210", organisation: "Sri Vidya High School", notes: "Principal. Prefers calls after 4 PM." } });
+  }
+
   console.log(`Seeded. Log in as arjun@robokalam.test / ${DEV_PASSWORD}`);
 }
 

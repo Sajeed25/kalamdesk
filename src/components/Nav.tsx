@@ -14,6 +14,9 @@ export default function Nav({ lead, name, role }: { lead: boolean; name: string;
     ...(lead ? [{ href: "/recurring", label: "Recurring", icon: "↻" }] : []),
     { href: "/leaderboard", label: "Scores", icon: "★" },
     ...(lead ? [{ href: "/dashboard", label: "Dashboard", icon: "◔" }, { href: "/updates", label: "Stand-ups", icon: "✉" }] : []),
+    { href: "/incentives", label: "Incentives", icon: "₹" },
+    { href: "/referrals", label: "Referrals", icon: "⇄" },
+    { href: "/snapshots", label: "Published", icon: "▣" },
     { href: "/people", label: "People", icon: "☺" },
   ];
   // exact or child match, so /update does not light up on /updates

@@ -28,7 +28,12 @@ Person-first daily operations and task tracker for Robokalam (Hyderabad / Warang
 | Daily stand-up (finished / pending / obstacle), obstacles alert founders, missing updates flagged on the Desk, stand-up review page | done (Phase 2) |
 | Scoring with editable weights, penalties, impact stars, initiative bonus, explainable on hover; weekly / monthly / all-time leaderboards for employees and interns, by department | done (Phase 2) |
 | Weekly and monthly dashboards (Recharts), CSV export, Monday and 1st-of-month summary emails | done (Phase 2) |
-| Incentives, referrals, encrypted bank details, snapshots, WhatsApp | Phase 3 (schema ready) |
+| Encrypted bank and ID details (AES-256-GCM), masked by default, founder-only reveal with password re-check, every reveal audited | done (Phase 3) |
+| Incentive rules (targets or top-N), monthly calculation, founder approval, paid tracking, per-person history | done (Phase 3) |
+| Referral programs and pipeline (Submitted to Reward paid), rewards flow into incentives | done (Phase 3) |
+| Published dashboard snapshots: link for signed-in staff + PDF, revocable | done (Phase 3) |
+| WhatsApp alerts via the Cloud API, opt-in per person, template based | done (Phase 3), needs your Meta setup |
+| 2FA / Google sign-in, ID document uploads (offer letters, ID scans), automated backups | not built yet |
 
 ## Architecture
 
@@ -97,7 +102,8 @@ Reset demo data: `npm run db:reset`.
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM` | email over SMTP. Hostinger: `smtp.hostinger.com`, port `465` (or `587`), user = full mailbox address. If `SMTP_HOST` is empty, emails are logged to the server console |
 | `CRON_SECRET` | bearer token required by `/api/cron/*` |
 | `UPLOAD_DIR` | where attachments are stored (default `./uploads`) |
-| `FIELD_ENCRYPTION_KEY` | Phase 3 only: 32-byte base64 key for bank/ID field encryption |
+| `FIELD_ENCRYPTION_KEY` | 32-byte base64 key for bank/ID encryption. Required to save or view bank details. See "Bank details" below |
+| `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_TEMPLATE`, `WHATSAPP_LANG` | optional WhatsApp alerts. Off unless the first three are set |
 
 ## Scheduled jobs
 
@@ -136,7 +142,7 @@ On Vercel, put these in `vercel.json` `crons` (Vercel sends the secret as `Autho
 
 - Passwords hashed with bcrypt; session cookie is httpOnly, SameSite=Lax, Secure in production.
 - The login throttle is in-memory (per instance). Use a shared store (Redis/Upstash) when running multiple instances.
-- No bank or ID data exists in Phase 1. Phase 3 design: AES-256-GCM field encryption, key from a secrets manager, masked by default, founder-only reveal with re-authentication, every reveal written to `AuditLog`, and never included in emails, exports or logs.
+- Bank and ID data (Phase 3) is encrypted with AES-256-GCM, masked by default, founder-only, revealed only after re-entering the password, and every reveal is written to `AuditLog`. It is never included in emails, exports, snapshots or logs.
 - Emails contain task titles and links only.
 
 ## First login on a fresh deployment
@@ -191,3 +197,49 @@ Rules worth knowing: points are earned when a task becomes Done, and removed if 
 **Who sees what.** Everyone sees the ranking and points. Detailed metrics (on-time %, P1/P2 rate, blockers, recurring %) are shown to founders for everyone, to managers for their team, and to each person for themselves. Founders are not ranked. CSV export is for founders and managers (managers get their team only).
 
 **Phase 2 assumptions to confirm:** a missed recurring task is closed as Cancelled (and shown outlined in red on the Calendar) so it stops cluttering My Day; employees and managers share one leaderboard while interns have their own; metrics count a task in the period of its due date (or creation date when it has none).
+
+## Phase 3: how it works
+
+### Upgrading an existing database (do this BEFORE redeploying)
+
+Phase 3 adds a few columns. They are all optional or have defaults, so the change is safe for your live data and old code keeps working.
+
+1. In phpMyAdmin, open your database, then the **SQL** tab, paste the contents of `prisma/phase3-upgrade.sql` and run it **once**. (Running it twice shows "Duplicate column" errors; they are harmless.)
+2. Only then redeploy the new code. The new code reads the new columns, so deploying first breaks the People, Desk and Settings pages until the SQL is run.
+3. Check `/api/health`: it must show `"phase3Schema": true`. If it shows `false`, the SQL has not been applied.
+
+New installs use `prisma/mysql-init.sql`, which already includes everything.
+
+### Bank details
+
+- **Set the key first.** Generate one (PowerShell): `[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Maximum 256 }))`, then set it as `FIELD_ENCRYPTION_KEY` in your server environment and restart. `/api/health` shows `encryptionKeyOk`.
+- **Back the key up somewhere safe and separate** (a password manager). If it is lost, saved bank and ID details cannot be recovered; changing it makes existing ones unreadable.
+- Founders open **People > a person > Edit > Bank and ID details**. Values are encrypted with AES-256-GCM before they reach the database, and each value is bound to its person and field, so a ciphertext copied elsewhere will not decrypt.
+- The page shows only masked values and the last 4 digits of the account. **Reveal** asks for the founder's password again, shows the values for 30 seconds, and writes an audit entry (who, whose, when, never the values). Reveals are limited to 20 per hour. The re-check cookie lasts 5 minutes, is separate from the login session, and cannot be used to sign in.
+- Managers, employees and interns get a 403 from the API as well as a redirect from the page. Bank and ID values are never in emails, CSV exports, snapshots, notifications, audit entries or server logs (this is checked by the automated tests).
+
+### Incentives
+
+Founders define rules in **Incentives**: *meets targets* (for example at least 200 points and 90% on time in the month) or *top N by points* within employees or within interns. **Calculate** (or the 1st-of-month cron, which also notifies founders) creates *pending* awards, never more than one per person per rule per month. You approve or reject each one, then mark it paid. A rejected award is not regenerated. A person with nothing delivered in the month is never rewarded by a targets rule. Employees see only their approved awards and the active rules. Founders can also add a manual award.
+
+### Referrals
+
+Founders open programs (name, reward text, optional rupee amount, optional end date). Anyone can submit a referral; the referred person's contact details are visible only to founders and the referrer. Founders move referrals along Submitted, Contacted, Qualified, Converted, Reward paid. **Converted** creates one pending incentive award for the referrer (if the program has an amount); **Reward paid** marks it approved and paid.
+
+### Published dashboard snapshots
+
+On the Dashboard, founders press **Publish snapshot** (weekly or monthly). It freezes the numbers and gives a link plus a PDF (tables and simple bars, no live charts). The link works only for signed-in staff, not the public, and can be removed at any time. Staff are notified in the app, and by email if you tick the box.
+
+### WhatsApp alerts
+
+1. Create a WhatsApp Business Cloud API app in Meta Business Manager and an approved **template** whose body has exactly three variables, for example: `{{1}} - {{2}}  Open: {{3}}`.
+2. Set `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_TEMPLATE` (and `WHATSAPP_LANG` if not `en`), then restart.
+3. Each person opts in under **Settings > WhatsApp alerts** with their mobile number and a consent tick. Nothing is sent without it, opting out is one click, and both are audited.
+Only new assignments, blockers, sent-back work, approvals and reminders are sent; comments and digests stay in the app and email. In-app and email delivery never depend on WhatsApp.
+
+### Phase 3 assumptions to confirm
+
+- Snapshot links need a login (safer than a public link, because they name people and show their numbers). Say so if you want a public link option.
+- ID proofs are stored as an encrypted number only. Uploading document scans (offer letters, ID images) is not built.
+- Two-factor sign-in (authenticator app) and Google sign-in are not built yet. They are the next security step, especially for founder accounts that can reveal bank details.
+- Daily database backups are not done by the app. Turn them on in your hosting panel (Hostinger offers backups), and back up `FIELD_ENCRYPTION_KEY` separately.

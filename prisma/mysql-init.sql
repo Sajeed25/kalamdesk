@@ -40,6 +40,7 @@ CREATE TABLE `EmployeeProfile` (
     `internEnd` DATETIME(3) NULL,
     `managerId` VARCHAR(191) NULL,
     `title` VARCHAR(191) NULL,
+    `whatsappOptIn` BOOLEAN NOT NULL DEFAULT false,
 
     PRIMARY KEY (`userId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -52,6 +53,8 @@ CREATE TABLE `EmployeeSensitive` (
     `ifscEnc` TEXT NULL,
     `bankNameEnc` TEXT NULL,
     `upiIdEnc` TEXT NULL,
+    `idType` VARCHAR(191) NULL,
+    `idNumberEnc` TEXT NULL,
     `last4` VARCHAR(191) NULL,
     `updatedAt` DATETIME(3) NOT NULL,
 
@@ -222,6 +225,9 @@ CREATE TABLE `IncentiveRule` (
     `minOnTimePct` DOUBLE NOT NULL DEFAULT 0,
     `amountInr` INTEGER NOT NULL,
     `active` BOOLEAN NOT NULL DEFAULT true,
+    `kind` VARCHAR(191) NOT NULL DEFAULT 'THRESHOLD',
+    `topN` INTEGER NULL,
+    `audience` VARCHAR(191) NOT NULL DEFAULT 'ALL',
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -236,6 +242,7 @@ CREATE TABLE `IncentiveAward` (
     `reason` VARCHAR(500) NOT NULL,
     `approved` BOOLEAN NOT NULL DEFAULT false,
     `paid` BOOLEAN NOT NULL DEFAULT false,
+    `referralId` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -246,6 +253,7 @@ CREATE TABLE `ReferralProgram` (
     `id` VARCHAR(191) NOT NULL,
     `name` VARCHAR(191) NOT NULL,
     `reward` VARCHAR(191) NOT NULL,
+    `rewardInr` INTEGER NULL,
     `validUntil` DATETIME(3) NULL,
     `active` BOOLEAN NOT NULL DEFAULT true,
 

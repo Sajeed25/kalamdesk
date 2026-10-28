@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
-import { isLead } from "@/lib/rbac";
+import { isFounder, isLead } from "@/lib/rbac";
 import { dashboardData } from "@/lib/dashboard";
 import DashboardCharts from "@/components/DashboardCharts";
+import { PublishSnapshot } from "@/components/SnapshotButtons";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,8 @@ export default async function Dashboard({ searchParams }: { searchParams: { peri
           <Link href="/dashboard?period=week" className={`btn ${period === "week" ? "!bg-brand !text-white" : ""}`}>Weekly</Link>
           <Link href="/dashboard?period=month" className={`btn ${period === "month" ? "!bg-brand !text-white" : ""}`}>Monthly</Link>
           <a href={`/api/export/metrics?period=${period}`} className="btn">Export CSV</a>
+          {isFounder(u) && <PublishSnapshot period={period} />}
+          <Link href="/snapshots" className="btn">Published</Link>
         </div>
       </div>
 
@@ -54,7 +57,7 @@ export default async function Dashboard({ searchParams }: { searchParams: { peri
             {d.top.length === 0 && <tr><td colSpan={5} className="py-4 text-center text-mute">No scores yet in this period.</td></tr>}
           </tbody>
         </table>
-        <p className="mt-2 text-xs text-mute">A shareable snapshot (PDF + link) arrives in Phase 3.</p>
+        <p className="mt-2 text-xs text-mute">Use Publish snapshot to share a frozen copy (link + PDF) with the team.</p>
       </section>
     </div>
   );

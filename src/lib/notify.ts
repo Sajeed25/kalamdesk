@@ -1,10 +1,11 @@
 import { db } from "./db";
 import { sendEmail, emailTemplate, appUrl } from "./email";
+import { normalizePhone, sendWhatsapp, whatsappConfigured } from "./whatsapp";
 
 /**
  * Notification service. Each delivery channel implements `Channel`; `notify()` fans out
- * to every channel enabled for the recipient. To add WhatsApp Business API / SMS later,
- * write one more Channel (see whatsappChannel stub) and add it to CHANNELS — no caller changes.
+ * to every channel enabled for the recipient. A new channel (SMS, push) is one more Channel in CHANNELS,
+ * with no change to any caller.
  */
 export type NotifyInput = {
   userId: string;
@@ -45,16 +46,28 @@ const emailChannel: Channel = {
   },
 };
 
-// Phase 3 stub: wire to WhatsApp Business Cloud API using a pre-approved template.
+// Only these kinds are worth a WhatsApp message; comments, status chatter and digests stay in-app/email.
+const WHATSAPP_KINDS = new Set(["ASSIGNED", "BLOCKED", "SENT_BACK", "REMINDER", "APPROVED"]);
+
 const whatsappChannel: Channel = {
   name: "whatsapp",
-  async send() {
-    /* not enabled */
+  async send(to, n) {
+    if (!whatsappConfigured() || !WHATSAPP_KINDS.has(n.kind)) return;
+    // Look up consent + number only when WhatsApp is configured, and fail safe: if the column is missing
+    // (schema not upgraded yet) this must never affect in-app or email delivery.
+    let profile: { phone: string | null; whatsappOptIn: boolean } | null = null;
+    try {
+      profile = await db.employeeProfile.findUnique({ where: { userId: to.id }, select: { phone: true, whatsappOptIn: true } });
+    } catch {
+      return;
+    }
+    const phone = normalizePhone(profile?.phone);
+    if (!profile?.whatsappOptIn || !phone) return; // explicit opt-in required
+    await sendWhatsapp(phone, n.title, n.body ?? "", n.url ? appUrl(n.url) : appUrl("/"));
   },
 };
-void whatsappChannel;
 
-const CHANNELS: Channel[] = [inAppChannel, emailChannel];
+const CHANNELS: Channel[] = [inAppChannel, emailChannel, whatsappChannel];
 
 export async function notify(n: NotifyInput) {
   const user = await db.user.findUnique({ where: { id: n.userId }, select: { id: true, email: true, name: true, active: true } });

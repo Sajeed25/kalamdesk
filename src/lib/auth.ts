@@ -49,6 +49,7 @@ export async function getUser(): Promise<SessionUser | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, key());
+    if (payload.p) return null; // purpose-scoped tokens (e.g. re-auth) are never login sessions
     const u = await db.user.findUnique({ where: { id: String(payload.uid) } });
     if (!u || !u.active) return null;
     return { id: u.id, name: u.name, email: u.email, role: u.role as Role, departmentId: u.departmentId, consentAt: u.consentAt };
