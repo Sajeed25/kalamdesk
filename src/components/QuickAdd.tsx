@@ -74,7 +74,7 @@ export default function QuickAdd({ people, meId, canAssign }: { people: Person[]
             {!canAssign && match && match.id !== meId && <p className="text-xs text-mute">This goes to {match.name} as a request from you.</p>}
             {err && <p className="text-sm text-red-600">{err}</p>}
             <div className="flex items-center justify-between gap-2 text-xs text-mute">
-              <span>@name · P1–P4 · today / tomorrow / tue · 5pm</span>
+              <span>@name · P1–P4 · today / tomorrow / tue · 5pm · <a href="/tasks/new" className="underline">full form</a></span>
               <button disabled={busy || !parsed.title || unknownAssignee} className="btn btn-primary">Add task</button>
             </div>
           </form>

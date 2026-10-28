@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -25,7 +26,7 @@ export default async function Person({ params }: { params: { id: string } }) {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">{person.name}</h1>
+        <div className="flex items-center gap-3"><h1 className="text-2xl font-bold">{person.name}</h1>{u.role === "FOUNDER" && <Link href={`/people/${person.id}/edit`} className="btn">Edit</Link>}</div>
         <p className="text-sm text-mute">{person.profile?.title} · {person.department?.name} · {person.profile?.office}</p>
         {isLead(u) && <p className="text-sm text-mute">{person.email} · {person.profile?.phone ?? "no phone"}</p>}
       </div>

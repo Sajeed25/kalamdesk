@@ -326,6 +326,17 @@ model AuditLog {
   @@index([createdAt])
 }
 
+// Password reset / invite links. Only the SHA-256 of the token is stored.
+model PasswordReset {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  @@index([userId])
+}
+
 // Idempotency for scheduled jobs (digests, reminders): one row per (kind, key).
 model JobRun {
   id        String   @id @default(cuid())

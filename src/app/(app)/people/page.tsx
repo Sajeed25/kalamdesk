@@ -15,7 +15,7 @@ export default async function People() {
   });
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-bold">People</h1>
+      <div className="flex items-center justify-between"><h1 className="text-2xl font-bold">People</h1>{u.role === "FOUNDER" && <Link href="/people/new" className="btn btn-primary">+ Add person</Link>}</div>
       <div className="panel overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b border-line text-left text-xs uppercase tracking-wide text-mute">
@@ -29,7 +29,7 @@ export default async function People() {
             {users.map((p) => (
               <tr key={p.id} className="border-b border-line last:border-0">
                 <td className="px-3 py-2 font-medium">
-                  {lead ? <Link href={`/people/${p.id}`} className="hover:underline">{p.name}</Link> : p.name}
+                  {lead ? <Link href={`/people/${p.id}`} className="hover:underline">{p.name}</Link> : p.name}{u.role === "FOUNDER" && <Link href={`/people/${p.id}/edit`} className="ml-2 text-xs text-mute underline">edit</Link>}
                   {p.role === "INTERN" && <span className="chip ml-2 bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300">Intern</span>}
                 </td>
                 <td className="px-3 py-2 text-mute">{p.profile?.title ?? p.role}</td>

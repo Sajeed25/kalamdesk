@@ -8,6 +8,7 @@ import { fmtDateTime } from "@/lib/time";
 import { PRIORITY_LABEL } from "@/lib/constants";
 import StatusMenu from "@/components/StatusMenu";
 import TaskActions from "@/components/TaskActions";
+import ChecklistAndFiles from "@/components/ChecklistAndFiles";
 import { PriorityChip, isOverdue } from "@/components/TaskRow";
 
 export const dynamic = "force-dynamic";
@@ -21,10 +22,12 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
       comments: { include: { author: { select: { name: true } } }, orderBy: { createdAt: "asc" } },
       activity: { include: { actor: { select: { name: true } } }, orderBy: { createdAt: "desc" } },
       checklist: { orderBy: { position: "asc" } },
+      attachments: { orderBy: { createdAt: "asc" } },
     },
   });
   if (!t) notFound();
   const mayChangeStatus = canReview(u) || t.assignees.some((a) => a.userId === u.id);
+  const canEdit = canReview(u) || t.creatorId === u.id || t.assignees.some((a) => a.userId === u.id);
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
@@ -52,6 +55,8 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
       </dl>
 
       {t.description && <p className="whitespace-pre-wrap text-sm">{t.description}</p>}
+
+      <ChecklistAndFiles taskId={t.id} canEdit={canEdit} items={t.checklist} files={t.attachments.map((a) => ({ id: a.id, fileName: a.fileName, sizeBytes: a.sizeBytes }))} />
 
       <TaskActions id={t.id} canReview={canReview(u)} inReview={t.status === "IN_REVIEW"} selfInitiated={t.selfInitiated} accepted={t.initiativeAccepted} />
 

@@ -34,6 +34,15 @@ export async function visibleWhere(u: SessionUser): Promise<Prisma.TaskWhereInpu
   return { OR: [{ creatorId: u.id }, { assignees: { some: { userId: { in: ids } } } }] };
 }
 
+/** Task the user can see AND contribute to (checklist, attachments): creator, assignee, or a lead. */
+export async function loadContributableTask(u: SessionUser, id: string) {
+  const task = await db.task.findFirst({ where: { AND: [{ id }, await visibleWhere(u)] }, include: { assignees: true } });
+  if (!task) throw new HttpError(404, "Task not found");
+  const mine = task.creatorId === u.id || task.assignees.some((a) => a.userId === u.id);
+  if (!mine && !isLead(u)) throw new HttpError(403, "You can't change this task");
+  return task;
+}
+
 export const createSchema = z.object({
   title: z.string().trim().min(1).max(200),
   description: z.string().max(5000).optional().default(""),

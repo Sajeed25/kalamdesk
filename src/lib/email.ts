@@ -3,7 +3,8 @@
 export async function sendEmail(to: string, subject: string, html: string) {
   const key = process.env.RESEND_API_KEY;
   if (!key) {
-    console.log(`[email:dev] to=${to} subject="${subject}"`);
+    const link = /href="([^"]+)"/.exec(html)?.[1] ?? "";
+    console.log(`[email:dev] to=${to} subject="${subject}" ${link}`);
     return { ok: true, dev: true };
   }
   const res = await fetch("https://api.resend.com/emails", {

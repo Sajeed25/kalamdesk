@@ -35,6 +35,7 @@ export default function Login() {
         </label>
         {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
         <button disabled={busy} className="btn btn-primary w-full">{busy ? "Signing in…" : "Sign in"}</button>
+        <a href="/forgot" className="block text-center text-xs text-mute underline">Forgot password?</a>
       </form>
     </main>
   );

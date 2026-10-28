@@ -9,6 +9,7 @@ export default function Nav({ lead, name, role }: { lead: boolean; name: string;
     { href: "/my-day", label: "My Day", icon: "☀" },
     { href: "/board", label: "Board", icon: "▦" },
     { href: "/list", label: "List", icon: "☰" },
+    { href: "/calendar", label: "Calendar", icon: "▤" },
     { href: "/people", label: "People", icon: "☺" },
   ];
   async function logout() {
@@ -30,6 +31,7 @@ export default function Nav({ lead, name, role }: { lead: boolean; name: string;
         <div className="border-t border-line px-2 pt-3 text-sm">
           <div className="font-medium">{name}</div>
           <div className="mb-2 text-xs text-mute">{role}</div>
+          <Link href="/settings" className="mr-3 text-xs text-mute underline">Settings</Link>
           <button onClick={logout} className="text-xs text-mute underline">Sign out</button>
         </div>
       </aside>

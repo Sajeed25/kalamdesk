@@ -17,6 +17,9 @@ Person-first daily operations and task tracker for Robokalam (Hyderabad / Warang
 | Quick-add (`N` or **+ New task**): `Raise invoice for Sunrise School @Pooja P1 tomorrow 5pm` | done |
 | Email on assignment, status change, comment/mention, blocked, sent back, approved; in-app bell | done |
 | Cron: 8:30 AM morning digest, 7 PM founder digest, 2-hour and overdue reminders | done |
+| Password reset by email link, change password in Settings, invite emails for new people | done |
+| People admin (founder): add / edit / deactivate, resend invite, last-founder guard, audit log | done |
+| Task checklist, file attachments (images, PDF, Office, CSV; 10 MB), full new-task form, month Calendar view | done |
 | Light/dark mode, mobile bottom-nav, PWA manifest | done |
 | Recurring tasks + check-in, daily stand-up, scoring/leaderboards, dashboards | Phase 2 (schema ready) |
 | Incentives, referrals, encrypted bank details, snapshots, WhatsApp | Phase 3 (schema ready) |
@@ -87,6 +90,7 @@ Reset demo data: `npm run db:reset`.
 | `APP_URL` | public URL, used for links in emails |
 | `RESEND_API_KEY`, `EMAIL_FROM` | transactional email. If the key is empty, emails are logged to the server console |
 | `CRON_SECRET` | bearer token required by `/api/cron/*` |
+| `UPLOAD_DIR` | where attachments are stored (default `./uploads`) |
 | `FIELD_ENCRYPTION_KEY` | Phase 3 only: 32-byte base64 key for bank/ID field encryption |
 
 ## Scheduled jobs
@@ -114,11 +118,12 @@ On Vercel, put these in `vercel.json` `crons` (Vercel sends the secret as `Autho
 ## Assumptions made (please confirm)
 
 1. **SQLite locally, PostgreSQL in production.** The build environment had no Postgres; the schema is Postgres-compatible.
-2. **Custom JWT sessions** instead of NextAuth or Supabase Auth, to keep Phase 1 small. Google sign-in and TOTP 2FA for admins are planned for Phase 3 (`User.totpSecret` is reserved). Password reset is not built yet; a founder must reset passwords until then.
+2. **Custom JWT sessions** instead of NextAuth or Supabase Auth, to keep Phase 1 small. Google sign-in and TOTP 2FA for admins are planned for Phase 3 (`User.totpSecret` is reserved). Password reset works by emailed single-use link (1 hour).
 3. **Employees can assign to others only as a request.** A non-lead creating a task for a colleague is allowed; the assignee sees who raised it. If you'd rather block this, say so.
 4. **Managers' scope = people whose profile lists them as `managerId`.** Founders see everyone.
 5. **Health dot rules** (`src/lib/desk.ts`): red = 2+ overdue or any overdue P1; amber = 1 overdue, any blocked, or no activity in 24h with open work; else green. Easy to change.
-6. **Not yet built in Phase 1:** file attachments (S3), checklist UI, calendar view, user-management screens (create/edit employee), department admin. Schema tables exist.
+6. **Attachments** use a local-disk driver (`UPLOAD_DIR`). On Vercel or multiple servers, swap `src/lib/storage.ts` for an S3-compatible bucket (the interface is three functions). The file type check uses the browser-declared type; downloads are forced as attachments with `nosniff`, so uploads can never render as pages. Add content sniffing before opening uploads to untrusted users.
+6b. **Still missing:** editing a task after creation (title / description / due date from the UI; the API supports it), department admin screen, bulk actions on the list, per-person pages for the Calendar. Schema tables exist.
 7. UI uses Tailwind with small custom components rather than the full shadcn/ui library.
 
 ## Security notes
