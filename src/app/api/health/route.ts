@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { cryptoConfigured } from "@/lib/crypto";
 import { whatsappConfigured } from "@/lib/whatsapp";
+import { emailStatus } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -71,6 +72,7 @@ export async function GET() {
     phase3Schema: null as boolean | null,
     encryptionKeyOk: cryptoConfigured(),
     whatsappConfigured: whatsappConfigured(),
+    emailMode: emailStatus().mode, // "console" means no real email is being sent
     serverStartedAt: startedAt,
     databaseUrlCheck: inspectDatabaseUrl(),
   };

@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { isFounder } from "@/lib/rbac";
 import { ChangePasswordForm } from "@/components/PasswordForms";
 import WhatsAppPrefs from "@/components/WhatsAppPrefs";
+import EmailCheck from "@/components/EmailCheck";
 import { whatsappConfigured } from "@/lib/whatsapp";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +20,7 @@ export default async function Settings() {
         <ChangePasswordForm />
         <WhatsAppPrefs configured={whatsappConfigured()} phone={profile?.phone ?? ""} optIn={profile?.whatsappOptIn ?? false} />
       </div>
+      {isFounder(u) && <EmailCheck />}
       {isFounder(u) && <p className="text-sm"><Link href="/settings/scoring" className="underline">Scoring weights</Link></p>}
     </div>
   );
