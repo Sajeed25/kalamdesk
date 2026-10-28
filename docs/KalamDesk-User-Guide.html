@@ -1,0 +1,380 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KalamDesk User Guide</title><style>
+:root{--ink:#0f172a;--mute:#5b6478;--line:#e3e7ee;--brand:#4f46e5;--deep:#1e1b4b;--red:#e11d48}
+*{box-sizing:border-box}html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;font:15px/1.6 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;color:var(--ink);background:#f4f5f8}
+.wrap{max-width:980px;margin:0 auto;padding:0 28px}
+.cover{min-height:100vh;color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:64px 56px;background:radial-gradient(circle at 85% 10%,rgba(255,255,255,.16),transparent 40%),linear-gradient(145deg,#4f46e5,#1e1b4b 70%)}
+.cover .logo{width:60px;height:60px;border-radius:16px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:28px}
+.cover h1{font-size:60px;line-height:1.04;margin:0 0 16px;letter-spacing:-.02em}.cover p.sub{font-size:21px;max-width:620px;opacity:.9;margin:0}
+.cover .foot{display:flex;justify-content:space-between;opacity:.8;font-size:14px}
+.page{padding:56px 0}.page h2{font-size:30px;margin:0 0 6px;letter-spacing:-.01em}.page .lead{color:var(--mute);margin:0 0 24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 28px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 10px 30px -16px rgba(15,23,42,.18)}
+.how{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.mark{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-weight:700;font-size:14px;box-shadow:0 0 0 3px #fff,0 0 0 4px #e3e7ee}
+.hl{display:inline-block;border:3px solid var(--red);border-radius:8px;background:rgba(250,204,21,.18);padding:2px 12px;font-weight:600}
+.toc{columns:2;gap:36px;list-style:none;padding:0;margin:0}.toc li{break-inside:avoid;margin:0 0 10px}.toc a{color:var(--ink);text-decoration:none;display:block;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:#fff}.toc b{color:var(--brand);margin-right:8px}
+.who-legend span{display:inline-block;margin:4px 8px 4px 0}
+.part{padding:20px 0}.part-title{margin:52px 0 22px;padding:34px 34px;border-radius:22px;color:#fff;background:linear-gradient(135deg,#4f46e5,#1e1b4b);page-break-before:always;break-before:page}
+.part-title span{font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.8;font-weight:700}.part-title h2{margin:6px 0 8px;font-size:34px;letter-spacing:-.02em}.part-title p{margin:0;opacity:.9;max-width:680px}
+.step{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px 30px 24px;margin:0 0 26px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 34px -18px rgba(15,23,42,.22);break-inside:avoid-page}
+.step header{display:flex;gap:16px;align-items:center;margin-bottom:12px}.num{flex:none;width:46px;height:46px;border-radius:14px;background:linear-gradient(160deg,#4f46e5,#1e1b4b);color:#fff;font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center}
+.step h3{margin:0;font-size:22px;letter-spacing:-.01em;line-height:1.25}.meta{margin:4px 0 0;color:var(--mute);font-size:13px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.who{padding:2px 10px;border-radius:999px;font-weight:700;font-size:12px;background:#eef2ff;color:#3730a3}.who-LEAD{background:#fef3c7;color:#92400e}.who-FOUNDER{background:#fee2e2;color:#991b1b}.who-OWNER{background:#dcfce7;color:#166534}
+.intro{margin:6px 0 14px;font-size:16px}
+figure{margin:0 0 16px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#f4f5f8}figure img{display:block;width:100%;height:auto}
+ol.callouts{list-style:none;counter-reset:c;margin:0;padding:0;display:grid;gap:10px}
+ol.callouts li{counter-increment:c;position:relative;padding:10px 14px 10px 54px;border:1px solid var(--line);border-radius:12px;background:#fbfbfd}
+ol.callouts li::before{content:counter(c);position:absolute;left:12px;top:9px;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-weight:700;text-align:center;line-height:28px;box-shadow:0 0 0 3px #fff,0 0 0 4px #e3e7ee}
+.tips{margin-top:16px;padding:14px 18px;border-radius:12px;background:#eef2ff;border:1px solid #dfe4ff}.tips b{display:block;margin-bottom:4px;color:#3730a3}.tips ul{margin:0;padding-left:18px}.tips li{margin:3px 0}
+kbd{font:600 .85em ui-monospace,Consolas,monospace;background:#eef0f5;border:1px solid #d9dde6;border-bottom-width:2px;border-radius:6px;padding:1px 6px}
+.phases{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.phase{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:#fbfbfd}.phase h4{margin:0 0 8px;color:var(--brand);font-size:16px}.phase ul{list-style:none;margin:0;padding:0}.phase li{display:flex;gap:10px;margin:7px 0;font-size:14px;line-height:1.45}.box{flex:none;width:16px;height:16px;border:2px solid #9aa3b5;border-radius:4px;margin-top:3px}
+table.tasks{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}.tasks th,.tasks td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.tasks th{background:#f4f5f8;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+.faq dt{font-weight:700;margin-top:14px}.faq dd{margin:4px 0 0;color:#2b3348}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid2 h4{margin:0 0 6px}table.ref{width:100%;border-collapse:collapse;font-size:14px}.ref td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}.ref td:first-child{white-space:nowrap}
+.end{text-align:center;color:var(--mute);padding:40px 0 70px}
+@page{size:A4;margin:12mm}
+@media print{body{background:#fff}.wrap{max-width:none;padding:0}.cover{min-height:270mm;border-radius:0}.page{padding:6mm 0}.step{box-shadow:none;margin-bottom:6mm;padding:5mm 6mm}.card{box-shadow:none}.part-title{margin-top:0}.toc a{border-color:#ccd}}
+@media(max-width:760px){.how,.grid2,.phases{grid-template-columns:1fr}.toc{columns:1}.cover h1{font-size:40px}}
+</style></head><body>
+<section class="cover"><div class="logo">K</div>
+<div><h1>KalamDesk<br>User Guide</h1><p class="sub">Step by step, screen by screen. For every employee, intern, manager, founder and group owner.</p></div>
+<div class="foot"><span>Onboarding edition</span><span>Screenshots use demo data</span></div></section>
+
+<div class="wrap">
+<section class="page"><h2>How to use this guide</h2><p class="lead">Every screen has a screenshot. The red numbers on the screenshot match the numbered list under it.</p>
+<div class="how">
+<div class="card"><p><b>Look for the yellow highlight</b> with a red border. That is the thing to look at or click.</p><p><span class="hl">Sign in</span> &nbsp; <span class="mark">3</span></p><p>The number in the red circle tells you the order, and where to read about it below the picture.</p></div>
+<div class="card"><p><b>Who is each step for?</b> Every step carries a tag.</p><p class="who-legend"><span class="who">Everyone</span><span class="who who-LEAD">Managers &amp; founders</span><span class="who who-FOUNDER">Founders</span><span class="who who-OWNER">Group owners</span></p><p>If you are an employee or intern, you only need <b>Parts 1 to 5</b>. Part 8 is your onboarding checklist.</p></div>
+</div></section>
+<section class="page"><h2>Contents</h2><ul class="toc"><li><a href="#p-start"><b>Part 1</b> Start here</a></li><li><a href="#p-day"><b>Part 2</b> Your working day</a></li><li><a href="#p-work"><b>Part 3</b> Leave, visits, leads and expenses</a></li><li><a href="#p-growth"><b>Part 4</b> Scores, rewards and recognition</a></li><li><a href="#p-settings"><b>Part 5</b> Settings and security</a></li><li><a href="#p-lead"><b>Part 6</b> For managers and founders</a></li><li><a href="#p-owner"><b>Part 7</b> For group owners: several organisations</a></li><li><a href="#onboarding"><b>Part 8</b> Onboarding plan and starter tasks</a></li><li><a href="#faq"><b>Part 9</b> Questions and quick reference</a></li></ul></section>
+
+<section class="part" id="p-start">
+  <div class="part-title"><span>Part 1</span><h2>Start here</h2><p>Everything you need on your very first day: your invitation, signing in, and finding your way around.</p></div>
+  
+<section class="step" id="s1">
+  <header><span class="num">01</span><div><h3>Accept your invitation and choose a password</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 2 min</span></p></div></header>
+  <p class="intro">When a founder adds you, KalamDesk emails you a <b>Welcome to KalamDesk</b> message. The link in it works once and expires after 3 days.</p>
+  <figure><img src="img/02-set-password.png" alt="Accept your invitation and choose a password"></figure>
+  <ol class="callouts"><li><b>New password.</b> Choose at least 8 characters. A short sentence you will remember is better than a clever word, for example <kbd>blue-chai-at-6pm</kbd>.</li><li><b>Confirm password.</b> Type the same password again so a typo cannot lock you out.</li><li><b>Set password.</b> Click it. You are signed in straight away.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>The link expired or stopped working? Ask your founder to open <b>People → your name → Edit</b> and send a new invitation.</li><li>Never share your password. Nobody at the company will ever ask you for it.</li></ul></aside>
+</section>
+<section class="step" id="s2">
+  <header><span class="num">02</span><div><h3>Sign in on any day</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">Open the KalamDesk address your company gave you in any browser, on a laptop or a phone. Bookmark it, or add it to your phone's home screen.</p>
+  <figure><img src="img/01-login.png" alt="Sign in on any day"></figure>
+  <ol class="callouts"><li><b>Email.</b> Use your official company email, the same one the invitation was sent to.</li><li><b>Password.</b> The one you chose. If you turned on two-step sign-in, you will be asked for a 6-digit code on the next screen.</li><li><b>Sign in.</b> Click it, or press Enter on your keyboard.</li><li><b>Forgot password?</b> Click it, type your email, and we send a link to choose a new one. It works once and lasts 1 hour.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Five wrong passwords in a row pauses sign-in for 10 minutes. Wait, then try again, or use <b>Forgot password?</b>.</li><li>You are signed out automatically after 12 hours, so sign in again each day.</li></ul></aside>
+</section>
+<section class="step" id="s3">
+  <header><span class="num">03</span><div><h3>Read and accept the privacy notice</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">The first time you sign in, a short notice appears. It tells you what KalamDesk stores about you and why.</p>
+  <figure><img src="img/03-consent.png" alt="Read and accept the privacy notice"></figure>
+  <ol class="callouts"><li><b>The notice.</b> We keep your name, contact details, work records and task performance only to assign work, measure delivery fairly and run incentives. Bank and ID details are encrypted and only founders can open them.</li><li><b>I understand and agree.</b> Click it to continue. You cannot use the app until you do.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>You can download everything we hold about you, or ask for a correction or deletion, any time from <b>Settings → Your data and privacy</b>.</li></ul></aside>
+</section>
+<section class="step" id="s4">
+  <header><span class="num">04</span><div><h3>Your first day: what you will see</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 3 min</span></p></div></header>
+  <p class="intro">A brand-new account is quiet, and that is normal. This is <b>My Day</b>, your home screen. It fills up as soon as you are given work.</p>
+  <figure><img src="img/04-first-day.png" alt="Your first day: what you will see"></figure>
+  <ol class="callouts"><li><b>I'm in.</b> Tap this when you start work. It records your attendance for the day. Tap <b>I'm out</b> when you finish.</li><li><b>Your 30-second stand-up.</b> Click <b>Fill it in</b> to tell the team what you finished and what is pending. Do this every working day.</li><li><b>Weekly goal.</b> A gentle target of how many tasks to finish this week. The bar fills as you finish work.</li><li><b>Plan my day.</b> Nothing assigned yet? Add your own tasks here. Self-started work shows up on the founders' desk and earns bonus points once accepted.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Your first three actions on day one: tap <b>I'm in</b>, file your first stand-up, and add one task of your own.</li></ul></aside>
+</section>
+<section class="step" id="s5">
+  <header><span class="num">05</span><div><h3>Find your way around: the left menu</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 3 min</span></p></div></header>
+  <p class="intro">The dark menu on the left is on every screen (on a phone it is the bar along the bottom, which scrolls sideways). It has three groups.</p>
+  <figure><img src="img/05-sidebar.png" alt="Find your way around: the left menu"></figure>
+  <ol class="callouts"><li><b>Your organisation</b> at the top. If you work for more than one organisation and have been given access, click it to switch.</li><li><b>My Day.</b> Your home screen: what is due, what is overdue, and what to do next.</li><li><b>Scores.</b> The leaderboard: points this week, this month and all time.</li><li><b>People.</b> Names, roles and contact details of your colleagues. You only ever see people in your own organisation.</li><li><b>Group headings.</b> *My work*, *Performance* and *Company* group everything. Items you cannot use are simply not shown to you.</li><li><b>+ New task.</b> Add a task from any screen. Tip: press <kbd>N</kbd> anywhere on your keyboard.</li><li><b>The bell.</b> Your notifications: tasks assigned to you, comments, kudos and reminders. A red dot means something is new.</li><li><b>Settings and Sign out.</b> Bottom left. Your level, points and a progress bar to the next level are shown just above.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Your <b>level</b> goes up as you earn points. It is a bit of fun, and it also unlocks badges.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-day">
+  <div class="part-title"><span>Part 2</span><h2>Your working day</h2><p>The routine that keeps you, your manager and your scores on track.</p></div>
+  
+<section class="step" id="s6">
+  <header><span class="num">06</span><div><h3>My Day: your home screen</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 3 min</span></p></div></header>
+  <p class="intro">Open <b>My Day</b> first thing every morning. Everything due today, and anything overdue, is here.</p>
+  <figure><img src="img/06-my-day.png" alt="My Day: your home screen"></figure>
+  <ol class="callouts"><li><b>The greeting banner.</b> Shows your streak (days in a row you filed a stand-up), points this week and your level. The ring shows tasks done today.</li><li><b>I'm in / I'm out.</b> Records your attendance. It is a single tap.</li><li><b>Focus now.</b> The one task to do next. <b>Mark done</b> finishes it. <b>Open details</b> shows the full task.</li><li><b>The round tick.</b> The quick way to finish any task in your list.</li><li><b>The status menu.</b> Change a task between To Do, In Progress, Blocked, In Review and Done without opening it.</li><li><b>Weekly goal.</b> How many tasks you have finished against this week's goal.</li><li><b>Your week in numbers.</b> Last week's points, tasks done, on-time rate, stand-ups and kudos, and your rank among your peers.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Red <b>Overdue</b> items come first. If something is stuck, set its status to <b>Blocked</b> and say why, so it does not count against you as silently late.</li><li>Some tasks need proof before they can be finished. You will be asked to add a note or file.</li></ul></aside>
+</section>
+<section class="step" id="s7">
+  <header><span class="num">07</span><div><h3>Add a task in ten seconds</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 2 min</span></p></div></header>
+  <p class="intro">Click <b>+ New task</b>, or press <kbd>N</kbd> anywhere. Type naturally; KalamDesk reads it for you.</p>
+  <figure><img src="img/07-quick-add.png" alt="Add a task in ten seconds"></figure>
+  <ol class="callouts"><li><b>Type the task in plain words.</b> Example: <kbd>Raise invoice for Sunrise School @Pooja P1 tomorrow 5pm</kbd>. It understands <kbd>@name</kbd> for who, <kbd>P1</kbd> to <kbd>P4</kbd> for priority, and words like <kbd>today</kbd>, <kbd>tomorrow</kbd>, <kbd>tue</kbd> or <kbd>5pm</kbd> for the deadline.</li><li><b>For: me.</b> Shows who the task is for. Employees and interns can add tasks for themselves. Asking someone else to do something sends them a *request* they can see.</li><li><b>Priority.</b> P1 is urgent, P2 high, P3 normal, P4 when free. P3 is the default.</li><li><b>Add task.</b> Saves it, or press Enter.</li><li><b>Full form.</b> Want a description, checklist, location or exact date? Open the full form instead.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Self-started tasks are marked *Self-initiated*. When a founder accepts one, you earn an initiative bonus.</li></ul></aside>
+</section>
+<section class="step" id="s8">
+  <header><span class="num">08</span><div><h3>Open a task: status, checklist, files and comments</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 4 min</span></p></div></header>
+  <p class="intro">Click any task title to open it. This is where the work gets done and recorded.</p>
+  <figure><img src="img/08-task.png" alt="Open a task: status, checklist, files and comments"></figure>
+  <ol class="callouts"><li><b>Status.</b> To Do, In Progress, Blocked, In Review or Done. Moving to <b>Blocked</b> asks for a reason, and the person who assigned it is told straight away.</li><li><b>Add a step.</b> Break the task into a checklist. Tick steps off as you go.</li><li><b>Attach file.</b> Photos, PDFs, Office files and CSV, up to 10 MB each.</li><li><b>Comment box.</b> Ask questions or give updates. Type <kbd>@name</kbd> to mention a colleague and they are notified.</li><li><b>Activity.</b> An automatic history of who changed what and when. It cannot be edited.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Tasks that need approval go to <b>In Review</b>. A manager or founder approves or sends them back with a note.</li><li>Finishing a task on time earns the most points; finishing late earns fewer. See *Scores*.</li></ul></aside>
+</section>
+<section class="step" id="s9">
+  <header><span class="num">09</span><div><h3>File your daily stand-up</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 2 min</span></p></div></header>
+  <p class="intro">Every working day, spend two minutes here. It keeps your streak alive, and it means your manager never has to chase you for a status.</p>
+  <figure><img src="img/09-update.png" alt="File your daily stand-up"></figure>
+  <ol class="callouts"><li><b>What did you finish today?</b> Short and specific beats long: <kbd>20 calls, 2 school visits, invoice for Sunrise School</kbd>.</li><li><b>What is pending?</b> What you will pick up tomorrow.</li><li><b>Any obstacles?</b> Anything slowing you down. Founders see these, and it is the fastest way to get help.</li><li><b>Save.</b> The button reads <b>Update again</b> if you have already filed today, and you can edit as often as you like until midnight.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Missed a day? The streak resets, but nothing is lost. Start a new one today.</li><li>Short on time? If your company has turned on WhatsApp, send <kbd>UPDATE &lt;what you did&gt;</kbd> to the KalamDesk number instead.</li></ul></aside>
+</section>
+<section class="step" id="s10">
+  <header><span class="num">10</span><div><h3>Board, List and Calendar: three ways to see your work</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 4 min</span></p></div></header>
+  <p class="intro"><b>Board</b> shows tasks as cards in columns. Drag a card to another column to change its status.</p>
+  <figure><img src="img/10-board.png" alt="Board, List and Calendar: three ways to see your work"></figure>
+  <ol class="callouts"><li><b>Filters.</b> Narrow by person, department, priority or tag. Employees see their own work; managers see their team.</li><li><b>A task card.</b> Click it to open the task. The coloured edge shows priority.</li><li><b>To Do column.</b> Work that has not started.</li><li><b>Done column.</b> Finished work. Drop a card here to finish it.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Prefer a table? Use <b>List</b>. Prefer a month view? Use <b>Calendar</b> (next two screens).</li></ul></aside>
+</section>
+<section class="step" id="s11">
+  <header><span class="num">11</span><div><h3>List: sort and filter every task</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 2 min</span></p></div></header>
+  <p class="intro"><b>List</b> shows the same tasks as a sortable table. It is the best view for searching and for bulk work.</p>
+  <figure><img src="img/11-list.png" alt="List: sort and filter every task"></figure>
+  <ol class="callouts"><li><b>Priority filter.</b> Also filter by person, department or tag, then click Apply.</li><li><b>Apply.</b> Run your filters.</li><li><b>Column headings.</b> Click TASK, PRIORITY, STATUS or DUE to sort.</li><li><b>A row.</b> Click to open the task.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Managers and founders can tick several rows and change status, priority or assignee for all of them at once.</li></ul></aside>
+</section>
+<section class="step" id="s12">
+  <header><span class="num">12</span><div><h3>Calendar: deadlines by date</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">See every deadline laid out across the month.</p>
+  <figure><img src="img/12-calendar.png" alt="Calendar: deadlines by date"></figure>
+  <ol class="callouts"><li><b>Previous month.</b></li><li><b>Next month.</b></li><li><b>A task.</b> Click to open it. Overdue tasks are shown in red.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Want these deadlines in Google, Apple or Outlook calendar? See <b>Settings → Calendar link</b>.</li></ul></aside>
+</section>
+<section class="step" id="s13">
+  <header><span class="num">13</span><div><h3>Notifications: the bell</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">KalamDesk tells you when something needs you: a new task, a comment, a task sent back, a deadline in 2 hours, or kudos from a colleague.</p>
+  <figure><img src="img/22-bell.png" alt="Notifications: the bell"></figure>
+  <ol class="callouts"><li><b>The bell.</b> A red dot means something is new. Click to open the list.</li><li><b>A notification.</b> Click it to jump straight to the task or page. It is then marked as read.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Important notifications also arrive by email, and by WhatsApp if you turned that on in Settings.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-work">
+  <div class="part-title"><span>Part 3</span><h2>Leave, visits, leads and expenses</h2><p>The everyday business tools. Use them instead of messages and spreadsheets, so everything lives in one place.</p></div>
+  
+<section class="step" id="s14">
+  <header><span class="num">14</span><div><h3>Ask for leave and mark attendance</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 3 min</span></p></div></header>
+  <p class="intro">Open <b>Leave</b> from the menu. Your manager and the founders are told as soon as you ask.</p>
+  <figure><img src="img/13-leave.png" alt="Ask for leave and mark attendance"></figure>
+  <ol class="callouts"><li><b>I'm in / I'm out.</b> Your daily attendance. Tap <b>I'm in</b> when you start and <b>I'm out</b> when you finish.</li><li><b>Type of leave.</b> Casual, Sick, Unpaid or Other.</li><li><b>Cover person.</b> Choose a colleague to cover for you. New tasks given to you while you are away are shared with them, so nothing sits idle.</li><li><b>Dates.</b> Choose the first and last day. Leave is counted in calendar days.</li><li><b>Ask for leave.</b> Sends the request. You will be notified when it is approved or declined.</li><li><b>Cancel leave.</b> Changed your plans? Cancel a pending or approved request here.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Ask as early as you can. Leave longer than 60 days needs a conversation with a founder.</li><li>While you are on approved leave, your name shows an *Away until* tag on the founders' desk.</li></ul></aside>
+</section>
+<section class="step" id="s15">
+  <header><span class="num">15</span><div><h3>Record a school visit</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 3 min</span></p></div></header>
+  <p class="intro">For field work such as school visits, open the visit task right after you finish. Two minutes now saves a long phone call later.</p>
+  <figure><img src="img/45-visit.png" alt="Record a school visit"></figure>
+  <ol class="callouts"><li><b>Location.</b> The place from the task. Tap it to open the address in Google Maps.</li><li><b>How did it go?</b> Great, Good, Needs follow-up or Problem. A <b>Problem</b> alerts the founders immediately.</li><li><b>What happened?</b> Who you met, what you showed, how students reacted.</li><li><b>Save visit report.</b> You can come back and edit it.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Add photos with <b>Attach file</b> on the same task. The <b>Visits</b> page in the menu lists every report.</li><li>Fill in <b>How many people attended</b> and <b>Follow-up needed</b> too. They feed the reports founders see.</li></ul></aside>
+</section>
+<section class="step" id="s16">
+  <header><span class="num">16</span><div><h3>Track your leads</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 4 min</span></p></div></header>
+  <p class="intro"><b>Leads</b> is your list of schools and contacts you are working to win. Log every call so nothing is forgotten.</p>
+  <figure><img src="img/46-add-lead.png" alt="Track your leads"></figure>
+  <ol class="callouts"><li><b>Contact name.</b> Who you spoke to. Only name and, usually, the school are required.</li><li><b>School or organisation.</b></li><li><b>Phone</b> (and email, deal size and source are optional). Tap a phone number later to call.</li><li><b>Add lead.</b> Saves it as a *New* lead.</li><li><b>Filters.</b> *Follow-up due* shows who you promised to call back today.</li><li><b>Log a call.</b> Record the outcome (connected, no answer, call back, not interested, wrong number) and set a follow-up date.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Move a lead along its stages: New → Contacted → Demo → Proposal → Won or Lost, from the drop-down on the lead.</li><li>You see your own leads. Managers see their team's, and founders see everything.</li></ul></aside>
+</section>
+<section class="step" id="s17">
+  <header><span class="num">17</span><div><h3>Claim an expense</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 3 min</span></p></div></header>
+  <p class="intro">Spent your own money on work? Claim it here and attach the receipt.</p>
+  <figure><img src="img/14-expenses.png" alt="Claim an expense"></figure>
+  <ol class="callouts"><li><b>What was it for?</b> For example <kbd>Auto fare to a school visit</kbd>.</li><li><b>Amount (₹).</b> Whole rupees.</li><li><b>Category.</b> Travel, Fuel, Food, Stationery or Other.</li><li><b>Receipt.</b> A photo or PDF up to 5 MB. Take the photo while you still have the paper.</li><li><b>Submit claim.</b> A founder is notified. You can withdraw a claim until it is decided.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>The date of spending cannot be in the future.</li><li>A rejected claim always shows the reason. An approved claim shows as <b>Paid</b> once the money has been sent.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-growth">
+  <div class="part-title"><span>Part 4</span><h2>Scores, rewards and recognition</h2><p>How good work is measured, celebrated and rewarded.</p></div>
+  
+<section class="step" id="s18">
+  <header><span class="num">18</span><div><h3>Scores: the leaderboard</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 3 min</span></p></div></header>
+  <p class="intro">Points reward finishing work, finishing it on time, and doing harder work. Employees and interns are ranked separately, so it is a fair comparison.</p>
+  <figure><img src="img/16-scores.png" alt="Scores: the leaderboard"></figure>
+  <ol class="callouts"><li><b>Time range.</b> This week, this month or all time.</li><li><b>Employees or Interns.</b> Choose which group to see.</li><li><b>How points are calculated.</b> Open this for the exact formula. Hover any score to see how it was worked out.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Default points: P1 = 10, P2 = 7, P3 = 5, P4 = 3, multiplied for difficulty (1× easy to 2.2× hardest). On time = full points, up to 24 hours late = 70%, later = 40%. Founders can change these numbers.</li><li>Penalties are small and explained: a missed recurring activity costs 3 points, and a task left overdue for 3+ days without a blocker reason costs 2. Marking a task <b>Blocked</b> with a reason avoids the penalty.</li></ul></aside>
+</section>
+<section class="step" id="s19">
+  <header><span class="num">19</span><div><h3>Challenges, badges, streaks and kudos</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 3 min</span></p></div></header>
+  <p class="intro">The fun part. It is there to make good habits visible.</p>
+  <figure><img src="img/17-challenges.png" alt="Challenges, badges, streaks and kudos"></figure>
+  <ol class="callouts"><li><b>Your badges.</b> Earned for milestones such as your first task, a 10-task club, and streaks. Locked badges show what to aim for next.</li><li><b>Streak board.</b> Who has filed stand-ups the most days in a row.</li><li><b>Give someone kudos.</b> Pick a colleague and a quick message, such as *Saved the day!*, or write your own.</li><li><b>Send kudos.</b> They get a notification, and it appears on the Kudos wall.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Founders can also launch <b>seasonal challenges</b>, a team goal with a prize, such as a Diwali sprint. The progress bar is at the top of this page.</li><li>On the day, your team's birthdays and work anniversaries are celebrated on My Day.</li></ul></aside>
+</section>
+<section class="step" id="s20">
+  <header><span class="num">20</span><div><h3>Incentives: what you can earn</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 2 min</span></p></div></header>
+  <p class="intro">Incentives are cash rewards for consistent, on-time work. Founders approve every payment.</p>
+  <figure><img src="img/18-incentives.png" alt="Incentives: what you can earn"></figure>
+  <ol class="callouts"><li><b>Your history.</b> Every award you have received or are waiting on, by month.</li><li><b>How to earn them.</b> The current rules, for example *at least 40 points and 90% on time in a month*.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Nothing is paid automatically. At the start of each month the founders review who qualified and approve.</li><li>Rules differ for employees and interns. The rules shown here are the ones that apply to you.</li></ul></aside>
+</section>
+<section class="step" id="s21">
+  <header><span class="num">21</span><div><h3>Referrals: bring someone in</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 2 min</span></p></div></header>
+  <p class="intro">Know a school, a franchise partner or a candidate we should talk to? Refer them and earn the reward.</p>
+  <figure><img src="img/19-referrals.png" alt="Referrals: bring someone in"></figure>
+  <ol class="callouts"><li><b>Programme.</b> Pick what you are referring. The reward is shown next to it.</li><li><b>Their name.</b></li><li><b>Contact.</b> A phone number or email.</li><li><b>Submit referral.</b> A founder follows up. When it converts, the reward is added to your incentives.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Add a note: how you know them and the best time to call. It helps us succeed.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-settings">
+  <div class="part-title"><span>Part 5</span><h2>Settings and security</h2><p>Your account, your privacy and how KalamDesk reaches you.</p></div>
+  
+<section class="step" id="s22">
+  <header><span class="num">22</span><div><h3>Settings: your account in one page</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 4 min</span></p></div></header>
+  <p class="intro">Click <b>Settings</b> at the bottom of the left menu.</p>
+  <figure><img src="img/20-settings.png" alt="Settings: your account in one page"></figure>
+  <ol class="callouts"><li><b>Change password.</b> Enter your current password and a new one (8+ characters).</li><li><b>Calendar link.</b> Click <b>Show my calendar link</b> and paste the private address into Google, Apple or Outlook calendar. Your deadlines then show up there. Keep the link private.</li><li><b>Birthday.</b> Optional. Choose a day and month (never a year) and your team can cheer your day.</li><li><b>WhatsApp alerts.</b> Enter your mobile number and tick the box to get alerts on WhatsApp. We never send a message without your tick.</li><li><b>Download my data.</b> Everything we hold about you in one file.</li><li><b>Security.</b> Turn on two-step sign-in (next page).</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li><b>Ask for a correction</b> or <b>Ask for deletion</b> sends a request to your founders. This is your right under India's DPDP Act.</li></ul></aside>
+</section>
+<section class="step" id="s23">
+  <header><span class="num">23</span><div><h3>Two-step sign-in (strongly recommended for founders)</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 5 min</span></p></div></header>
+  <p class="intro">Two-step sign-in asks for a 6-digit code from your phone as well as your password. Founders can open bank details, so <b>founders should turn this on today</b>.</p>
+  <figure><img src="img/48-2fa.png" alt="Two-step sign-in (strongly recommended for founders)"></figure>
+  <ol class="callouts"><li><b>Set up.</b> From Settings → Security click <b>Set up two-step sign-in</b>.</li><li><b>Scan the QR code.</b> In Google Authenticator or Microsoft Authenticator, choose *Scan a QR code*.</li><li><b>Cannot scan?</b> Type the long key shown here into the app by hand.</li><li><b>Type the 6-digit code</b> the app shows now.</li><li><b>Turn on.</b> You are then shown 8 recovery codes. Save them somewhere safe (a password manager or paper). Each works once if you lose your phone.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Locked out with no phone and no recovery codes? Another founder can switch your two-step sign-in off from your profile.</li><li>Revealing someone's bank details always asks you to confirm your password (and a code) again.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-lead">
+  <div class="part-title"><span>Part 6</span><h2>For managers and founders</h2><p>Running a team: assign, watch, approve and reward. Employees and interns do not see these screens.</p></div>
+  
+<section class="step" id="s24">
+  <header><span class="num">24</span><div><h3>The Founder's Desk: your whole team at a glance</h3><p class="meta"><span class="who who-LEAD">Managers & founders</span><span>About 4 min</span></p></div></header>
+  <p class="intro">Open <b>Desk</b> every morning. Managers see their own team. Founders see everybody in the organisation.</p>
+  <figure><img src="img/30-desk.png" alt="The Founder's Desk: your whole team at a glance"></figure>
+  <ol class="callouts"><li><b>Health tiles.</b> *Needs attention*, *Keep an eye*, *On track*, and how many stand-ups are in today.</li><li><b>Self-initiated work to review.</b> Tasks people started themselves. Open one to accept it (which earns the person a bonus) or leave it.</li><li><b>A person's card.</b> Overdue, blocked and open counts, today's top task, and when they last filed a stand-up. Click the name for their full page.</li><li><b>Nudge.</b> One friendly reminder to that person, at most once per day. It arrives as a notification, email and WhatsApp if on.</li><li><b>Dashboard and the rest of the menu.</b> Leads see extra items: Desk, Recurring, Dashboard, Stand-ups and Templates.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Red means someone is overdue or has had no stand-up. Use <b>Nudge</b> before you message. It is kinder, and it is recorded.</li></ul></aside>
+</section>
+<section class="step" id="s25">
+  <header><span class="num">25</span><div><h3>People: your directory</h3><p class="meta"><span class="who who-LEAD">Managers & founders</span><span>About 2 min</span></p></div></header>
+  <p class="intro"><b>People</b> lists everyone in your organisation, grouped by role.</p>
+  <figure><img src="img/31-people.png" alt="People: your directory"></figure>
+  <ol class="callouts"><li><b>+ Add person.</b> Founders only. Starts the onboarding below.</li><li><b>Departments.</b> Founders only. Create and rename teams.</li><li><b>A person.</b> Click the name to see their open tasks and recent activity.</li><li><b>edit.</b> Founders only. Change a role, department, manager, or deactivate the account.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>People who leave are <b>deactivated</b>, never deleted. Their history is kept, and they cannot sign in.</li></ul></aside>
+</section>
+<section class="step" id="s26">
+  <header><span class="num">26</span><div><h3>Add a new employee or intern</h3><p class="meta"><span class="who who-FOUNDER">Founders</span><span>About 4 min</span></p></div></header>
+  <p class="intro">Founders only. This is the first step of onboarding. KalamDesk emails the person an invitation to choose their own password. You never see or set it.</p>
+  <figure><img src="img/32-add-person.png" alt="Add a new employee or intern"></figure>
+  <ol class="callouts"><li><b>Name.</b> As they should appear to the team.</li><li><b>Email.</b> Their official company email. An email can belong to only one organisation.</li><li><b>Role.</b> *Intern* and *Employee* work on their own tasks. *Manager* leads a team. *Founder* sees everything in the organisation, including bank details.</li><li><b>Department.</b> Their team. Create more under *Departments*.</li><li><b>Office.</b> Hyderabad, Warangal, Remote or Other.</li><li><b>Reports to.</b> Their manager. This decides who approves their leave and sees their work.</li><li><b>Add person and send invite.</b> They receive the email immediately. Resend it any time from their profile if it is lost.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>For interns, also set the <b>start and end dates</b> further down the form. The team is reminded when an internship is about to end.</li><li>Fill in emergency contact and joining date too. The joining date powers work-anniversary celebrations.</li></ul></aside>
+</section>
+<section class="step" id="s27">
+  <header><span class="num">27</span><div><h3>A person's page</h3><p class="meta"><span class="who who-LEAD">Managers & founders</span><span>About 2 min</span></p></div></header>
+  <p class="intro">Click anyone's name for a quick view of how they are doing.</p>
+  <figure><img src="img/33-person.png" alt="A person's page"></figure>
+  <ol class="callouts"><li><b>Edit.</b> Founders can change details, role or reporting manager.</li><li><b>Open tasks.</b> Everything on their plate, with deadlines and status. You can change a status from here.</li><li><b>Nudge.</b> A friendly reminder on a single task.</li><li><b>Recently done.</b> What they finished lately.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Founders also see bank details and ID documents (encrypted) on the Edit page. Each reveal asks for a password check and is written to the audit log.</li></ul></aside>
+</section>
+<section class="step" id="s28">
+  <header><span class="num">28</span><div><h3>Departments</h3><p class="meta"><span class="who who-FOUNDER">Founders</span><span>About 2 min</span></p></div></header>
+  <p class="intro">Departments are the teams in your organisation. Each organisation has its own set.</p>
+  <figure><img src="img/34-departments.png" alt="Departments"></figure>
+  <ol class="callouts"><li><b>Name.</b></li><li><b>Colour.</b> Shown on tags and charts.</li><li><b>Add.</b></li><li><b>Rename / colour.</b></li><li><b>Delete.</b> Only possible when nobody and no task uses it.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Examples: Accounts, BD, Marketing, Training, Tech. An NGO might use Programs and Outreach.</li></ul></aside>
+</section>
+<section class="step" id="s29">
+  <header><span class="num">29</span><div><h3>Recurring activities</h3><p class="meta"><span class="who who-LEAD">Managers & founders</span><span>About 4 min</span></p></div></header>
+  <p class="intro">Anything that repeats: weekly school visits, Monday reports, month-start invoicing. KalamDesk creates each task for you at the right time.</p>
+  <figure><img src="img/35-recurring.png" alt="Recurring activities"></figure>
+  <ol class="callouts"><li><b>Activity.</b> The task title that will repeat.</li><li><b>Repeats.</b> Weekly on chosen days, every weekday, or monthly.</li><li><b>Days.</b> Choose which days of the week.</li><li><b>Assigned to.</b> Tick everyone responsible. Each person gets their own task and is scored separately.</li><li><b>Create recurring activity.</b> Saves the rule. You can pause or edit it later.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>A task that is not done by the end of its day is marked <b>Missed</b>, closed, and a small penalty applies. The person and you are told.</li><li>Managers can only assign recurring work to their own team.</li></ul></aside>
+</section>
+<section class="step" id="s30">
+  <header><span class="num">30</span><div><h3>Templates: saved task shapes</h3><p class="meta"><span class="who who-LEAD">Managers & founders</span><span>About 2 min</span></p></div></header>
+  <p class="intro">Make a template for work you create again and again, such as a school visit with its checklist.</p>
+  <figure><img src="img/36-templates.png" alt="Templates: saved task shapes"></figure>
+  <ol class="callouts"><li><b>+ New template.</b> Give it a name, title, priority and checklist.</li><li><b>Edit.</b></li><li><b>Delete.</b></li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>When creating a task, choose a template and everything is filled in for you.</li></ul></aside>
+</section>
+<section class="step" id="s31">
+  <header><span class="num">31</span><div><h3>Dashboard: numbers for the week or month</h3><p class="meta"><span class="who who-LEAD">Managers & founders</span><span>About 3 min</span></p></div></header>
+  <p class="intro">See how the team is performing, then share or export it.</p>
+  <figure><img src="img/37-dashboard.png" alt="Dashboard: numbers for the week or month"></figure>
+  <ol class="callouts"><li><b>Weekly or Monthly.</b></li><li><b>Export CSV.</b> For a spreadsheet.</li><li><b>Publish snapshot.</b> Saves a read-only copy with a private link you can share, or download as PDF.</li><li><b>Workload per person.</b> Open tasks for each person. Uneven bars mean uneven work.</li><li><b>Top performers.</b> The current leaders.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Every chart has <b>View as table</b> underneath for screen readers and for copying numbers.</li></ul></aside>
+</section>
+<section class="step" id="s32">
+  <header><span class="num">32</span><div><h3>Stand-ups: who has filed</h3><p class="meta"><span class="who who-LEAD">Managers & founders</span><span>About 1 min</span></p></div></header>
+  <p class="intro">One page with everyone's daily update, newest first. Obstacles are highlighted so you can help.</p>
+  <figure><img src="img/38-updates.png" alt="Stand-ups: who has filed"></figure>
+  
+  <aside class="tips"><b>Good to know</b><ul><li>Use the arrows to move between days. Missing stand-ups are listed so you can nudge them.</li></ul></aside>
+</section>
+<section class="step" id="s33">
+  <header><span class="num">33</span><div><h3>Approve expense claims</h3><p class="meta"><span class="who who-FOUNDER">Founders</span><span>About 2 min</span></p></div></header>
+  <p class="intro">Founders approve every expense. Claims waiting for you appear at the top.</p>
+  <figure><img src="img/40-expense-approval.png" alt="Approve expense claims"></figure>
+  <ol class="callouts"><li><b>All claims.</b> Open the receipt by clicking it.</li><li><b>Approve.</b> Then, once you have paid, click <b>Mark paid</b>.</li><li><b>Reject.</b> You must give a reason. The employee sees it.</li><li><b>Download CSV.</b> Send it to your accountant.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>You cannot approve your own claim unless you are the only founder.</li></ul></aside>
+</section>
+<section class="step" id="s34">
+  <header><span class="num">34</span><div><h3>Approve leave</h3><p class="meta"><span class="who who-LEAD">Managers & founders</span><span>About 2 min</span></p></div></header>
+  <p class="intro">Open <b>Leave</b>. Requests from your team are listed under *Waiting for your decision*.</p>
+  <figure><img src="img/41-leave-approval.png" alt="Approve leave"></figure>
+  <ol class="callouts"><li><b>Waiting for your decision.</b> Each request shows dates, reason and the cover person.</li><li><b>Approve.</b> You can choose to hand over open tasks to the cover person in one click.</li><li><b>Decline.</b> Add a short note. The person sees it.</li><li><b>Today.</b> Who is away or checked in today.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Approved leave appears as an *Away until* tag on the Desk.</li></ul></aside>
+</section>
+<section class="step" id="s35">
+  <header><span class="num">35</span><div><h3>Incentives: rules and monthly awards</h3><p class="meta"><span class="who who-FOUNDER">Founders</span><span>About 3 min</span></p></div></header>
+  <p class="intro">Set the rules once, then review awards on the 1st of each month. Nothing is paid without your approval.</p>
+  <figure><img src="img/39-incentives.png" alt="Incentives: rules and monthly awards"></figure>
+  <ol class="callouts"><li><b>+ Add rule.</b> Choose *Threshold* (points and on-time %) or *Top N* (reward the top few), who it applies to and the amount.</li><li><b>Edit or pause a rule.</b></li><li><b>Calculate for this month.</b> Works out who qualifies. Review each award, approve or reject, then mark it paid.</li><li><b>+ Manual award.</b> Reward something special, with a reason.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>The system emails founders on the 1st with what is waiting for approval.</li></ul></aside>
+</section>
+<section class="step" id="s36">
+  <header><span class="num">36</span><div><h3>Scoring weights</h3><p class="meta"><span class="who who-FOUNDER">Founders</span><span>About 2 min</span></p></div></header>
+  <p class="intro">On the <b>Scores</b> page, founders see a <b>Scoring settings</b> button (also under <b>Settings → Scoring weights</b>). There they can tune how points are worked out: points per priority, difficulty multipliers, late penalties, the initiative bonus, and the missed-recurring and overdue penalties.</p>
+  <figure><img src="img/47-scoring-raw.png" alt="Scoring weights"></figure>
+  
+  <aside class="tips"><b>Good to know</b><ul><li>Each box shows its default. <b>Reset to defaults</b> puts everything back. Changes apply to future scoring; they do not rewrite history.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-owner">
+  <div class="part-title"><span>Part 7</span><h2>For group owners: several organisations</h2><p>Running Robokalam, Samaritan Stand-Up, Calvings, Nextpreneur and more from one place, with each one completely separate.</p></div>
+  
+<section class="step" id="s37">
+  <header><span class="num">37</span><div><h3>Switch between organisations</h3><p class="meta"><span class="who who-OWNER">Group owners</span><span>About 1 min</span></p></div></header>
+  <p class="intro">Group owners see an organisation switcher at the top of the left menu. Everyone else sees only their own organisation's name.</p>
+  <figure><img src="img/43-switcher.png" alt="Switch between organisations"></figure>
+  <ol class="callouts"><li><b>The switcher.</b> Shows where you are. Click it.</li><li><b>An organisation.</b> Click to move there. The whole screen changes to that organisation's people, tasks and colour.</li><li><b>Manage organisations.</b> Opens the control page.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>What is in one organisation is never visible in another. Staff of Samaritan cannot see Robokalam staff, and the reverse. Only group owners, who are founders of every organisation, cross over.</li><li>Each time you sign in you start back in your home organisation.</li></ul></aside>
+</section>
+<section class="step" id="s38">
+  <header><span class="num">38</span><div><h3>Organisations: create, colour and manage</h3><p class="meta"><span class="who who-OWNER">Group owners</span><span>About 3 min</span></p></div></header>
+  <p class="intro">Open <b>Organisations</b> in the menu. Each organisation has its own card, with its own dashboard.</p>
+  <figure><img src="img/42-organisations.png" alt="Organisations: create, colour and manage"></figure>
+  <ol class="callouts"><li><b>Your organisation</b> is marked *Viewing now*. *Home* is the one you belong to.</li><li><b>Open dashboard / Open.</b> Jump into that organisation's Desk.</li><li><b>Edit.</b> Rename it, change its one-line description, or pick its brand colour. The app repaints in that colour whenever you are inside it.</li><li><b>New organisation.</b> Start another one.</li><li><b>Group owners.</b> Choose which other founders may open every organisation.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li><b>Archive</b> hides an organisation and signs its people out. Nothing is deleted and you can restore it.</li><li>People and open-task counts are shown for each organisation, and you can compare at a glance.</li></ul></aside>
+</section>
+<section class="step" id="s39">
+  <header><span class="num">39</span><div><h3>Start a new organisation</h3><p class="meta"><span class="who who-OWNER">Group owners</span><span>About 3 min</span></p></div></header>
+  <p class="intro">Adding Calvings, Nextpreneur or anyone else takes about a minute.</p>
+  <figure><img src="img/44-new-org.png" alt="Start a new organisation"></figure>
+  <ol class="callouts"><li><b>Name.</b> For example *Calvings*.</li><li><b>Colour.</b> Pick the brand colour. All options keep text readable.</li><li><b>First founder.</b> Optional but recommended. Enter their name and email, and they receive an invitation. They will only ever see this organisation.</li><li><b>Create.</b> Then open the organisation, add its departments and people just as you did for the first one.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>An email address can belong to only one organisation. If someone works for two, give them a separate email for each, or make them a group owner.</li></ul></aside>
+</section>
+</section>
+
+<section class="part" id="onboarding">
+  <div class="part-title"><span>Part 8</span><h2>Onboarding plan and starter tasks</h2><p>Hand these out. Tick the boxes on paper, or create the starter tasks in KalamDesk so they appear on each person's My Day.</p></div>
+  <section class="step plan"><header><span class="num">A</span><div><h3>New employee: first month</h3></div></header><div class="phases"><div class="phase"><h4>Day 1</h4><ul><li><span class="box"></span>Accept the invitation and choose a password</li><li><span class="box"></span>Read and accept the privacy notice</li><li><span class="box"></span>Tap <b>I'm in</b> on My Day</li><li><span class="box"></span>Open every item in the left menu once, to see what is there</li><li><span class="box"></span>Add your birthday and WhatsApp number in Settings (optional)</li><li><span class="box"></span>File your first stand-up before you leave</li><li><span class="box"></span>Add one task of your own with <b>+ New task</b></li></ul></div><div class="phase"><h4>Week 1</h4><ul><li><span class="box"></span>File a stand-up every working day (aim for a 5-day streak)</li><li><span class="box"></span>Finish at least 3 tasks on time and mark them Done</li><li><span class="box"></span>Add a checklist and a comment to one task</li><li><span class="box"></span>Attach one file to a task</li><li><span class="box"></span>Send one kudos to a teammate</li><li><span class="box"></span>Read how points are calculated on <b>Scores</b></li><li><span class="box"></span>Download your calendar link into your phone calendar</li></ul></div><div class="phase"><h4>Month 1</h4><ul><li><span class="box"></span>Log your leads, visits or expenses in KalamDesk instead of on paper</li><li><span class="box"></span>Ask for leave using the Leave page, naming a cover person</li><li><span class="box"></span>Check your level, badges and rank. Pick one thing to improve</li><li><span class="box"></span>Turn on two-step sign-in (founders: required)</li><li><span class="box"></span>Give your manager one suggestion to improve KalamDesk</li></ul></div></div></section>
+  <section class="step plan"><header><span class="num">B</span><div><h3>New intern: the internship</h3></div></header><div class="phases"><div class="phase"><h4>Day 1</h4><ul><li><span class="box"></span>Accept the invitation and choose a password</li><li><span class="box"></span>Read and accept the privacy notice</li><li><span class="box"></span>Tap <b>I'm in</b> on My Day</li><li><span class="box"></span>Meet your manager and find them under <b>People</b></li><li><span class="box"></span>Add one task of your own so you have something to work on</li><li><span class="box"></span>File your first stand-up before you leave</li></ul></div><div class="phase"><h4>Week 1</h4><ul><li><span class="box"></span>File a stand-up every working day</li><li><span class="box"></span>Finish your first task and look at the points it earned</li><li><span class="box"></span>Ask your manager for feedback via a task comment</li><li><span class="box"></span>Open <b>Scores → Interns</b> to see how interns are ranked</li><li><span class="box"></span>Send kudos to someone who helped you</li></ul></div><div class="phase"><h4>Final month</h4><ul><li><span class="box"></span>Check your internship end date with your manager</li><li><span class="box"></span>Upload any pending expense claims with receipts</li><li><span class="box"></span>Ask for a reference or feedback note while your work history is fresh</li><li><span class="box"></span>Download your data from <b>Settings</b> if you want a record of your work</li></ul></div></div></section>
+  <section class="step plan"><header><span class="num">C</span><div><h3>For the founder or manager: onboarding someone</h3></div></header><div class="phases"><div class="phase"><h4>Before they start</h4><ul><li><span class="box"></span>Go to <b>People → + Add person</b> and fill in name, official email, role, department, office and manager</li><li><span class="box"></span>For interns, set the start and end dates</li><li><span class="box"></span>Click <b>Add person and send invite</b></li><li><span class="box"></span>Add their tasks for week 1 (or use the checklist below) so My Day is not empty</li><li><span class="box"></span>Tell them to look for the *Welcome to KalamDesk* email and check spam</li></ul></div><div class="phase"><h4>Day 1</h4><ul><li><span class="box"></span>Check they appear on the Desk and have tapped <b>I'm in</b></li><li><span class="box"></span>Assign a first small task with a clear deadline</li><li><span class="box"></span>Show them the stand-up page</li><li><span class="box"></span>For founders and managers: ask them to turn on two-step sign-in</li></ul></div><div class="phase"><h4>End of week 1</h4><ul><li><span class="box"></span>Read their stand-ups and the tasks they finished</li><li><span class="box"></span>Send kudos for something genuine</li><li><span class="box"></span>Approve any self-initiated work they added</li><li><span class="box"></span>Ask what was confusing, and fix it for the next person</li></ul></div></div></section>
+  <section class="step plan"><header><span class="num">D</span><div><h3>Starter tasks to assign</h3><p class="meta"><span>Copy these into KalamDesk (use <b>+ New task</b> or a template) and assign them to every new joiner.</span></p></div></header>
+    <table class="tasks"><thead><tr><th>Task title</th><th>Description</th><th>Priority</th><th>Due</th></tr></thead><tbody>
+    <tr><td><b>Complete KalamDesk onboarding</b></td><td>Set your password, accept the privacy notice, tap I'm in, add your birthday (optional).</td><td>P2</td><td>Day 1</td></tr><tr><td><b>File your first stand-up</b></td><td>Open Daily update and tell the team what you did today.</td><td>P2</td><td>Day 1</td></tr><tr><td><b>Tour of KalamDesk</b></td><td>Open every menu item once. Make a note of anything unclear and send it to your manager.</td><td>P3</td><td>Day 2</td></tr><tr><td><b>Finish three tasks on time</b></td><td>Use My Day to plan them, mark them Done on time.</td><td>P2</td><td>Week 1</td></tr><tr><td><b>Use checklists and comments</b></td><td>Add a checklist and one comment with an @mention on a real task.</td><td>P3</td><td>Week 1</td></tr><tr><td><b>Log your first lead / visit / expense</b></td><td>Whichever applies to your role. Use KalamDesk, not paper.</td><td>P3</td><td>Week 2</td></tr><tr><td><b>Ask for a day of leave (practice)</b></td><td>Open Leave and see how a request looks, then cancel it if you do not need it.</td><td>P4</td><td>Week 2</td></tr><tr><td><b>Share one improvement idea</b></td><td>Tell your manager one thing KalamDesk should do better.</td><td>P4</td><td>Month 1</td></tr>
+    </tbody></table>
+    <aside class="tips"><b>Tip</b><ul><li>Save these as **templates** (Templates menu), then each new person takes one click to set up.</li></ul></aside>
+  </section>
+</section>
+
+<section class="part" id="faq">
+  <div class="part-title"><span>Part 9</span><h2>Questions and quick reference</h2><p>Quick answers, and the things worth remembering.</p></div>
+  <section class="step"><header><span class="num">?</span><div><h3>Common questions</h3></div></header>
+    <dl class="faq"><dt>I forgot my password.</dt><dd>On the sign-in page click <b>Forgot password?</b>, enter your email and use the link we send. It works once and lasts 1 hour.</dd><dt>I never got the invitation email.</dt><dd>Check your spam folder first. Then ask a founder to open your profile and send a new invitation.</dd><dt>I cannot see a menu item a colleague has.</dt><dd>Menus depend on your role. Leads see Desk, Recurring, Dashboard, Stand-ups and Templates. Only founders see Departments, bank details and approvals, and only group owners see Organisations.</dd><dt>Why can't I see colleagues from the other organisation?</dt><dd>Each organisation is completely separate by design. Nobody in one can see the people, tasks or data of another.</dd><dt>My task is late because I am waiting for someone.</dt><dd>Set the status to <b>Blocked</b> and write the reason. The person who assigned it is told, and you avoid the overdue penalty.</dd><dt>I finished a task but it will not close.</dt><dd>It may need proof. Add the note or file it asks for. Or it may be waiting in <b>In Review</b> for a manager to approve.</dd><dt>I changed my mind about a leave request or expense.</dt><dd>Cancel leave on the Leave page, and withdraw an expense claim on the Expenses page, until it has been decided.</dd><dt>Are my bank details safe?</dt><dd>They are encrypted, and only founders can open them. Every reveal asks for a password check and is logged.</dd><dt>Can I use KalamDesk on my phone?</dt><dd>Yes. Open the same address in your phone's browser. The menu becomes a bar along the bottom, and you can add the page to your home screen.</dd><dt>What does a red dot on the bell mean?</dt><dd>A new notification: a task assigned to you, a comment, a reminder or kudos.</dd><dt>I turned on two-step sign-in and lost my phone.</dt><dd>Use one of your recovery codes instead of the 6-digit code. If you have none, another founder can switch it off for you.</dd></dl></section>
+  <section class="step"><header><span class="num">✓</span><div><h3>Quick reference</h3></div></header>
+    <div class="grid2">
+      <div><h4>Priorities</h4><table class="ref"><tr><td><b>P1</b></td><td>Urgent. Do it now.</td></tr><tr><td><b>P2</b></td><td>High. Today.</td></tr><tr><td><b>P3</b></td><td>Normal. The default.</td></tr><tr><td><b>P4</b></td><td>When you are free.</td></tr></table></div>
+      <div><h4>Task statuses</h4><table class="ref"><tr><td><b>To Do</b></td><td>Not started.</td></tr><tr><td><b>In Progress</b></td><td>You are on it.</td></tr><tr><td><b>Blocked</b></td><td>Stuck. A reason is required.</td></tr><tr><td><b>In Review</b></td><td>Waiting for approval.</td></tr><tr><td><b>Done</b></td><td>Finished.</td></tr></table></div>
+      <div><h4>Who can do what</h4><table class="ref"><tr><td><b>Intern / Employee</b></td><td>Own tasks, stand-ups, leave, leads, expenses, scores, kudos.</td></tr><tr><td><b>Manager</b></td><td>Everything above, plus assign work to the team, review, approve leave, Desk, Dashboard.</td></tr><tr><td><b>Founder</b></td><td>Everything in the organisation, including people, departments, bank details, expenses and incentives.</td></tr><tr><td><b>Group owner</b></td><td>A founder who can switch between organisations.</td></tr></table></div>
+      <div><h4>Handy shortcuts</h4><table class="ref"><tr><td><kbd>N</kbd></td><td>Add a task from anywhere.</td></tr><tr><td><kbd>Enter</kbd></td><td>Save in the quick-add box.</td></tr><tr><td><kbd>Esc</kbd></td><td>Close a pop-up or menu.</td></tr></table>
+      <h4 style="margin-top:14px">WhatsApp replies (if turned on)</h4><table class="ref"><tr><td><b>DONE a1b2c3</b></td><td>Finish a task. The code is in each alert.</td></tr><tr><td><b>START a1b2c3</b></td><td>Mark it in progress.</td></tr><tr><td><b>BLOCKED a1b2c3 reason</b></td><td>Mark it blocked.</td></tr><tr><td><b>UPDATE …</b></td><td>File your stand-up.</td></tr><tr><td><b>TASKS</b></td><td>See what is due.</td></tr></table></div>
+    </div></section>
+</section>
+<p class="end">KalamDesk · If something here does not match what you see, tell your founder so the guide can be fixed.</p>
+</div></body></html>
