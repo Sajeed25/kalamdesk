@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: 15 23 42; --paper: 248 250 252; --card: 255 255 255; --line: 226 232 240; --mute: 100 116 139; --brand: 79 70 229;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --ink: 226 232 240; --paper: 11 17 32; --card: 20 28 46; --line: 40 51 74; --mute: 148 163 184; --brand: 129 140 248; }
+}
+body { @apply bg-paper text-ink antialiased; font-family: ui-sans-serif, system-ui, "Segoe UI", sans-serif; }
+
+@layer components {
+  .btn { @apply inline-flex items-center justify-center gap-1 rounded-lg border border-line bg-card px-3 py-2 text-sm font-medium hover:bg-line/50 disabled:opacity-50; }
+  .btn-primary { @apply border-transparent bg-brand text-white hover:opacity-90; }
+  .input { @apply w-full rounded-lg border border-line bg-card px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand/40; }
+  .chip { @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold; }
+  .panel { @apply rounded-xl border border-line bg-card; }
+}
+
+/* Overdue cards pulse subtly */
+@keyframes soft-pulse { 0%,100% { box-shadow: 0 0 0 0 rgb(239 68 68 / 0.0) } 50% { box-shadow: 0 0 0 3px rgb(239 68 68 / 0.25) } }
+.overdue-pulse { animation: soft-pulse 2.4s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .overdue-pulse { animation: none; } }

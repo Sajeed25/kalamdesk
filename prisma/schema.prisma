@@ -1,0 +1,336 @@
+// KalamDesk data model (full: Phase 1 is implemented in the app; Phase 2/3 tables are
+// created now so later phases need no destructive migration).
+//
+// Postgres in production: change `provider` to "postgresql" and DATABASE_URL.
+// Enums/JSON are intentionally avoided (plain strings validated in src/lib/constants.ts)
+// so the same schema runs on SQLite for zero-setup local development.
+// All DateTime values are UTC; the UI renders Asia/Kolkata.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- People ----------
+
+model Department {
+  id        String  @id @default(cuid())
+  name      String  @unique
+  color     String  @default("#64748b")
+  users     User[]
+  tasks     Task[]
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String    @unique // official email, used for login + notifications
+  name           String
+  passwordHash   String
+  role           String    @default("EMPLOYEE") // FOUNDER | MANAGER | EMPLOYEE | INTERN
+  active         Boolean   @default(true)
+  departmentId   String?
+  department     Department? @relation(fields: [departmentId], references: [id])
+  totpSecret     String? // Phase 3: 2FA for admins
+  consentAt      DateTime? // DPDP Act: consent recorded at onboarding
+  lastSeenAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  profile        EmployeeProfile?
+  sensitive      EmployeeSensitive?
+
+  createdTasks   Task[]            @relation("TaskCreator")
+  assignments    TaskAssignee[]
+  comments       TaskComment[]
+  activities     TaskActivity[]
+  notifications  Notification[]
+  dailyUpdates   DailyUpdate[]
+  scoreEvents    ScoreEvent[]
+  incentives     IncentiveAward[]
+  referrals      Referral[]
+  auditEntries   AuditLog[]
+  managedUsers   EmployeeProfile[] @relation("ReportingManager")
+}
+
+model EmployeeProfile {
+  userId           String   @id
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  photoUrl         String?
+  office           String   @default("Hyderabad") // Hyderabad | Warangal
+  phone            String?
+  personalEmail    String?
+  emergencyContact String?
+  joinedOn         DateTime?
+  employmentType   String   @default("FULL_TIME") // FULL_TIME | INTERN | CONTRACT
+  internStart      DateTime?
+  internEnd        DateTime?
+  managerId        String?
+  manager          User?    @relation("ReportingManager", fields: [managerId], references: [id])
+  title            String?
+}
+
+// Phase 3: every column holds AES-256-GCM ciphertext (see src/lib/crypto.ts). Admin only.
+model EmployeeSensitive {
+  userId            String   @id
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountHolderEnc  String?
+  accountNumberEnc  String?
+  ifscEnc           String?
+  bankNameEnc       String?
+  upiIdEnc          String?
+  last4             String? // the only part ever shown by default
+  updatedAt         DateTime @updatedAt
+}
+
+// ---------- Tasks ----------
+
+model Task {
+  id            String   @id @default(cuid())
+  title         String
+  description   String   @default("")
+  status        String   @default("TODO") // TODO | IN_PROGRESS | BLOCKED | IN_REVIEW | DONE | CANCELLED
+  priority      String   @default("P3") // P1 | P2 | P3 | P4
+  complexity    Int      @default(2) // 1..5
+  dueAt         DateTime?
+  estimateHours Float?
+  tags          String   @default("") // comma separated, optional filter only
+  links         String   @default("") // newline separated
+  location      String? // field visits
+  blockedReason String?
+  requiresProof Boolean  @default(false)
+  proofNote     String?
+  selfInitiated Boolean  @default(false)
+  initiativeAccepted Boolean @default(false)
+  reviewState   String? // APPROVED | SENT_BACK
+  impactStars   Int? // 0..5 founder rating
+  departmentId  String?
+  department    Department? @relation(fields: [departmentId], references: [id])
+  creatorId     String
+  creator       User     @relation("TaskCreator", fields: [creatorId], references: [id])
+  recurringRuleId String?
+  recurringRule RecurringRule? @relation(fields: [recurringRuleId], references: [id])
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  assignees     TaskAssignee[]
+  checklist     TaskChecklistItem[]
+  comments      TaskComment[]
+  attachments   TaskAttachment[]
+  activity      TaskActivity[]
+  instances     TaskInstance[]
+  scoreEvents   ScoreEvent[]
+
+  @@index([status, dueAt])
+  @@index([creatorId])
+}
+
+model TaskAssignee {
+  taskId String
+  userId String
+  task   Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user   User @relation(fields: [userId], references: [id])
+  @@id([taskId, userId])
+  @@index([userId])
+}
+
+model TaskChecklistItem {
+  id     String  @id @default(cuid())
+  taskId String
+  task   Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  text   String
+  done   Boolean @default(false)
+  position Int    @default(0)
+}
+
+model TaskComment {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime @default(now())
+}
+
+model TaskAttachment {
+  id         String   @id @default(cuid())
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  fileName   String
+  storageKey String // S3-compatible object key
+  mimeType   String
+  sizeBytes  Int
+  createdAt  DateTime @default(now())
+}
+
+model TaskActivity {
+  id        String   @id @default(cuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  actorId   String
+  actor     User     @relation(fields: [actorId], references: [id])
+  action    String // CREATED | STATUS | ASSIGNED | PRIORITY | DUE | COMMENT | REVIEW | EDITED
+  detail    String   @default("")
+  createdAt DateTime @default(now())
+  @@index([taskId, createdAt])
+}
+
+// ---------- Phase 2: recurring ----------
+
+model RecurringRule {
+  id            String   @id @default(cuid())
+  title         String
+  description   String   @default("")
+  rrule         String // simplified: "WEEKLY;BYDAY=TU;AT=10:00" | "MONTHLY;BYMONTHDAY=1;AT=09:00" | "WEEKDAYS;AT=09:00"
+  leadHours     Int      @default(12)
+  priority      String   @default("P3")
+  location      String?
+  departmentId  String?
+  assigneeIds   String   @default("") // comma separated user ids
+  creatorId     String
+  active        Boolean  @default(true)
+  tasks         Task[]
+  instances     TaskInstance[]
+}
+
+model TaskInstance {
+  id          String   @id @default(cuid())
+  ruleId      String
+  rule        RecurringRule @relation(fields: [ruleId], references: [id])
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id])
+  forDate     DateTime
+  outcome     String   @default("PENDING") // PENDING | DONE | LATE | MISSED
+  checkInAt   DateTime?
+  checkInLat  Float?
+  checkInLng  Float?
+}
+
+// ---------- Phase 2: updates + scoring ----------
+
+model DailyUpdate {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  forDate   String // YYYY-MM-DD in IST
+  finished  String   @default("")
+  pending   String   @default("")
+  obstacles String   @default("")
+  createdAt DateTime @default(now())
+  @@unique([userId, forDate])
+}
+
+model ScoreSetting {
+  key   String @id
+  value Float
+}
+
+model ScoreEvent {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  taskId    String?
+  task      Task?    @relation(fields: [taskId], references: [id])
+  kind      String // TASK_DONE | MISSED_RECURRING | OVERDUE_PENALTY | INITIATIVE | IMPACT
+  points    Float
+  breakdown String   @default("") // human-readable formula shown on hover
+  createdAt DateTime @default(now())
+  @@index([userId, createdAt])
+}
+
+// ---------- Phase 3: incentives, referrals, snapshots ----------
+
+model IncentiveRule {
+  id        String @id @default(cuid())
+  name      String
+  minPoints Float  @default(0)
+  minOnTimePct Float @default(0)
+  amountInr Int
+  active    Boolean @default(true)
+  awards    IncentiveAward[]
+}
+
+model IncentiveAward {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  ruleId    String?
+  rule      IncentiveRule? @relation(fields: [ruleId], references: [id])
+  month     String // YYYY-MM
+  amountInr Int
+  reason    String
+  approved  Boolean  @default(false)
+  paid      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ReferralProgram {
+  id          String   @id @default(cuid())
+  name        String
+  reward      String
+  validUntil  DateTime?
+  active      Boolean  @default(true)
+  referrals   Referral[]
+}
+
+model Referral {
+  id           String   @id @default(cuid())
+  programId    String
+  program      ReferralProgram @relation(fields: [programId], references: [id])
+  referrerId   String
+  referrer     User     @relation(fields: [referrerId], references: [id])
+  name         String
+  contact      String
+  organisation String?
+  notes        String   @default("")
+  status       String   @default("SUBMITTED") // SUBMITTED | CONTACTED | QUALIFIED | CONVERTED | REWARD_PAID
+  createdAt    DateTime @default(now())
+}
+
+model DashboardSnapshot {
+  id        String   @id @default(cuid())
+  period    String // WEEKLY | MONTHLY
+  label     String
+  payload   String // serialized metrics
+  shareSlug String   @unique
+  createdAt DateTime @default(now())
+}
+
+// ---------- Cross-cutting ----------
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  kind      String // ASSIGNED | STATUS | COMMENT | BLOCKED | SENT_BACK | APPROVED | REMINDER | DIGEST
+  title     String
+  body      String   @default("")
+  url       String   @default("")
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+  @@index([userId, readAt])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorId   String?
+  actor     User?    @relation(fields: [actorId], references: [id])
+  action    String // e.g. USER_CREATED, SENSITIVE_REVEAL, SETTINGS_CHANGED
+  target    String   @default("")
+  meta      String   @default("")
+  createdAt DateTime @default(now())
+  @@index([createdAt])
+}
+
+// Idempotency for scheduled jobs (digests, reminders): one row per (kind, key).
+model JobRun {
+  id        String   @id @default(cuid())
+  kind      String
+  key       String
+  createdAt DateTime @default(now())
+  @@unique([kind, key])
+}
