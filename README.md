@@ -147,3 +147,12 @@ npm run create-founder -- --email you@yourdomain.com --name "Your Name" --passwo
 Then sign in and add everyone else from **People → Add person**; they get an invite email to set their own password. Do not run `db:seed` in production.
 
 Open `/api/health` on the live site to see what's missing. It reports only yes/no flags: `sessionSecretOk`, `databaseUrlSet`, `dbReachable`, `schemaReady`, `hasUsers`.
+
+## Scheduled jobs on Hostinger (Node.js cron)
+
+In hPanel → Advanced → Cron Jobs, choose **Node.js** and create **one** job:
+
+- Command (the part after the pre-filled prefix): `scripts/cron.js`
+- Schedule: every 15 minutes (`*/15 * * * *`)
+
+`CRON_SECRET` and `APP_URL` must be in the `.env` file the cron prefix loads (`--env-file=…`). The script sends reminders every run, the 8:30 AM IST digest once that time has passed, and the 7 PM IST founder digest once that time has passed. IST is computed inside the script, so the server's timezone doesn't matter, and the server makes each digest idempotent per day.
