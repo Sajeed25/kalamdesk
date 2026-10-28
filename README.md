@@ -38,7 +38,7 @@ Person-first daily operations and task tracker for Robokalam (Hyderabad / Warang
     │              src/lib/notify.ts    Channel fan-out: in-app · email · (whatsapp stub)
     │              src/lib/email.ts     SMTP via nodemailer (Hostinger-ready, console fallback in dev)
     ▼
- Prisma ──► SQLite (dev) / PostgreSQL (prod)
+ Prisma ──► MySQL
 
  Scheduler (Vercel Cron / GitHub Actions / any cron) ──► GET /api/cron/* with Bearer CRON_SECRET
 ```
@@ -61,13 +61,13 @@ src/components/           Nav, Bell, QuickAdd, KanbanBoard, TaskRow, StatusMenu,
 
 ## Setup
 
-Requires Node 20+.
+Requires Node 20+ and a MySQL database (local MySQL/XAMPP for development, or Hostinger MySQL).
 
 ```bash
 cd kalamdesk
 npm install
 cp .env.example .env        # then edit SESSION_SECRET and CRON_SECRET
-npx prisma db push          # creates the SQLite database
+npx prisma db push          # creates the tables in your MySQL database
 npm run db:seed
 npm run dev                 # http://localhost:3000
 ```
@@ -87,7 +87,7 @@ Reset demo data: `npm run db:reset`.
 
 | Name | Purpose |
 |---|---|
-| `DATABASE_URL` | `file:./dev.db` for SQLite, `postgresql://…` in production |
+| `DATABASE_URL` | `mysql://USER:PASSWORD@localhost:3306/DBNAME` (URL-encode special characters in the password) |
 | `SESSION_SECRET` | ≥ 32 random chars; signs session cookies (`openssl rand -base64 32`) |
 | `APP_URL` | public URL, used for links in emails |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM` | email over SMTP. Hostinger: `smtp.hostinger.com`, port `465` (or `587`), user = full mailbox address. If `SMTP_HOST` is empty, emails are logged to the server console |
@@ -107,10 +107,10 @@ Call with header `Authorization: Bearer $CRON_SECRET`. Cron expressions are in *
 
 On Vercel, put these in `vercel.json` `crons` (Vercel sends the secret as `Authorization: Bearer $CRON_SECRET` when the env var is set).
 
-## Deployment (Vercel + managed Postgres)
+## Deployment (Hostinger Node.js + MySQL)
 
-1. Create a Postgres database (Neon, Supabase or RDS).
-2. In `prisma/schema.prisma` change `provider = "sqlite"` to `"postgresql"`. The schema uses no enums or JSON columns, so nothing else changes.
+1. In hPanel go to Databases, create a MySQL database and user, and note the host (usually `localhost`), database name, user and password.
+2. Put them in `DATABASE_URL`, then run `npx prisma db push` once on the server and create your first founder (see "First login" below).
 3. Set the environment variables above in your host. Use a **new** `SESSION_SECRET` and `CRON_SECRET`.
 4. Run `npx prisma db push` (or `prisma migrate dev --name init` locally, then `prisma migrate deploy` in CI) against the production database.
 5. Seed only if you want demo data. For real use, create your founders with a one-off script and **change every seed password**.
@@ -119,7 +119,7 @@ On Vercel, put these in `vercel.json` `crons` (Vercel sends the secret as `Autho
 
 ## Assumptions made (please confirm)
 
-1. **SQLite locally, PostgreSQL in production.** The build environment had no Postgres; the schema is Postgres-compatible.
+1. **MySQL** (the schema sets explicit column sizes because MySQL cannot default TEXT columns). The SQL was generated and inspected with Prisma but not run against a live MySQL server in the build environment; the first `db push` on your server is the real test.
 2. **Custom JWT sessions** instead of NextAuth or Supabase Auth, to keep Phase 1 small. Google sign-in and TOTP 2FA for admins are planned for Phase 3 (`User.totpSecret` is reserved). Password reset works by emailed single-use link (1 hour).
 3. **Employees can assign to others only as a request.** A non-lead creating a task for a colleague is allowed; the assignee sees who raised it. If you'd rather block this, say so.
 4. **Managers' scope = people whose profile lists them as `managerId`.** Founders see everyone.

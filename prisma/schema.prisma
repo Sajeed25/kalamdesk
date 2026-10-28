@@ -1,9 +1,9 @@
 // KalamDesk data model (full: Phase 1 is implemented in the app; Phase 2/3 tables are
 // created now so later phases need no destructive migration).
 //
-// Postgres in production: change `provider` to "postgresql" and DATABASE_URL.
-// Enums/JSON are intentionally avoided (plain strings validated in src/lib/constants.ts)
-// so the same schema runs on SQLite for zero-setup local development.
+// MySQL (Hostinger). Enums/JSON are intentionally avoided (plain strings validated in
+// src/lib/constants.ts). MySQL needs explicit sizes: VarChar for defaulted text (TEXT columns
+// cannot have defaults), Text for long nullable/required bodies.
 // All DateTime values are UTC; the UI renders Asia/Kolkata.
 
 generator client {
@@ -12,7 +12,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -59,11 +59,11 @@ model User {
 model EmployeeProfile {
   userId           String   @id
   user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  photoUrl         String?
+  photoUrl         String? @db.VarChar(500)
   office           String   @default("Hyderabad") // Hyderabad | Warangal
   phone            String?
   personalEmail    String?
-  emergencyContact String?
+  emergencyContact String? @db.VarChar(255)
   joinedOn         DateTime?
   employmentType   String   @default("FULL_TIME") // FULL_TIME | INTERN | CONTRACT
   internStart      DateTime?
@@ -77,11 +77,11 @@ model EmployeeProfile {
 model EmployeeSensitive {
   userId            String   @id
   user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accountHolderEnc  String?
-  accountNumberEnc  String?
-  ifscEnc           String?
-  bankNameEnc       String?
-  upiIdEnc          String?
+  accountHolderEnc  String? @db.Text
+  accountNumberEnc  String? @db.Text
+  ifscEnc           String? @db.Text
+  bankNameEnc       String? @db.Text
+  upiIdEnc          String? @db.Text
   last4             String? // the only part ever shown by default
   updatedAt         DateTime @updatedAt
 }
@@ -90,19 +90,19 @@ model EmployeeSensitive {
 
 model Task {
   id            String   @id @default(cuid())
-  title         String
-  description   String   @default("")
+  title         String @db.VarChar(255)
+  description   String   @default("") @db.VarChar(5000)
   status        String   @default("TODO") // TODO | IN_PROGRESS | BLOCKED | IN_REVIEW | DONE | CANCELLED
   priority      String   @default("P3") // P1 | P2 | P3 | P4
   complexity    Int      @default(2) // 1..5
   dueAt         DateTime?
   estimateHours Float?
-  tags          String   @default("") // comma separated, optional filter only
-  links         String   @default("") // newline separated
-  location      String? // field visits
-  blockedReason String?
+  tags          String   @default("") @db.VarChar(200) // comma separated, optional filter only
+  links         String   @default("") @db.VarChar(2000) // newline separated
+  location      String? @db.VarChar(300) // field visits
+  blockedReason String? @db.Text
   requiresProof Boolean  @default(false)
-  proofNote     String?
+  proofNote     String? @db.Text
   selfInitiated Boolean  @default(false)
   initiativeAccepted Boolean @default(false)
   reviewState   String? // APPROVED | SENT_BACK
@@ -142,7 +142,7 @@ model TaskChecklistItem {
   id     String  @id @default(cuid())
   taskId String
   task   Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  text   String
+  text   String @db.VarChar(255)
   done   Boolean @default(false)
   position Int    @default(0)
 }
@@ -153,7 +153,7 @@ model TaskComment {
   task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
   authorId  String
   author    User     @relation(fields: [authorId], references: [id])
-  body      String
+  body      String @db.Text
   createdAt DateTime @default(now())
 }
 
@@ -161,7 +161,7 @@ model TaskAttachment {
   id         String   @id @default(cuid())
   taskId     String
   task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  fileName   String
+  fileName   String @db.VarChar(255)
   storageKey String // S3-compatible object key
   mimeType   String
   sizeBytes  Int
@@ -175,7 +175,7 @@ model TaskActivity {
   actorId   String
   actor     User     @relation(fields: [actorId], references: [id])
   action    String // CREATED | STATUS | ASSIGNED | PRIORITY | DUE | COMMENT | REVIEW | EDITED
-  detail    String   @default("")
+  detail    String   @default("") @db.VarChar(1000)
   createdAt DateTime @default(now())
   @@index([taskId, createdAt])
 }
@@ -184,14 +184,14 @@ model TaskActivity {
 
 model RecurringRule {
   id            String   @id @default(cuid())
-  title         String
-  description   String   @default("")
+  title         String @db.VarChar(255)
+  description   String   @default("") @db.VarChar(2000)
   rrule         String // simplified: "WEEKLY;BYDAY=TU;AT=10:00" | "MONTHLY;BYMONTHDAY=1;AT=09:00" | "WEEKDAYS;AT=09:00"
   leadHours     Int      @default(12)
   priority      String   @default("P3")
-  location      String?
+  location      String? @db.VarChar(300)
   departmentId  String?
-  assigneeIds   String   @default("") // comma separated user ids
+  assigneeIds   String   @default("") @db.VarChar(2000) // comma separated user ids
   creatorId     String
   active        Boolean  @default(true)
   tasks         Task[]
@@ -218,9 +218,9 @@ model DailyUpdate {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   forDate   String // YYYY-MM-DD in IST
-  finished  String   @default("")
-  pending   String   @default("")
-  obstacles String   @default("")
+  finished  String   @default("") @db.VarChar(2000)
+  pending   String   @default("") @db.VarChar(2000)
+  obstacles String   @default("") @db.VarChar(2000)
   createdAt DateTime @default(now())
   @@unique([userId, forDate])
 }
@@ -238,7 +238,7 @@ model ScoreEvent {
   task      Task?    @relation(fields: [taskId], references: [id])
   kind      String // TASK_DONE | MISSED_RECURRING | OVERDUE_PENALTY | INITIATIVE | IMPACT
   points    Float
-  breakdown String   @default("") // human-readable formula shown on hover
+  breakdown String   @default("") @db.VarChar(1000) // human-readable formula shown on hover
   createdAt DateTime @default(now())
   @@index([userId, createdAt])
 }
@@ -263,7 +263,7 @@ model IncentiveAward {
   rule      IncentiveRule? @relation(fields: [ruleId], references: [id])
   month     String // YYYY-MM
   amountInr Int
-  reason    String
+  reason    String @db.VarChar(500)
   approved  Boolean  @default(false)
   paid      Boolean  @default(false)
   createdAt DateTime @default(now())
@@ -287,7 +287,7 @@ model Referral {
   name         String
   contact      String
   organisation String?
-  notes        String   @default("")
+  notes        String   @default("") @db.VarChar(2000)
   status       String   @default("SUBMITTED") // SUBMITTED | CONTACTED | QUALIFIED | CONVERTED | REWARD_PAID
   createdAt    DateTime @default(now())
 }
@@ -296,7 +296,7 @@ model DashboardSnapshot {
   id        String   @id @default(cuid())
   period    String // WEEKLY | MONTHLY
   label     String
-  payload   String // serialized metrics
+  payload   String @db.Text // serialized metrics
   shareSlug String   @unique
   createdAt DateTime @default(now())
 }
@@ -308,9 +308,9 @@ model Notification {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   kind      String // ASSIGNED | STATUS | COMMENT | BLOCKED | SENT_BACK | APPROVED | REMINDER | DIGEST
-  title     String
-  body      String   @default("")
-  url       String   @default("")
+  title     String @db.VarChar(500)
+  body      String   @default("") @db.VarChar(1000)
+  url       String   @default("") @db.VarChar(255)
   readAt    DateTime?
   createdAt DateTime @default(now())
   @@index([userId, readAt])
@@ -322,7 +322,7 @@ model AuditLog {
   actor     User?    @relation(fields: [actorId], references: [id])
   action    String // e.g. USER_CREATED, SENSITIVE_REVEAL, SETTINGS_CHANGED
   target    String   @default("")
-  meta      String   @default("")
+  meta      String   @default("") @db.VarChar(500)
   createdAt DateTime @default(now())
   @@index([createdAt])
 }

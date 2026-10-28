@@ -10,16 +10,18 @@ export const dynamic = "force-dynamic";
 /** Coarse category only. The raw message may contain paths or hostnames, so it stays in the server log. */
 function classify(msg: string) {
   const m = msg.toLowerCase();
-  if (m.includes("must start with the protocol") || m.includes("provider") || m.includes("invalid database string"))
-    return "DATABASE_URL does not match the schema provider (this build expects a SQLite 'file:' URL)";
+  if (m.includes("must start with the protocol") || m.includes("invalid database string") || m.includes("provider"))
+    return "DATABASE_URL is not a mysql:// URL (format: mysql://USER:PASSWORD@HOST:3306/DBNAME)";
   if (m.includes("query engine") || m.includes("binary") || m.includes("libssl") || m.includes("prisma client could not locate"))
     return "Prisma engine for this server's OS is missing: run 'npx prisma generate' on the server";
-  if (m.includes("unable to open") || m.includes("cannot open") || m.includes("eacces") || m.includes("read-only") || m.includes("readonly"))
-    return "SQLite file cannot be opened or written (folder missing or not writable)";
-  if (m.includes("no such table") || m.includes("does not exist"))
+  if (m.includes("authentication failed") || m.includes("access denied"))
+    return "MySQL rejected the username or password (special characters in the password must be URL-encoded)";
+  if (m.includes("unknown database") || m.includes("does not exist") && m.includes("database"))
+    return "MySQL database name in DATABASE_URL does not exist";
+  if (m.includes("no such table") || m.includes("doesn't exist") || m.includes("does not exist"))
     return "tables are missing: run 'npx prisma db push'";
-  if (m.includes("econnrefused") || m.includes("can't reach") || m.includes("timed out"))
-    return "database server unreachable";
+  if (m.includes("econnrefused") || m.includes("can't reach") || m.includes("timed out") || m.includes("enotfound"))
+    return "MySQL server unreachable (check the host in DATABASE_URL; on Hostinger it is usually localhost)";
   return "other: check the server log for lines starting with [health]";
 }
 
