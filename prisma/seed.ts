@@ -169,6 +169,26 @@ async function main() {
     }
   }
 
+  // ---- Phase 4 demo data ----
+  if ((await db.taskTemplate.count()) === 0) {
+    await db.taskTemplate.createMany({
+      data: [
+        { name: "School visit", title: "School visit: ", description: "On-site demo or training at a school.", priority: "P2", complexity: 3, estimateHours: 4, checklist: "Confirm the date with the principal\nPack the kits\nTake photos\nFile the visit report", createdById: id["kiran"] },
+        { name: "Month-end invoicing", title: "Month-end invoices", description: "Raise and send all invoices.", priority: "P2", complexity: 2, estimateHours: 3, checklist: "Collect delivery list\nRaise invoices\nEmail to schools\nUpdate the tracker", createdById: id["arjun"] },
+      ],
+    });
+  }
+  if ((await db.lead.count()) === 0) {
+    const soon = new Date(Date.now() + 24 * H);
+    await db.lead.createMany({
+      data: [
+        { name: "Mrs. Rekha", organisation: "Sunrise Public School", phone: "+91 98765 11111", stage: "DEMO", valueInr: 150000, ownerId: id["ravi"], nextFollowUp: soon, source: "Referral", notes: "Wants a demo for classes 6 to 8." },
+        { name: "Mr. Anand", organisation: "Vagdevi High School", phone: "+91 98765 22222", stage: "CONTACTED", valueInr: 80000, ownerId: id["divya"], source: "Walk-in" },
+        { name: "Dr. Suma", organisation: "Kakatiya Academy", stage: "NEW", ownerId: id["nikhil"], source: "Event" },
+      ],
+    });
+  }
+
   console.log(`Seeded. Log in as arjun@robokalam.test / ${DEV_PASSWORD}`);
 }
 

@@ -12,6 +12,12 @@ import TaskRow, { PriorityChip, isOverdue } from "@/components/TaskRow";
 import CompleteButton from "@/components/CompleteButton";
 import ProgressRing from "@/components/ProgressRing";
 import Icon from "@/components/Icon";
+import { AttendanceCard } from "@/components/LeaveParts";
+import RecapCard from "@/components/RecapCard";
+import CelebrationBanner from "@/components/CelebrationBanner";
+import { celebrationsFor } from "@/lib/celebrations";
+import { weeklyRecap } from "@/lib/recap";
+import { toIstParts } from "@/lib/time";
 
 export const dynamic = "force-dynamic";
 
@@ -30,6 +36,9 @@ export default async function MyDay() {
     personalGoal(u.id),
     badgeStats(u.id, istDateKey(now)),
   ]);
+  const attendance = await db.attendanceLog.findUnique({ where: { userId_forDate: { userId: u.id, forDate: istDateKey(now) } } }).catch(() => null);
+  const cheers = await celebrationsFor(now);
+  const recap = [1, 2, 3].includes(toIstParts(now).dow) ? await weeklyRecap(u.id, u.role).catch(() => null) : null;
   const allBadges = evaluate(stats);
   const earnedBadges = allBadges.filter((b) => b.earned);
   // the closest locked badge: the one you are furthest along towards
@@ -79,6 +88,10 @@ export default async function MyDay() {
           </div>
         </div>
       </section>
+
+      <CelebrationBanner items={cheers} dayKey={istDateKey(now)} />
+      {recap && <RecapCard r={recap} />}
+      <AttendanceCard checkIn={attendance?.checkInAt.toISOString() ?? null} checkOut={attendance?.checkOutAt?.toISOString() ?? null} />
 
       {/* ---------------- stand-up nudge ---------------- */}
       {!streak.doneToday ? (

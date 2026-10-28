@@ -1,12 +1,12 @@
-import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { isLead } from "@/lib/rbac";
 import { taskInclude } from "@/lib/tasks";
 import { filterOptions, filteredWhere, type TaskFilters } from "@/lib/filters";
 import { fmtDateTime } from "@/lib/time";
-import { STATUS_LABEL } from "@/lib/constants";
 import Filters from "@/components/Filters";
-import { PriorityChip, isOverdue } from "@/components/TaskRow";
+import BulkTaskTable, { type Row } from "@/components/BulkTaskTable";
+import { isOverdue } from "@/components/TaskRow";
 
 export const dynamic = "force-dynamic";
 
@@ -28,39 +28,22 @@ export default async function List({ searchParams }: { searchParams: SP }) {
     p.set("dir", searchParams.sort === k && dir === "asc" ? "desc" : "asc");
     return `/list?${p}`;
   };
-  const th = "px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-mute";
+  const rows: Row[] = tasks.map((t) => ({
+    id: t.id, title: t.title, assignees: t.assignees.map((a) => a.user.name).join(", "), priority: t.priority, status: t.status,
+    due: t.dueAt ? fmtDateTime(t.dueAt) : "", overdue: isOverdue(t),
+  }));
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <h1 className="page-title">All tasks <span className="text-base font-normal text-mute">({tasks.length})</span></h1>
+        <div>
+          <div className="eyebrow">Everything in one place</div>
+          <h1 className="page-title mt-1">All tasks <span className="text-lg font-bold text-mute">({tasks.length})</span></h1>
+          {isLead(u) && <p className="text-sm font-semibold text-mute">Tick several tasks to change their priority, status, assignee or due date at once.</p>}
+        </div>
         <Filters {...opts} current={searchParams} />
       </div>
-      <div className="panel overflow-x-auto">
-        <table className="w-full text-sm">
-          <thead className="border-b border-line">
-            <tr>
-              <th className={th}><Link href={q("title")}>Task</Link></th>
-              <th className={th}>Assignee</th>
-              <th className={th}><Link href={q("priority")}>Priority</Link></th>
-              <th className={th}><Link href={q("status")}>Status</Link></th>
-              <th className={th}><Link href={q("due")}>Due</Link></th>
-            </tr>
-          </thead>
-          <tbody>
-            {tasks.map((t) => (
-              <tr key={t.id} className="border-b border-line last:border-0 hover:bg-line/30">
-                <td className="px-3 py-2"><Link href={`/tasks/${t.id}`} className="font-medium hover:underline">{t.title}</Link></td>
-                <td className="px-3 py-2 text-mute">{t.assignees.map((a) => a.user.name).join(", ")}</td>
-                <td className="px-3 py-2"><PriorityChip p={t.priority} /></td>
-                <td className="px-3 py-2">{STATUS_LABEL[t.status]}</td>
-                <td className={`px-3 py-2 ${isOverdue(t) ? "font-semibold text-red-600" : "text-mute"}`}>{fmtDateTime(t.dueAt)}</td>
-              </tr>
-            ))}
-            {tasks.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-mute">No tasks match.</td></tr>}
-          </tbody>
-        </table>
-      </div>
+      <BulkTaskTable rows={rows} people={opts.people} canBulk={isLead(u)} sortLinks={{ title: q("title"), priority: q("priority"), status: q("status"), due: q("due") }} />
     </div>
   );
 }

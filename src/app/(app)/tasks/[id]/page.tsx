@@ -11,6 +11,7 @@ import TaskActions from "@/components/TaskActions";
 import ChecklistAndFiles from "@/components/ChecklistAndFiles";
 import EditTask from "@/components/EditTask";
 import CheckIn from "@/components/CheckIn";
+import VisitReportForm from "@/components/VisitReportForm";
 import { toIstInputValue } from "@/lib/time";
 import { PriorityChip, isOverdue } from "@/components/TaskRow";
 
@@ -33,6 +34,7 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
   const mayChangeStatus = canReview(u) || t.assignees.some((a) => a.userId === u.id);
   const canEdit = canReview(u) || t.creatorId === u.id || t.assignees.some((a) => a.userId === u.id);
   const canEditFields = canReview(u) || t.creatorId === u.id;
+  const visit = await db.visitReport.findUnique({ where: { taskId: t.id } }).catch(() => null);
   const people = canAssignOthers(u) ? await db.user.findMany({ where: { active: true }, select: { id: true, name: true }, orderBy: { name: "asc" } }) : [];
 
   return (
@@ -74,6 +76,12 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
           canCheckIn={t.assignees.some((a) => a.userId === u.id)}
         />
       )}
+
+      {t.instances[0]?.checkInLat != null && t.instances[0]?.checkInLng != null && (
+        <a href={`https://www.google.com/maps?q=${t.instances[0].checkInLat},${t.instances[0].checkInLng}`} target="_blank" rel="noopener noreferrer" className="btn w-fit">📍 See where they checked in</a>
+      )}
+
+      {(t.instances.length > 0 || !!t.location || !!visit) && canEdit && <VisitReportForm taskId={t.id} initial={visit ? { summary: visit.summary, attendees: visit.attendees, outcome: visit.outcome, followUp: visit.followUp } : null} />}
 
       <ChecklistAndFiles taskId={t.id} canEdit={canEdit} items={t.checklist} files={t.attachments.map((a) => ({ id: a.id, fileName: a.fileName, sizeBytes: a.sizeBytes }))} />
 

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { db } from "./db";
 import { notifyMany } from "./notify";
 import { onTaskSaved } from "./recurring";
+import { awayOn } from "./leave";
 import { canAssignOthers, canReview, isLead } from "./rbac";
 import { STATUS_LABEL, STATUSES, PRIORITIES } from "./constants";
 import type { SessionUser } from "./auth";
@@ -56,6 +57,7 @@ export const createSchema = z.object({
   location: z.string().max(300).nullish(),
   tags: z.string().max(200).optional().default(""),
   requiresProof: z.boolean().optional().default(false),
+  checklist: z.array(z.string().trim().min(1).max(200)).max(30).optional().default([]),
 });
 
 export async function createTask(u: SessionUser, input: z.infer<typeof createSchema>) {
@@ -68,6 +70,15 @@ export async function createTask(u: SessionUser, input: z.infer<typeof createSch
 
   const valid = await db.user.findMany({ where: { id: { in: assigneeIds }, active: true }, select: { id: true } });
   if (valid.length !== assigneeIds.length) throw new HttpError(400, "Unknown assignee");
+
+  // Someone on approved leave today: their named cover person gets the task too, so nothing sits idle.
+  const covering: string[] = [];
+  try {
+    for (const [, a] of await awayOn(assigneeIds)) {
+      if (a.backupUserId && !assigneeIds.includes(a.backupUserId) && !covering.includes(a.backupUserId) && (await db.user.count({ where: { id: a.backupUserId, active: true } }))) covering.push(a.backupUserId);
+    }
+  } catch { /* leave tables not upgraded yet: carry on without cover */ }
+  assigneeIds = [...assigneeIds, ...covering];
 
   const task = await db.task.create({
     data: {
@@ -84,6 +95,7 @@ export async function createTask(u: SessionUser, input: z.infer<typeof createSch
       creatorId: u.id,
       selfInitiated,
       assignees: { create: assigneeIds.map((userId) => ({ userId })) },
+      checklist: { create: input.checklist.map((text, position) => ({ text, position })) },
       activity: { create: { actorId: u.id, action: "CREATED", detail: selfInitiated ? "Self-initiated" : "" } },
     },
     include: taskInclude,

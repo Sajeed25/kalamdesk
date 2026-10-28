@@ -4,6 +4,7 @@ import { fmtDateTime } from "@/lib/time";
 import type { TaskCard } from "@/lib/tasks";
 import StatusMenu from "./StatusMenu";
 import CompleteButton from "./CompleteButton";
+import NudgeButton from "./NudgeButton";
 
 export function isOverdue(t: { status: string; dueAt: Date | null }) {
   return !!t.dueAt && t.dueAt < new Date() && t.status !== "DONE" && t.status !== "CANCELLED";
@@ -16,7 +17,7 @@ export function PriorityChip({ p }: { p: string }) {
 const BAR: Record<string, string> = { P1: "bg-red-500", P2: "bg-orange-500", P3: "bg-blue-500", P4: "bg-slate-400" };
 
 /** Task card used on My Day and the person pages. `canComplete` adds the one-tap check button. */
-export default function TaskRow({ t, showAssignee = false, canComplete = false, i = 0 }: { t: TaskCard; showAssignee?: boolean; canComplete?: boolean; i?: number }) {
+export default function TaskRow({ t, showAssignee = false, canComplete = false, nudge = false, i = 0 }: { t: TaskCard; showAssignee?: boolean; canComplete?: boolean; nudge?: boolean; i?: number }) {
   const over = isOverdue(t);
   const open = t.status !== "DONE" && t.status !== "CANCELLED";
   return (
@@ -35,6 +36,7 @@ export default function TaskRow({ t, showAssignee = false, canComplete = false, 
           {t.status === "BLOCKED" && <span className="font-semibold text-amber-600 dark:text-amber-400">Blocked: {t.blockedReason}</span>}
         </div>
       </div>
+      {nudge && (over || t.status === "BLOCKED") && <NudgeButton endpoint={`/api/tasks/${t.id}/chase`} who={t.assignees.map((a) => a.user.name).join(", ")} />}
       <StatusMenu id={t.id} status={t.status} requiresProof={t.requiresProof} />
     </div>
   );

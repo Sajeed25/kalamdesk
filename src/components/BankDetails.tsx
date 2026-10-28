@@ -25,6 +25,8 @@ export default function BankDetails({ userId, masked }: { userId: string; masked
   const [left, setLeft] = useState(0);
   const [askPw, setAskPw] = useState(false);
   const [pw, setPw] = useState("");
+  const [code, setCode] = useState("");
+  const [needCode, setNeedCode] = useState(false);
   const [err, setErr] = useState("");
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
@@ -43,9 +45,14 @@ export default function BankDetails({ userId, masked }: { userId: string; masked
   async function reveal(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true); setErr("");
-    const a = await call("/api/auth/reauth", "POST", { password: pw });
-    setPw("");
-    if (!a.ok) { setBusy(false); return setErr(a.error ?? "Could not confirm your password"); }
+    const a = await call("/api/auth/reauth", "POST", { password: pw, code: code || undefined });
+    if (!a.ok) {
+      setBusy(false);
+      if (a.data?.needs2fa) setNeedCode(true); // keep the password; ask for the 6-digit code too
+      else setPw("");
+      return setErr(a.error ?? "Could not confirm your password");
+    }
+    setPw(""); setCode(""); setNeedCode(false);
     const r = await call(`${base}/reveal`, "POST");
     setBusy(false);
     if (!r.ok) return setErr(r.error ?? "Could not reveal");
@@ -112,6 +119,11 @@ export default function BankDetails({ userId, masked }: { userId: string; masked
             <label className="text-sm font-medium">Confirm your password to reveal
               <input type="password" autoFocus required autoComplete="current-password" value={pw} onChange={(e) => setPw(e.target.value)} className="input mt-1 !w-64" />
             </label>
+            {needCode && (
+              <label className="text-sm font-medium">6-digit code from your authenticator app
+                <input inputMode="numeric" autoComplete="one-time-code" autoFocus required value={code} onChange={(e) => setCode(e.target.value)} className="input mt-1 !w-48 font-mono tracking-widest" placeholder="123456" />
+              </label>
+            )}
             <button disabled={busy} className="btn btn-primary">{busy ? "Checking…" : "Reveal"}</button>
             <button type="button" onClick={() => { setAskPw(false); setPw(""); }} className="btn">Cancel</button>
             <p className="w-full text-xs text-mute">Every reveal is recorded in the audit log with your name and the time.</p>

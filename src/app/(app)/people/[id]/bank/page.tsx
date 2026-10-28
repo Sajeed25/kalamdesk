@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { isFounder } from "@/lib/rbac";
 import { cryptoConfigured } from "@/lib/crypto";
 import BankDetails from "@/components/BankDetails";
+import DocumentsPanel from "@/components/DocumentsPanel";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,7 @@ export default async function Bank({ params }: { params: { id: string } }) {
   const person = await db.user.findUnique({ where: { id: params.id }, select: { id: true, name: true } });
   if (!person) notFound();
   const row = await db.employeeSensitive.findUnique({ where: { userId: person.id } });
+  const docs = await db.idDocument.findMany({ where: { userId: person.id }, orderBy: { createdAt: "desc" }, select: { id: true, kind: true, fileName: true, sizeBytes: true, createdAt: true } });
   // The page only receives the masked view; plaintext never touches the server-rendered HTML.
   const masked = {
     encryptionReady: cryptoConfigured(), saved: !!row, account: row?.last4 ? `••••••••${row.last4}` : null,
@@ -31,6 +33,7 @@ export default async function Bank({ params }: { params: { id: string } }) {
         <p className="text-sm text-mute">Encrypted at rest, founder-only, masked by default. Never included in emails, exports or logs.</p>
       </div>
       <BankDetails userId={person.id} masked={masked} />
+      <DocumentsPanel userId={person.id} docs={docs.map((d) => ({ ...d, createdAt: d.createdAt.toISOString() }))} encryptionReady={cryptoConfigured()} />
     </div>
   );
 }

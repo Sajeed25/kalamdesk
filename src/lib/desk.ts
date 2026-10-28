@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { endOfIstDay, istDateKey, toIstParts, startOfIstDay } from "./time";
 import { teamIds } from "./tasks";
+import { awayOn } from "./leave";
 import type { SessionUser } from "./auth";
 
 export type Health = "RED" | "AMBER" | "GREEN";
@@ -19,6 +20,7 @@ export type PersonSummary = {
   lastUpdate: Date | null;
   updatedToday: boolean;
   health: Health;
+  awayUntil: string | null;
 };
 
 /**
@@ -48,6 +50,7 @@ export async function deskSummaries(viewer: SessionUser): Promise<PersonSummary[
   });
   const lastBy = new Map(acts.map((a) => [a.actorId, a._max.createdAt]));
   const updated = new Set((await db.dailyUpdate.findMany({ where: { userId: { in: ids }, forDate: istDateKey(now) }, select: { userId: true } })).map((x) => x.userId));
+  const away = await awayOn(ids, istDateKey(now)).catch(() => new Map<string, { backupUserId: string | null; toDate: string }>());
   const afterSix = toIstParts(now).h >= 18;
 
   return users.map((u) => {
@@ -79,6 +82,7 @@ export async function deskSummaries(viewer: SessionUser): Promise<PersonSummary[
       lastUpdate,
       updatedToday: updated.has(u.id),
       health,
+      awayUntil: away.get(u.id)?.toDate ?? null,
     };
   });
 }

@@ -1,6 +1,7 @@
 import { db } from "./db";
 import { sendEmail, emailTemplate, appUrl } from "./email";
 import { normalizePhone, sendWhatsapp, whatsappConfigured } from "./whatsapp";
+import { taskCode } from "./whatsappInbound";
 
 /**
  * Notification service. Each delivery channel implements `Channel`; `notify()` fans out
@@ -63,7 +64,10 @@ const whatsappChannel: Channel = {
     }
     const phone = normalizePhone(profile?.phone);
     if (!profile?.whatsappOptIn || !phone) return; // explicit opt-in required
-    await sendWhatsapp(phone, n.title, n.body ?? "", n.url ? appUrl(n.url) : appUrl("/"));
+    // Tell them how to answer straight from WhatsApp (see /api/inbound/whatsapp).
+    const id = /^\/tasks\/([a-z0-9]+)/i.exec(n.url ?? "")?.[1];
+    const body = id ? `${(n.body ?? "").slice(0, 130)} Reply DONE ${taskCode(id)} when finished.` : n.body ?? "";
+    await sendWhatsapp(phone, n.title, body, n.url ? appUrl(n.url) : appUrl("/"));
   },
 };
 

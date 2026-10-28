@@ -54,3 +54,23 @@ export function decryptField(token: string, aad: string): string {
 export function maskTail(value: string, visible = 4) {
   return value.length <= visible ? "•".repeat(value.length) : "•".repeat(Math.min(value.length - visible, 12)) + value.slice(-visible);
 }
+
+// ---------- binary files (ID documents) ----------
+// Same AES-256-GCM scheme, for whole files. Layout: "KD1" | iv(12) | authTag(16) | ciphertext.
+const MAGIC = Buffer.from("KD1");
+
+export function encryptBuffer(data: Buffer, aad: string): Buffer {
+  const iv = randomBytes(12);
+  const c = createCipheriv("aes-256-gcm", key(), iv);
+  c.setAAD(Buffer.from(aad));
+  const ct = Buffer.concat([c.update(data), c.final()]);
+  return Buffer.concat([MAGIC, iv, c.getAuthTag(), ct]);
+}
+
+export function decryptBuffer(blob: Buffer, aad: string): Buffer {
+  if (blob.length < 31 || !blob.subarray(0, 3).equals(MAGIC)) throw new Error("Not an encrypted file");
+  const d = createDecipheriv("aes-256-gcm", key(), blob.subarray(3, 15));
+  d.setAAD(Buffer.from(aad));
+  d.setAuthTag(blob.subarray(15, 31));
+  return Buffer.concat([d.update(blob.subarray(31)), d.final()]);
+}

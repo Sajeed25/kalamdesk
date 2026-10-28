@@ -70,6 +70,7 @@ export async function GET() {
     hasUsers: false,
     dbProblem: null as string | null,
     phase3Schema: null as boolean | null,
+    phase4Schema: null as boolean | null,
     encryptionKeyOk: cryptoConfigured(),
     whatsappConfigured: whatsappConfigured(),
     emailMode: emailStatus().mode, // "console" means no real email is being sent
@@ -83,6 +84,8 @@ export async function GET() {
     out.schemaReady = true;
     // Phase 3 added columns. If this fails, run prisma/phase3-upgrade.sql before using the new features.
     try { await db.incentiveRule.count(); await db.employeeProfile.findFirst({ select: { whatsappOptIn: true } }); out.phase3Schema = true; } catch { out.phase3Schema = false; }
+    // Phase 4 added tables only. If false, run prisma/phase4-upgrade.sql; the older features keep working meanwhile.
+    try { await db.lead.count(); await db.recoveryCode.count(); await db.challenge.count(); out.phase4Schema = true; } catch { out.phase4Schema = false; }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[health]", msg);

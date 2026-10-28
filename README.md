@@ -104,6 +104,8 @@ Reset demo data: `npm run db:reset`.
 | `UPLOAD_DIR` | where attachments are stored (default `./uploads`) |
 | `FIELD_ENCRYPTION_KEY` | 32-byte base64 key for bank/ID encryption. Required to save or view bank details. See "Bank details" below |
 | `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_TEMPLATE`, `WHATSAPP_LANG` | optional WhatsApp alerts. Off unless the first three are set |
+| `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` | optional: let staff reply DONE/START/BLOCKED on WhatsApp (webhook `/api/inbound/whatsapp`) |
+| `RESET_2FA_EMAILS` | emergency only: switches off two-step sign-in for these emails at startup. Delete after use |
 
 ## Scheduled jobs
 
@@ -268,3 +270,59 @@ Features meant to make people want to fill things in, all computed from existing
 - **Kudos:** give a colleague a short public thank-you (3 to 140 characters, max 10 a day). They get an in-app notification (never an email) and it appears on the wall. It is recorded in the audit log, which also feeds the Team Player badge.
 
 Goals are stored in the `ScoreSetting` table under `goal.*` keys. The scoring screens only read and reset the real scoring weights, so changing or resetting scoring never touches goals.
+
+## Phase 4: how it works
+
+### Upgrading an existing database (do this BEFORE redeploying)
+
+Phase 4 only **adds** 12 tables; nothing existing is changed.
+
+1. In hPanel open **phpMyAdmin**, select your database, go to the **SQL** tab.
+2. Paste the whole of `prisma/phase4-upgrade.sql` and click **Go**. (A fresh install uses `prisma/mysql-init.sql`, which already includes everything.)
+3. Redeploy the app. Open `/api/health`: `phase4Schema` must say `true`. If it says `false` the SQL was not run; the older features keep working meanwhile and only the new pages show an error.
+
+### Two-step sign-in (authenticator app)
+
+- Anyone can turn it on at **Settings → Security** (founders see a reminder banner until they do). Scan the QR code with Google Authenticator, Microsoft Authenticator or Authy, type the 6-digit code to prove it works, and save the **8 recovery codes** shown once.
+- After that, signing in asks for the code after the password. Revealing bank details or opening an ID document also asks for the code.
+- A code works once (replay is blocked) and 5 wrong codes lock code entry for 10 minutes.
+- Lost phone: use a recovery code, or another founder opens **People → the person → Reset two-step sign-in**.
+- **Emergency (every founder locked out):** in the Hostinger panel add the environment variable `RESET_2FA_EMAILS=you@robokalam.com` (comma-separated for several), restart the app, sign in with the password, then **delete the variable** and turn 2FA on again. Each reset is written to the audit log.
+
+### Backups and restore
+
+- Turn on **automatic backups in Hostinger** (hPanel → Files / Databases → Backups) and keep at least 7 days.
+- Founders can download the whole company data as JSON at `/api/admin/export` (secrets, bank and ID data are never included). Everyone can download their own data at **Settings → Your data and privacy**.
+- Monthly restore drill (10 minutes): in phpMyAdmin **Export** the database, create a scratch database, **Import** the file there, and check that `User` and `Task` have rows. Delete the scratch database. If the drill fails, fix it before you need it.
+- Keep `FIELD_ENCRYPTION_KEY` somewhere safe outside the server. Without it, bank details and ID documents in any backup cannot be read.
+
+### ID documents
+
+Founder-only, on **People → person → Bank & ID**. Files (PDF/image/Office, up to 8 MB) are **encrypted before they are stored**; opening one asks for your password (and 2FA code) again, and every open is audited.
+
+### Time savers
+
+- **Nudge** on the Founder's Desk sends one friendly message about overdue/blocked work, at most once a day per person. Managers can nudge their own team only.
+- **Templates** (`/templates`, leads only): save the title, priority, complexity, estimate and checklist of work you repeat. Everyone can start a task from one on **New task**.
+- **Bulk actions** on **List** (leads only): tick tasks, then change priority, status, assignee or due date in one go. Tasks that can't change are reported, not skipped silently.
+- **Calendar link** (Settings): a private link that shows your tasks in Google/Apple/Outlook calendar. **Reset link** invalidates the old one.
+- **WhatsApp replies:** staff reply `DONE a1b2c3`, `START`, `BLOCKED a1b2c3 reason`, `UPDATE text` or `TASKS`. In Meta's developer dashboard set the webhook to `https://YOUR-SITE/api/inbound/whatsapp`, with the verify token you chose, and add `WHATSAPP_APP_SECRET` (the app secret) and `WHATSAPP_VERIFY_TOKEN` to the environment. Only people who opted in can use it; tasks that need proof must be finished in the app. Replying **by email** is not built (it needs a mailbox the server can read).
+
+### Robokalam-specific pages
+
+- **Visits** (`/visits`): on the page of any task that has a location or is a recurring activity, fill the visit report (outcome, people reached, follow-up). Photos go in the Files box of the same task. Check-ins with location show a "See where they checked in" Google Maps link. A "Problem" report alerts founders.
+- **Leads** (`/leads`): schools and contacts with stages New → Contacted → Demo → Proposal → Won/Lost, call log, follow-up reminders, and pipeline value. Employees see their own, managers their team's, founders everyone's.
+- **Expenses** (`/expenses`): claim with an optional receipt photo; **founders** approve/reject and mark paid (a founder can't approve their own claim when there is another founder). **Download CSV** gives your accountant the lot.
+- **Leave and attendance** (`/leave`): request leave naming a cover person; the reporting manager (or a founder) approves. On approval the cover person can be added to the open tasks due during the leave, and **new tasks for someone on leave also go to their cover**. The Desk shows "Away until". **I'm in / I'm out** on My Day stamps the time on the server.
+
+### More fun
+
+- **Weekly recap** card on My Day (Mon–Wed): last week's points, tasks, on-time %, stand-ups and kudos received.
+- **Team celebrations** on My Day and the Desk, with confetti once a day: birthdays (people add their own day and month in Settings, optional), work anniversaries from the joining date, and internships ending within 7 days.
+- **Seasonal challenges** on the Challenges page: founders launch a goal for a date range (tasks completed, points, stand-ups or kudos) with a prize; everyone sees the team progress bar and top three contributors.
+
+### Phase 4 assumptions to confirm
+
+- Leave days are counted as calendar days (no Sunday or holiday calendar yet); there is no leave balance.
+- Expense approval is founders-only; receipts are stored on the server disk, not encrypted (IDs are).
+- Birthdays are stored without a year and only if the person adds them.

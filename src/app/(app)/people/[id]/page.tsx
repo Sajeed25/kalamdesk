@@ -32,7 +32,7 @@ export default async function Person({ params }: { params: { id: string } }) {
       </div>
       <section className="space-y-2">
         <h2 className="eyebrow">Open · {open.length}</h2>
-        {open.map((t) => <TaskRow key={t.id} t={t} />)}
+        {open.map((t) => <TaskRow key={t.id} t={t} nudge={isLead(u) && u.id !== person.id} />)}
         {open.length === 0 && <p className="text-sm text-mute">No open tasks.</p>}
       </section>
       <section className="space-y-2">

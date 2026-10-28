@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { createSession, verifyPassword } from "@/lib/auth";
+import { setPending } from "@/lib/twofa";
 
 // Naive in-memory throttle (per instance). Use Redis/Upstash for multi-instance production.
 const fails = new Map<string, { n: number; until: number }>();
@@ -29,6 +30,12 @@ async function handle(req: Request) {
     return NextResponse.json({ error: "Wrong email or password" }, { status: 401 });
   }
   fails.delete(email);
+
+  // Two-step sign-in: the password alone only earns a 5-minute "pending" pass. No session yet.
+  if (user.totpSecret) {
+    await setPending(user.id);
+    return NextResponse.json({ ok: true, needs2fa: true });
+  }
   await createSession(user.id);
   await db.user.update({ where: { id: user.id }, data: { lastSeenAt: new Date() } });
   return NextResponse.json({ ok: true });

@@ -26,6 +26,7 @@ export default function Nav({ lead, name, role, lvl }: { lead: boolean; name: st
         { href: "/board", label: "Board", icon: "board" },
         { href: "/list", label: "List", icon: "list" },
         { href: "/calendar", label: "Calendar", icon: "calendar" },
+        { href: "/leave", label: "Leave", icon: "sun" },
         ...(lead ? [{ href: "/recurring", label: "Recurring", icon: "repeat" as IconName }] : []),
       ],
     },
@@ -40,7 +41,16 @@ export default function Nav({ lead, name, role, lvl }: { lead: boolean; name: st
         { href: "/snapshots", label: "Published", icon: "doc" },
       ],
     },
-    { title: "Company", items: [{ href: "/people", label: "People", icon: "users" }] },
+    {
+      title: "Company",
+      items: [
+        { href: "/people", label: "People", icon: "users" },
+        { href: "/leads", label: "Leads", icon: "bolt" },
+        { href: "/visits", label: "Visits", icon: "arrow" },
+        { href: "/expenses", label: "Expenses", icon: "coins" },
+        ...(lead ? [{ href: "/templates", label: "Templates", icon: "doc" as IconName }] : []),
+      ],
+    },
   ];
   const all = groups.flatMap((g) => g.items);
   // exact or child match, so /update does not light up on /updates

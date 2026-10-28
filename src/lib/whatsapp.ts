@@ -44,3 +44,22 @@ export async function sendWhatsapp(toPhone: string, title: string, body: string,
     return false;
   }
 }
+
+/** Free-form reply inside the 24-hour window that opens when a person messages us first. */
+export async function sendWhatsappText(toPhone: string, body: string): Promise<boolean> {
+  if (!whatsappConfigured()) return false;
+  const base = (process.env.WHATSAPP_API_BASE ?? "https://graph.facebook.com").replace(/\/$/, "");
+  try {
+    const res = await fetch(`${base}/v20.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ messaging_product: "whatsapp", to: toPhone, type: "text", text: { body: body.slice(0, 1500) } }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!res.ok) console.error(`[whatsapp] reply failed: HTTP ${res.status} to ***${toPhone.slice(-2)}`);
+    return res.ok;
+  } catch (e) {
+    console.error("[whatsapp] reply error:", e instanceof Error ? e.message : e);
+    return false;
+  }
+}

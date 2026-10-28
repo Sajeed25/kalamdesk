@@ -1,21 +1,24 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { PRIORITIES, PRIORITY_LABEL } from "@/lib/constants";
 import { fromIstInputValue } from "@/lib/time";
+import { splitChecklist } from "@/lib/templates";
 
 type Opt = { id: string; name: string };
+export type TemplateOpt = { id: string; name: string; title: string; description: string; priority: string; complexity: number; estimateHours: number | null; departmentId: string | null; checklist: string };
 
 /** Full task form: the quick-add bar covers the common case, this sets every field. */
 function L({ t, children }: { t: string; children: React.ReactNode }) {
   return <label className="block text-sm font-medium">{t}<div className="mt-1">{children}</div></label>;
 }
 
-export default function TaskForm({ people, departments, meId, canAssign }: { people: Opt[]; departments: Opt[]; meId: string; canAssign: boolean }) {
+export default function TaskForm({ people, departments, templates = [], meId, canAssign }: { people: Opt[]; departments: Opt[]; templates?: TemplateOpt[]; meId: string; canAssign: boolean }) {
   const router = useRouter();
   const [assignees, setAssignees] = useState<string[]>([meId]);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const [tpl, setTpl] = useState<TemplateOpt | null>(null);
 
   const toggle = (id: string) => setAssignees((a) => (a.includes(id) ? a.filter((x) => x !== id) : [...a, id]));
 
@@ -41,6 +44,7 @@ export default function TaskForm({ people, departments, meId, canAssign }: { peo
         location: f.get("location") || null,
         tags: f.get("tags") ?? "",
         requiresProof: f.get("proof") === "on",
+        checklist: splitChecklist(String(f.get("checklist") ?? "")),
       }),
     });
     setBusy(false);
@@ -48,29 +52,42 @@ export default function TaskForm({ people, departments, meId, canAssign }: { peo
     router.push(`/tasks/${(await res.json()).task.id}`);
   }
 
-
   return (
     <form onSubmit={submit} className="panel grid grid-cols-1 max-w-3xl gap-4 p-5 sm:grid-cols-2">
-      <div className="sm:col-span-2"><L t="Title"><input name="title" required maxLength={200} className="input" autoFocus /></L></div>
-      <div className="sm:col-span-2"><L t="Description"><textarea name="description" rows={4} className="input" /></L></div>
-      <L t="Priority">
-        <select name="priority" defaultValue="P3" className="input">{PRIORITIES.map((p) => <option key={p} value={p}>{PRIORITY_LABEL[p]}</option>)}</select>
-      </L>
-      <L t="Complexity (1 trivial → 5 very complex)">
-        <select name="complexity" defaultValue="2" className="input">{[1, 2, 3, 4, 5].map((n) => <option key={n}>{n}</option>)}</select>
-      </L>
-      <L t="Due (IST)"><input name="due" type="datetime-local" className="input" /></L>
-      <L t="Estimated effort (hours)"><input name="estimate" type="number" min="0" step="0.5" className="input" /></L>
-      <L t="Department">
-        <select name="department" className="input"><option value="">—</option>{departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}</select>
-      </L>
-      <L t="Location (e.g. school name)"><input name="location" className="input" /></L>
-      <L t="Tags (comma separated, optional)"><input name="tags" className="input" /></L>
-      <label className="flex items-center gap-2 self-end pb-2 text-sm"><input type="checkbox" name="proof" /> Require proof before Done</label>
+      {templates.length > 0 && (
+        <div className="sm:col-span-2">
+          <L t="Start from a template (optional)">
+            <select value={tpl?.id ?? ""} onChange={(e) => setTpl(templates.find((t) => t.id === e.target.value) ?? null)} className="input" aria-label="Template">
+              <option value="">Blank task</option>
+              {templates.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+            </select>
+          </L>
+        </div>
+      )}
+      {/* the key remounts the (uncontrolled) fields so a picked template fills them in */}
+      <Fragment key={tpl?.id ?? "blank"}>
+        <div className="sm:col-span-2"><L t="Title"><input name="title" required maxLength={200} className="input" autoFocus defaultValue={tpl?.title ?? ""} /></L></div>
+        <div className="sm:col-span-2"><L t="Description"><textarea name="description" rows={4} className="input" defaultValue={tpl?.description ?? ""} /></L></div>
+        <L t="Priority">
+          <select name="priority" defaultValue={tpl?.priority ?? "P3"} className="input">{PRIORITIES.map((p) => <option key={p} value={p}>{PRIORITY_LABEL[p]}</option>)}</select>
+        </L>
+        <L t="Complexity (1 trivial → 5 very complex)">
+          <select name="complexity" defaultValue={String(tpl?.complexity ?? 2)} className="input">{[1, 2, 3, 4, 5].map((n) => <option key={n}>{n}</option>)}</select>
+        </L>
+        <L t="Due (IST)"><input name="due" type="datetime-local" className="input" /></L>
+        <L t="Estimated effort (hours)"><input name="estimate" type="number" min="0" step="0.5" className="input" defaultValue={tpl?.estimateHours ?? ""} /></L>
+        <L t="Department">
+          <select name="department" className="input" defaultValue={tpl?.departmentId ?? ""}><option value="">—</option>{departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}</select>
+        </L>
+        <L t="Location (e.g. school name)"><input name="location" className="input" /></L>
+        <L t="Tags (comma separated, optional)"><input name="tags" className="input" /></L>
+        <label className="flex items-center gap-2 self-end pb-2 text-sm"><input type="checkbox" name="proof" /> Require proof before Done</label>
+        <div className="sm:col-span-2"><L t="Checklist (one step per line, optional)"><textarea name="checklist" rows={4} className="input" defaultValue={tpl?.checklist ?? ""} placeholder={"Call the principal\nSend the proposal"} /></L></div>
+      </Fragment>
 
       <fieldset className="sm:col-span-2">
         <legend className="mb-1 text-sm font-medium">{canAssign ? "Assign to" : "For"}</legend>
-        <div className="grid max-h-48 grid-cols-2 gap-1 overflow-auto rounded-lg border border-line p-2 sm:grid-cols-3">
+        <div className="grid grid-cols-2 max-h-48 gap-1 overflow-auto rounded-lg border border-line p-2 sm:grid-cols-3">
           {people.map((p) => (
             <label key={p.id} className="flex items-center gap-2 text-sm">
               <input type="checkbox" checked={assignees.includes(p.id)} onChange={() => toggle(p.id)} />{p.name}{p.id === meId && " (me)"}

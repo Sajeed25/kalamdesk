@@ -9,6 +9,7 @@ import { fmtRelative, istDateKey } from "@/lib/time";
 import BadgeWall from "@/components/BadgeWall";
 import ProgressRing from "@/components/ProgressRing";
 import Icon from "@/components/Icon";
+import SeasonalChallenges from "@/components/SeasonalChallenges";
 import { BadgeWatcher, GoalEditor, KudosBox } from "@/components/FunParts";
 
 export const dynamic = "force-dynamic";
@@ -74,6 +75,8 @@ export default async function Challenges() {
         <div className="eyebrow">Play together</div>
         <h1 className="page-title mt-1">Challenges</h1>
       </div>
+
+      <SeasonalChallenges founder={isFounder(u)} />
 
       {/* ---- team challenge + personal goal ---- */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1.6fr_1fr]">

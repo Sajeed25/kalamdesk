@@ -354,3 +354,166 @@ model JobRun {
   createdAt DateTime @default(now())
   @@unique([kind, key])
 }
+
+// =====================================================================
+// Phase 4: NEW TABLES ONLY. No existing table or column is altered, so an
+// older database keeps working if the code is deployed before this SQL runs
+// (only the new screens fail until prisma/phase4-upgrade.sql is applied).
+// =====================================================================
+
+// One-time recovery codes for two-factor sign-in. Only a SHA-256 of each code is stored.
+model RecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String    @unique
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  @@index([userId])
+}
+
+// Offer letters / ID scans. The file CONTENT is AES-256-GCM encrypted before it is written to storage.
+model IdDocument {
+  id           String   @id @default(cuid())
+  userId       String
+  uploadedById String
+  kind         String   // OFFER_LETTER | ID_PROOF | CONTRACT | OTHER
+  fileName     String   @db.VarChar(255)
+  storageKey   String
+  mimeType     String
+  sizeBytes    Int
+  createdAt    DateTime @default(now())
+  @@index([userId])
+}
+
+// Secret salt behind each person's private calendar-feed link; changing it revokes the old link.
+model CalendarFeed {
+  userId    String   @id
+  salt      String
+  createdAt DateTime @default(now())
+}
+
+// Optional "MM-DD" birthday, shown to the team on the celebrations card.
+model PersonDate {
+  userId   String @id
+  birthday String
+}
+
+model LeaveRequest {
+  id           String    @id @default(cuid())
+  userId       String
+  type         String    @default("CASUAL") // CASUAL | SICK | UNPAID | OTHER
+  fromDate     String    // YYYY-MM-DD (IST)
+  toDate       String
+  days         Float
+  reason       String    @default("") @db.VarChar(500)
+  status       String    @default("PENDING") // PENDING | APPROVED | REJECTED | CANCELLED
+  backupUserId String?
+  decidedById  String?
+  decidedAt    DateTime?
+  decisionNote String?   @db.VarChar(300)
+  createdAt    DateTime  @default(now())
+  @@index([userId, status])
+  @@index([fromDate, toDate])
+}
+
+model AttendanceLog {
+  id         String    @id @default(cuid())
+  userId     String
+  forDate    String    // YYYY-MM-DD (IST)
+  checkInAt  DateTime
+  checkOutAt DateTime?
+  @@unique([userId, forDate])
+}
+
+model ExpenseClaim {
+  id           String    @id @default(cuid())
+  userId       String
+  title        String    @db.VarChar(200)
+  category     String    // TRAVEL | FUEL | FOOD | STATIONERY | OTHER
+  amountInr    Int
+  spentOn      String    // YYYY-MM-DD
+  notes        String    @default("") @db.VarChar(1000)
+  receiptKey   String?
+  receiptName  String?   @db.VarChar(255)
+  receiptMime  String?
+  status       String    @default("SUBMITTED") // SUBMITTED | APPROVED | REJECTED | PAID
+  decidedById  String?
+  decidedAt    DateTime?
+  decisionNote String?   @db.VarChar(300)
+  paidAt       DateTime?
+  createdAt    DateTime  @default(now())
+  @@index([userId, status])
+}
+
+model Lead {
+  id           String    @id @default(cuid())
+  name         String    @db.VarChar(150)
+  organisation String?   @db.VarChar(150)
+  phone        String?
+  email        String?
+  source       String?
+  stage        String    @default("NEW") // NEW | CONTACTED | DEMO | PROPOSAL | WON | LOST
+  valueInr     Int?
+  ownerId      String
+  nextFollowUp DateTime?
+  notes        String    @default("") @db.VarChar(2000)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  calls        LeadCall[]
+  @@index([ownerId, stage])
+  @@index([nextFollowUp])
+}
+
+model LeadCall {
+  id        String   @id @default(cuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  userId    String
+  outcome   String   // CONNECTED | NO_ANSWER | CALL_BACK | NOT_INTERESTED | WRONG_NUMBER
+  note      String   @default("") @db.VarChar(500)
+  createdAt DateTime @default(now())
+  @@index([leadId])
+  @@index([userId, createdAt])
+}
+
+// One report per field-visit task. Photos are ordinary task attachments.
+model VisitReport {
+  id        String   @id @default(cuid())
+  taskId    String   @unique
+  userId    String
+  summary   String   @db.VarChar(2000)
+  attendees Int?
+  outcome   String   @default("GOOD") // GREAT | GOOD | NEEDS_FOLLOW_UP | PROBLEM
+  followUp  String   @default("") @db.VarChar(1000)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TaskTemplate {
+  id            String   @id @default(cuid())
+  name          String   @db.VarChar(100)
+  title         String   @db.VarChar(200)
+  description   String   @default("") @db.VarChar(2000)
+  priority      String   @default("P3")
+  complexity    Int      @default(2)
+  estimateHours Float?
+  departmentId  String?
+  checklist     String   @default("") @db.VarChar(2000) // one item per line
+  createdById   String
+  createdAt     DateTime @default(now())
+}
+
+// Founder-created, time-boxed team challenges (e.g. a Diwali sprint). Progress is derived from existing data.
+model Challenge {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(120)
+  description String   @default("") @db.VarChar(500)
+  metric      String   // TASKS_DONE | POINTS | STANDUPS | KUDOS
+  target      Int
+  startsOn    String   // YYYY-MM-DD (IST)
+  endsOn      String
+  prize       String   @default("") @db.VarChar(200)
+  active      Boolean  @default(true)
+  createdById String
+  createdAt   DateTime @default(now())
+}
