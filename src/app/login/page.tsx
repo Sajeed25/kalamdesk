@@ -10,16 +10,22 @@ export default function Login() {
     setBusy(true);
     setError("");
     const f = new FormData(e.currentTarget);
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email: f.get("email"), password: f.get("password") }),
-    });
-    if (res.ok) window.location.href = "/";
-    else {
-      setError((await res.json()).error ?? "Could not sign in");
-      setBusy(false);
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: f.get("email"), password: f.get("password") }),
+      });
+      if (res.ok) {
+        window.location.href = "/";
+        return;
+      }
+      const data = await res.json().catch(() => null);
+      setError(data?.error ?? `Server error (${res.status}). The site is not set up correctly yet. Check /api/health`);
+    } catch {
+      setError("Could not reach the server. Check your connection and try again.");
     }
+    setBusy(false);
   }
 
   return (

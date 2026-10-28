@@ -7,6 +7,15 @@ import { createSession, verifyPassword } from "@/lib/auth";
 const fails = new Map<string, { n: number; until: number }>();
 
 export async function POST(req: Request) {
+  try {
+    return await handle(req);
+  } catch (e) {
+    console.error("[login] failed:", e instanceof Error ? e.message : e);
+    return NextResponse.json({ error: "The server is not configured correctly (database or SESSION_SECRET). See /api/health." }, { status: 500 });
+  }
+}
+
+async function handle(req: Request) {
   const body = z.object({ email: z.string().email(), password: z.string().min(1) }).safeParse(await req.json().catch(() => null));
   if (!body.success) return NextResponse.json({ error: "Enter email and password" }, { status: 400 });
   const email = body.data.email.toLowerCase();

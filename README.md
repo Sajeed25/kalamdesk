@@ -134,3 +134,16 @@ On Vercel, put these in `vercel.json` `crons` (Vercel sends the secret as `Autho
 - The login throttle is in-memory (per instance). Use a shared store (Redis/Upstash) when running multiple instances.
 - No bank or ID data exists in Phase 1. Phase 3 design: AES-256-GCM field encryption, key from a secrets manager, masked by default, founder-only reveal with re-authentication, every reveal written to `AuditLog`, and never included in emails, exports or logs.
 - Emails contain task titles and links only.
+
+## First login on a fresh deployment
+
+The demo accounts (`*@robokalam.test`) only exist where you ran `npm run db:seed`. On a new live database there are **no users**, so create your first founder with your real email:
+
+```bash
+npx prisma db push                      # creates the tables (once, and after schema changes)
+npm run create-founder -- --email you@yourdomain.com --name "Your Name" --password "a-long-password"
+```
+
+Then sign in and add everyone else from **People → Add person**; they get an invite email to set their own password. Do not run `db:seed` in production.
+
+Open `/api/health` on the live site to see what's missing. It reports only yes/no flags: `sessionSecretOk`, `databaseUrlSet`, `dbReachable`, `schemaReady`, `hasUsers`.
