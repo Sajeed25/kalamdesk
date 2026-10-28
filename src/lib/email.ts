@@ -30,6 +30,11 @@ export function emailStatus() {
     passwordSet: !!process.env.SMTP_PASSWORD,
     fromSet: !!process.env.EMAIL_FROM,
     port: Number(process.env.SMTP_PORT ?? 465),
+    // Shape checks for the usual hidden mistakes. Booleans only, never the values.
+    userLooksLikeEmail: /^[^\s@"']+@[^\s@"']+[.][^\s@"']+$/.test(process.env.SMTP_USER ?? ""),
+    userHasQuotesOrSpaces: (process.env.SMTP_USER ?? "") !== (process.env.SMTP_USER ?? "").trim() || /["']/.test(process.env.SMTP_USER ?? ""),
+    passwordHasQuotesOrSpaces: (process.env.SMTP_PASSWORD ?? "") !== (process.env.SMTP_PASSWORD ?? "").trim() || /^["']|["']$/.test(process.env.SMTP_PASSWORD ?? ""),
+    fromMatchesUser: !!process.env.SMTP_USER && (process.env.EMAIL_FROM ?? process.env.SMTP_USER ?? "").toLowerCase().includes((process.env.SMTP_USER ?? "").trim().toLowerCase()),
   };
 }
 

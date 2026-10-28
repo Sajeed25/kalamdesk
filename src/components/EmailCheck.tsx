@@ -1,7 +1,10 @@
 "use client";
 import { useState } from "react";
 
-type Result = { ok: boolean; reason?: string; sentTo?: string; status?: { mode: string; hostSet: boolean; userSet: boolean; passwordSet: boolean; fromSet: boolean; port: number } };
+type Result = {
+  ok: boolean; reason?: string; sentTo?: string;
+  status?: { mode: string; hostSet: boolean; userSet: boolean; passwordSet: boolean; fromSet: boolean; port: number; userLooksLikeEmail: boolean; userHasQuotesOrSpaces: boolean; passwordHasQuotesOrSpaces: boolean; fromMatchesUser: boolean };
+};
 
 export default function EmailCheck() {
   const [busy, setBusy] = useState(false);
@@ -36,6 +39,15 @@ export default function EmailCheck() {
           <li>SMTP_USER: {yes(res.status.userSet)}</li>
           <li>SMTP_PASSWORD: {yes(res.status.passwordSet)}</li>
           <li>EMAIL_FROM: {yes(res.status.fromSet)}</li>
+        </ul>
+      )}
+      {res?.status && !res.ok && (
+        <ul className="space-y-1 text-xs font-bold">
+          {!res.status.userLooksLikeEmail && <li className="text-amber-700 dark:text-amber-300">⚠ SMTP_USER does not look like a full email address (it needs the @yourdomain part).</li>}
+          {res.status.userHasQuotesOrSpaces && <li className="text-amber-700 dark:text-amber-300">⚠ SMTP_USER has a space or quote mark in it. Remove it.</li>}
+          {res.status.passwordHasQuotesOrSpaces && <li className="text-amber-700 dark:text-amber-300">⚠ SMTP_PASSWORD starts or ends with a space or quote mark. Remove it.</li>}
+          {!res.status.fromMatchesUser && <li className="text-amber-700 dark:text-amber-300">⚠ EMAIL_FROM does not contain the SMTP_USER address. Hostinger needs them to match.</li>}
+          {res.status.userLooksLikeEmail && !res.status.userHasQuotesOrSpaces && !res.status.passwordHasQuotesOrSpaces && res.status.fromMatchesUser && <li className="font-semibold text-mute">The values look well-formed, so the password itself is probably wrong. Try signing in to this mailbox in Hostinger webmail with the same password.</li>}
         </ul>
       )}
     </div>
