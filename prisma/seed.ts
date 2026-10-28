@@ -156,6 +156,19 @@ async function main() {
     if (prog) await db.referral.create({ data: { programId: prog.id, referrerId: id["ravi"], name: "Mrs. Lakshmi", contact: "+91 98765 43210", organisation: "Sri Vidya High School", notes: "Principal. Prefers calls after 4 PM." } });
   }
 
+  // ---- Fun demo data: a few kudos on the wall ----
+  if ((await db.auditLog.count({ where: { action: "KUDOS_SENT" } })) === 0) {
+    const kudos: [string, string, string][] = [
+      ["ravi", "pooja", "Thanks for turning the invoice around so fast!"],
+      ["suresh", "anil", "Great session at Vagdevi. The kids loved it."],
+      ["sneha", "harsha", "Brilliant Diwali post, it got so many likes."],
+    ];
+    for (const [from, to, message] of kudos) {
+      await db.auditLog.create({ data: { actorId: id[from], action: "KUDOS_SENT", target: id[to], meta: message } });
+      await db.notification.create({ data: { userId: id[to], kind: "KUDOS", title: "🙌 Someone gave you kudos", body: message, url: "/challenges" } });
+    }
+  }
+
   console.log(`Seeded. Log in as arjun@robokalam.test / ${DEV_PASSWORD}`);
 }
 

@@ -2,7 +2,10 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { taskInclude } from "@/lib/tasks";
-import { endOfIstDay, startOfIstDay, fmtDateTime } from "@/lib/time";
+import { endOfIstDay, startOfIstDay, fmtDateTime, istDateKey } from "@/lib/time";
+import { badgeStats, evaluate } from "@/lib/badges";
+import { personalGoal } from "@/lib/goals";
+import { BadgeWatcher } from "@/components/FunParts";
 import { currentRange } from "@/lib/metrics";
 import { dailyLine, greeting, levelFor, lifetimePoints, standupStreak } from "@/lib/gamify";
 import TaskRow, { PriorityChip, isOverdue } from "@/components/TaskRow";
@@ -18,13 +21,19 @@ export default async function MyDay() {
   const end = endOfIstDay(now);
   const mine = { assignees: { some: { userId: u.id } } };
 
-  const [open, doneToday, weekPts, total, streak] = await Promise.all([
+  const [open, doneToday, weekPts, total, streak, wgoal, stats] = await Promise.all([
     db.task.findMany({ where: { ...mine, status: { notIn: ["DONE", "CANCELLED"] } }, include: taskInclude, orderBy: [{ priority: "asc" }, { dueAt: "asc" }] }),
     db.task.count({ where: { ...mine, status: "DONE", completedAt: { gte: startOfIstDay(now) } } }),
     db.scoreEvent.aggregate({ where: { userId: u.id, createdAt: { gte: currentRange("week").from } }, _sum: { points: true } }),
     lifetimePoints(u.id),
     standupStreak(u.id, now),
+    personalGoal(u.id),
+    badgeStats(u.id, istDateKey(now)),
   ]);
+  const allBadges = evaluate(stats);
+  const earnedBadges = allBadges.filter((b) => b.earned);
+  // the closest locked badge: the one you are furthest along towards
+  const nextBadge = allBadges.filter((b) => !b.earned).sort((a, b) => b.have / b.need - a.have / a.need)[0];
 
   const overdue = open.filter((t) => t.dueAt && t.dueAt < now);
   const today = open.filter((t) => t.dueAt && t.dueAt >= now && t.dueAt <= end);
@@ -86,6 +95,25 @@ export default async function MyDay() {
           <Icon name="check" className="h-5 w-5" strokeWidth={3} />Stand-up filed for today. Streak safe.
         </div>
       )}
+
+      {/* ---------------- weekly goal + badges ---------------- */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Link href="/challenges" className="panel panel-hover rise p-5 sm:p-6" style={{ ["--i" as string]: 2 }}>
+          <div className="flex items-center justify-between"><span className="eyebrow flex items-center gap-2"><Icon name="target" className="h-4 w-4" />Weekly goal</span><span className="text-xs font-bold text-mute">{wgoal.daysLeft}d left</span></div>
+          <div className="mt-2 flex items-baseline gap-2"><span className="stat-value">{wgoal.done}</span><span className="text-xl font-bold text-mute">/ {wgoal.goal} tasks</span></div>
+          <div className="mt-3 h-3 overflow-hidden rounded-full bg-line"><div className="xp-bar h-full rounded-full" style={{ width: `${Math.max(3, Math.round(wgoal.pct * 100))}%` }} /></div>
+          <div className="mt-2 text-sm font-semibold text-mute">{wgoal.done >= wgoal.goal ? "Goal smashed! 🎯" : `${wgoal.goal - wgoal.done} more to go`}</div>
+        </Link>
+        <Link href="/challenges" className="panel panel-hover rise p-5 sm:p-6" style={{ ["--i" as string]: 3 }}>
+          <div className="flex items-center justify-between"><span className="eyebrow flex items-center gap-2"><Icon name="star" className="h-4 w-4" />Badges</span><span className="text-xs font-bold text-mute">{earnedBadges.length}/{allBadges.length}</span></div>
+          <div className="mt-3 flex flex-wrap gap-2 text-3xl" aria-label={`${earnedBadges.length} badges earned`}>
+            {earnedBadges.slice(-5).map((b) => <span key={b.id} title={b.name}>{b.emoji}</span>)}
+            {earnedBadges.length === 0 && <span className="text-base font-semibold text-mute">Finish a task to earn your first 🌱</span>}
+          </div>
+          {nextBadge && <div className="mt-3 text-sm font-semibold text-mute">Next: <b className="text-ink">{nextBadge.emoji} {nextBadge.name}</b> · {nextBadge.have}/{nextBadge.need}</div>}
+        </Link>
+      </div>
+      <BadgeWatcher userId={u.id} earned={earnedBadges.map((b) => ({ id: b.id, emoji: b.emoji, name: b.name }))} goalDone={wgoal.done} goalTarget={wgoal.goal} weekKey={istDateKey(currentRange("week").from)} />
 
       {/* ---------------- focus ---------------- */}
       {focus && (

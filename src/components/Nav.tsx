@@ -33,6 +33,7 @@ export default function Nav({ lead, name, role, lvl }: { lead: boolean; name: st
       title: "Performance",
       items: [
         { href: "/leaderboard", label: "Scores", icon: "trophy" },
+        { href: "/challenges", label: "Challenges", icon: "target" },
         ...(lead ? [{ href: "/dashboard", label: "Dashboard", icon: "chart" as IconName }, { href: "/updates", label: "Stand-ups", icon: "chat" as IconName }] : []),
         { href: "/incentives", label: "Incentives", icon: "coins" },
         { href: "/referrals", label: "Referrals", icon: "gift" },

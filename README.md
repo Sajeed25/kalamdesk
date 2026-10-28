@@ -255,3 +255,16 @@ Features meant to make people want to fill things in, all computed from existing
 - **Levels:** lifetime points become levels (Rookie, Explorer, Achiever, Pro, Champion, Star, Legend, Icon). Level n starts at 30 x (n-1)^2 points. The sidebar shows progress to the next level.
 - **Scores** shows a podium for the top three. Empty states are written to encourage, not to scold.
 - Animations are skipped for people who ask their device for reduced motion.
+
+### Challenges, badges and kudos (no database change)
+
+**Challenges** (in the menu for everyone) gathers the team-building features:
+
+- **Team challenge:** this week's company-wide task count against a goal, with the week's MVPs. The goal adapts to the last 4 weeks (a little above the average, never below 10). Founders can set their own number or go back to automatic.
+- **Weekly goal:** each person gets a goal that stretches them slightly beyond their recent weeks (min 3, max 25) and can set their own (1 to 50) or return to automatic. Reaching it triggers a celebration once per week on that device.
+- **Department race:** average points per person this week, so small and large teams compete fairly.
+- **Streak board:** the longest current stand-up streaks. **Last week's stars:** top employee and intern.
+- **Badges:** 18 achievements (task milestones, stand-up streaks, on-time runs, early finishes, complex work, accepted initiative, a perfect week, field check-ins, a converted referral, raising blockers early, giving and receiving kudos). They are computed from existing data each time, so nothing is stored and they can never drift. New badges are celebrated when you next open the app on a device.
+- **Kudos:** give a colleague a short public thank-you (3 to 140 characters, max 10 a day). They get an in-app notification (never an email) and it appears on the wall. It is recorded in the audit log, which also feeds the Team Player badge.
+
+Goals are stored in the `ScoreSetting` table under `goal.*` keys. The scoring screens only read and reset the real scoring weights, so changing or resetting scoring never touches goals.

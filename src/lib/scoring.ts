@@ -23,7 +23,8 @@ export const DEFAULTS: Record<string, number> = {
 export type Settings = Record<string, number>;
 
 export async function getSettings(): Promise<Settings> {
-  const rows = await db.scoreSetting.findMany();
+  // The table also holds goal keys ("goal.*"); only real scoring weights belong in this map.
+  const rows = await db.scoreSetting.findMany({ where: { key: { in: Object.keys(DEFAULTS) } } });
   return { ...DEFAULTS, ...Object.fromEntries(rows.map((r) => [r.key, r.value])) };
 }
 
@@ -35,7 +36,8 @@ export async function saveSettings(values: Record<string, number>) {
 }
 
 export async function resetSettings() {
-  await db.scoreSetting.deleteMany();
+  // Only the scoring weights: personal and team goals live in the same table and must survive a reset.
+  await db.scoreSetting.deleteMany({ where: { key: { in: Object.keys(DEFAULTS) } } });
 }
 
 const fmt = (n: number) => (Math.round(n * 100) / 100).toString();
