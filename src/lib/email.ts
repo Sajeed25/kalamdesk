@@ -1,19 +1,46 @@
-// Transactional email via Resend's HTTP API. With no key set, emails are logged
-// to the server console so local development needs no account.
+import nodemailer, { type Transporter } from "nodemailer";
+
+// Transactional email over SMTP (built for Hostinger mailboxes, works with any SMTP server).
+// With SMTP_HOST empty, emails are logged to the server console so development needs no mailbox.
+let transporter: Transporter | null = null;
+
+function getTransporter() {
+  if (transporter) return transporter;
+  const port = Number(process.env.SMTP_PORT ?? 465);
+  transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port,
+    secure: port === 465, // 465 = implicit TLS; 587 = STARTTLS (upgraded automatically)
+    auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASSWORD },
+    pool: true,
+    maxConnections: 3,
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 20_000,
+  });
+  return transporter;
+}
+
 export async function sendEmail(to: string, subject: string, html: string) {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) {
+  if (!process.env.SMTP_HOST) {
     const link = /href="([^"]+)"/.exec(html)?.[1] ?? "";
     console.log(`[email:dev] to=${to} subject="${subject}" ${link}`);
     return { ok: true, dev: true };
   }
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ from: process.env.EMAIL_FROM, to, subject, html }),
-  });
-  if (!res.ok) console.error("[email] failed", res.status, await res.text());
-  return { ok: res.ok, dev: false };
+  try {
+    await getTransporter().sendMail({
+      // Hostinger only accepts a From address that belongs to the authenticated mailbox.
+      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+      to,
+      subject,
+      html,
+    });
+    return { ok: true, dev: false };
+  } catch (e) {
+    // Never let a mail failure break the task action that triggered it.
+    console.error("[email] send failed:", e instanceof Error ? e.message : e);
+    return { ok: false, dev: false };
+  }
 }
 
 export const appUrl = (path = "") => `${process.env.APP_URL ?? "http://localhost:3000"}${path}`;

@@ -36,7 +36,7 @@ Person-first daily operations and task tracker for Robokalam (Hyderabad / Warang
     │              src/lib/rbac.ts      role helpers
     │              src/lib/tasks.ts     ALL task rules + visibility scope (single source of truth)
     │              src/lib/notify.ts    Channel fan-out: in-app · email · (whatsapp stub)
-    │              src/lib/email.ts     Resend HTTP API (console fallback in dev)
+    │              src/lib/email.ts     SMTP via nodemailer (Hostinger-ready, console fallback in dev)
     ▼
  Prisma ──► SQLite (dev) / PostgreSQL (prod)
 
@@ -90,7 +90,7 @@ Reset demo data: `npm run db:reset`.
 | `DATABASE_URL` | `file:./dev.db` for SQLite, `postgresql://…` in production |
 | `SESSION_SECRET` | ≥ 32 random chars; signs session cookies (`openssl rand -base64 32`) |
 | `APP_URL` | public URL, used for links in emails |
-| `RESEND_API_KEY`, `EMAIL_FROM` | transactional email. If the key is empty, emails are logged to the server console |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM` | email over SMTP. Hostinger: `smtp.hostinger.com`, port `465` (or `587`), user = full mailbox address. If `SMTP_HOST` is empty, emails are logged to the server console |
 | `CRON_SECRET` | bearer token required by `/api/cron/*` |
 | `UPLOAD_DIR` | where attachments are stored (default `./uploads`) |
 | `FIELD_ENCRYPTION_KEY` | Phase 3 only: 32-byte base64 key for bank/ID field encryption |
@@ -114,7 +114,7 @@ On Vercel, put these in `vercel.json` `crons` (Vercel sends the secret as `Autho
 3. Set the environment variables above in your host. Use a **new** `SESSION_SECRET` and `CRON_SECRET`.
 4. Run `npx prisma db push` (or `prisma migrate dev --name init` locally, then `prisma migrate deploy` in CI) against the production database.
 5. Seed only if you want demo data. For real use, create your founders with a one-off script and **change every seed password**.
-6. Verify a sending domain with Resend and set `EMAIL_FROM`.
+6. Create a mailbox in Hostinger (e.g. `desk@yourdomain.com`), put its credentials in the `SMTP_*` variables and set `EMAIL_FROM` to the same address. Check the domain has SPF/DKIM records enabled in hPanel so mail doesn't land in spam. Hostinger limits how many emails a mailbox may send per hour/day; the morning digest sends one email per person.
 7. Enable daily database backups at the provider (Neon/Supabase/RDS all offer point-in-time recovery).
 
 ## Assumptions made (please confirm)
