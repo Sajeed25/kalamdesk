@@ -17,6 +17,9 @@ export default function Bell() {
     const d = await r.json();
     setItems(d.items);
     setUnread(d.unread);
+    const nav = navigator as Navigator & { setAppBadge?: (n?: number) => Promise<void>; clearAppBadge?: () => Promise<void> };
+    if (d.unread > 0) nav.setAppBadge?.(d.unread).catch(() => {});
+    else nav.clearAppBadge?.().catch(() => {});
   }
   useEffect(() => {
     load();

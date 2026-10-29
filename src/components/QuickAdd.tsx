@@ -24,8 +24,17 @@ export default function QuickAdd({ people, meId, canAssign }: { people: Person[]
       }
       if (e.key === "Escape") setOpen(false);
     };
+    const openIt = () => setOpen(true);
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("kd:quickadd", openIt);
+    if (new URLSearchParams(window.location.search).get("new") === "1") {
+      setOpen(true);
+      window.history.replaceState(null, "", window.location.pathname); // so a refresh does not reopen it
+    }
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("kd:quickadd", openIt);
+    };
   }, []);
   useEffect(() => {
     if (open) setTimeout(() => ref.current?.focus(), 30);

@@ -29,7 +29,15 @@
   }
 }
 
-html { font-size: 16.5px; -webkit-text-size-adjust: 100%; }
+html { font-size: 16.5px; -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+@media (max-width: 767px) {
+  html { font-size: 16px; }
+  body { overscroll-behavior-y: none; }
+  /* keep content clear of the notch (top) and the home-indicator bar (bottom) when installed */
+  header.glass { padding-top: max(0.75rem, env(safe-area-inset-top)); }
+  .btn, .input { min-height: 2.9rem; }
+}
+.safe-b { padding-bottom: env(safe-area-inset-bottom); }
 body {
   @apply bg-paper text-ink antialiased;
   font-family: "Inter", "Segoe UI Variable Display", "Segoe UI", ui-sans-serif, system-ui, -apple-system, sans-serif;

@@ -66,25 +66,31 @@ export default async function MyDay() {
     <div className="mx-auto max-w-5xl space-y-6">
       {/* ---------------- hero ---------------- */}
       <section className="hero rise">
-        <div className="relative z-10 flex flex-wrap items-center justify-between gap-8">
+        <div className="relative z-10 flex flex-wrap items-center justify-between gap-4 sm:gap-8">
           <div className="min-w-0 max-w-xl">
             <div className="text-sm font-bold uppercase tracking-[0.16em] text-white/80">{dateLabel}</div>
-            <h1 className="mt-2 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl">{greeting(u.name, now)} 👋</h1>
+            <h1 className="mt-2 text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl">{greeting(u.name, now)} 👋</h1>
             <p className="mt-3 text-lg font-semibold text-white/90">{mood}</p>
             <p className="mt-1 text-sm font-medium text-white/75">{dailyLine(now)}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <span className="inline-flex items-center gap-2 rounded-2xl bg-white/20 px-4 py-2.5 text-sm font-extrabold backdrop-blur" title="Consecutive working days with a daily update">
+            <div className="mt-4 flex flex-wrap gap-2 sm:mt-6 sm:gap-3">
+              <span className="inline-flex items-center gap-1.5 rounded-2xl bg-white/20 px-3 py-2 text-xs font-extrabold backdrop-blur sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm" title="Consecutive working days with a daily update">
                 <span className={streak.count > 0 ? "flame" : ""}><Icon name="flame" className="h-5 w-5" /></span>{streak.count}-day streak
               </span>
-              <span className="inline-flex items-center gap-2 rounded-2xl bg-white/20 px-4 py-2.5 text-sm font-extrabold backdrop-blur"><Icon name="star" className="h-5 w-5" />{Math.round((weekPts._sum.points ?? 0) * 10) / 10} pts this week</span>
-              <span className="inline-flex items-center gap-2 rounded-2xl bg-white/20 px-4 py-2.5 text-sm font-extrabold backdrop-blur"><Icon name="bolt" className="h-5 w-5" />Lv {lvl.level} {lvl.name}</span>
+              <span className="inline-flex items-center gap-1.5 rounded-2xl bg-white/20 px-3 py-2 text-xs font-extrabold backdrop-blur sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm"><Icon name="star" className="h-5 w-5" />{Math.round((weekPts._sum.points ?? 0) * 10) / 10} pts this week</span>
+              <span className="inline-flex items-center gap-1.5 rounded-2xl bg-white/20 px-3 py-2 text-xs font-extrabold backdrop-blur sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm"><Icon name="bolt" className="h-5 w-5" />Lv {lvl.level} {lvl.name}</span>
             </div>
           </div>
-          <div className="text-white">
+          <div className="hidden text-white sm:block">
             <ProgressRing value={pct} size={168} stroke={16} label={`${doneToday} of ${goal} tasks done today`}>
               <span className="text-5xl font-extrabold leading-none">{doneToday}<span className="text-2xl font-bold text-white/70">/{goal}</span></span>
               <span className="mt-1 text-xs font-bold uppercase tracking-widest text-white/80">done today</span>
             </ProgressRing>
+          </div>
+          <div className="flex w-full items-center gap-4 text-white sm:hidden">
+            <ProgressRing value={pct} size={88} stroke={10} label={`${doneToday} of ${goal} tasks done today`}>
+              <span className="text-2xl font-extrabold leading-none">{doneToday}<span className="text-sm font-bold text-white/70">/{goal}</span></span>
+            </ProgressRing>
+            <span className="text-sm font-bold text-white/85">{doneToday} of {goal} tasks done today</span>
           </div>
         </div>
       </section>

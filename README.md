@@ -358,3 +358,16 @@ A fresh install uses `prisma/mysql-init.sql` (already includes this). `BOOTSTRAP
 - An email address belongs to exactly one organisation (no one has two logins with the same email).
 - Archiving an organisation hides it from the switcher, stops its scheduled emails and signs its people out (they see "archived" at sign-in); nothing is deleted and a group owner can restore it from the Organisations page.
 - Office choices now include "Remote" and "Other" besides Hyderabad and Warangal.
+
+## Phone app (installable, no app store)
+
+KalamDesk is an installable web app (PWA). Nothing to configure and no database change.
+
+- **Install:** Android (Chrome/Edge) shows an **Install app** button in the header and on **Settings**; iPhone/iPad (Safari) shows the "Share → Add to Home Screen" steps. Laptops can install from the address bar. The app then opens full screen from the home screen.
+- **Phone layout:** a bottom bar with three shortcuts (My Day, Stand-up, Board; managers get Desk), a large **+** to add a task, and **More**, a sheet with every other page, the organisation switcher, level, Settings and Sign out. Content respects the notch and home bar.
+- **Shortcuts:** long-press the icon on Android for *Add a task*, *My Day* and *Daily update* (`/my-day?new=1` opens the quick-add box).
+- **Unread badge:** the home-screen icon shows the number of unread notifications where the phone supports it.
+- **Offline:** an offline banner appears when the connection drops, and a friendly page replaces the browser error. The service worker (`public/sw.js`) caches only static files and icons. It never caches pages or API responses, so private work data is never stored on the device by the app.
+- Installing needs the site to be served over **HTTPS** (Hostinger does this) and works in production only (the service worker is not registered in `next dev`).
+- Icons are in `public/icons/`; the manifest is `public/manifest.webmanifest`.
+- Not included yet: push notifications to the phone's lock screen (needs a database table and push keys) and offline editing.

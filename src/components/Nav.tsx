@@ -1,6 +1,8 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import InstallApp from "./InstallApp";
 import Icon, { type IconName } from "./Icon";
 import OrgSwitcher from "./OrgSwitcher";
 
@@ -17,8 +19,20 @@ export function Logo({ size = "h-11 w-11", letter = "K" }: { size?: string; lett
 
 type OrgLite = { id: string; name: string; color: string };
 
+/** One of the tabs on the phone's bottom bar. */
+function Tab({ i, on }: { i: Item; on: boolean }) {
+  return (
+    <Link href={i.href} aria-current={on ? "page" : undefined} className={`flex flex-col items-center gap-0.5 px-1 py-1.5 text-[11px] font-bold ${on ? "text-brand" : "text-mute"}`}>
+      <span className={`flex h-8 w-14 items-center justify-center rounded-full transition ${on ? "bg-brand/15" : ""}`}><Icon name={i.icon} className="h-6 w-6" /></span>
+      {i.label}
+    </Link>
+  );
+}
+
 export default function Nav({ lead, name, role, lvl, org, orgs, owner }: { lead: boolean; name: string; role: string; lvl: NavLevel; org: OrgLite; orgs: OrgLite[]; owner: boolean }) {
   const path = usePathname();
+  const [more, setMore] = useState(false);
+  useEffect(() => setMore(false), [path]); // close the sheet after choosing something
   const groups: { title: string; items: Item[] }[] = [
     {
       title: "My work",
@@ -57,6 +71,10 @@ export default function Nav({ lead, name, role, lvl, org, orgs, owner }: { lead:
     },
   ];
   const all = groups.flatMap((g) => g.items);
+  // the three most-used pages sit on the phone's bottom bar; everything else is under More
+  const tabs: Item[] = lead
+    ? [{ href: "/desk", label: "Desk", icon: "desk" }, { href: "/my-day", label: "My Day", icon: "sun" }, { href: "/board", label: "Board", icon: "board" }]
+    : [{ href: "/my-day", label: "My Day", icon: "sun" }, { href: "/update", label: "Stand-up", icon: "pencil" }, { href: "/board", label: "Board", icon: "board" }];
   // exact or child match, so /update does not light up on /updates
   const active = (href: string) => path === href || path.startsWith(href + "/");
   const initials = name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
@@ -116,19 +134,53 @@ export default function Nav({ lead, name, role, lvl, org, orgs, owner }: { lead:
         </div>
       </aside>
 
-      {/* ---------- mobile floating bar (scrolls sideways) ---------- */}
-      <nav aria-label="Main" className="glass fixed inset-x-3 bottom-3 z-30 flex gap-1 overflow-x-auto rounded-3xl border border-line/80 p-1.5 shadow-2xl md:hidden">
-        {all.map((i) => {
-          const on = active(i.href);
-          return (
-            <Link key={i.href} href={i.href} aria-current={on ? "page" : undefined}
-              className={`flex min-w-[4.6rem] flex-1 flex-col items-center gap-0.5 rounded-2xl px-1 py-2 text-[11px] font-bold transition ${on ? "text-white" : "text-mute"}`}
-              style={on ? { backgroundImage: "linear-gradient(135deg, rgb(var(--grad-a)), rgb(var(--grad-b)))" } : undefined}>
-              <Icon name={i.icon} className="h-5 w-5" />{i.label}
-            </Link>
-          );
-        })}
+      {/* ---------- phone: five big tabs, a centre + button, and a More sheet with everything else ---------- */}
+      <nav aria-label="Main" className="glass safe-b fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 items-end border-t border-line/80 px-1 pt-1.5 md:hidden">
+        {tabs.slice(0, 2).map((i) => <Tab key={i.href} i={i} on={active(i.href)} />)}
+        <button onClick={() => window.dispatchEvent(new Event("kd:quickadd"))} aria-label="Add a task" className="-mt-5 mb-1.5 flex flex-col items-center gap-0.5 text-[11px] font-bold text-mute">
+          <span className="flex h-14 w-14 items-center justify-center rounded-full text-3xl font-light leading-none text-white" style={{ backgroundImage: "linear-gradient(160deg, rgb(var(--grad-a)), rgb(var(--grad-b)))", boxShadow: "var(--glow)" }}>+</span>
+          <span className="sr-only">Add a task</span>
+        </button>
+        {tabs.slice(2, 3).map((i) => <Tab key={i.href} i={i} on={active(i.href)} />)}
+        <button onClick={() => setMore(true)} aria-haspopup="dialog" className={`flex flex-col items-center gap-0.5 rounded-2xl px-1 py-2 text-[11px] font-bold ${more ? "text-brand" : "text-mute"}`}>
+          <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor" aria-hidden><circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" /></svg>More
+        </button>
       </nav>
+
+      {more && (
+        <div className="fixed inset-0 z-40 md:hidden" role="dialog" aria-label="All pages">
+          <button className="absolute inset-0 bg-black/50" aria-label="Close" onClick={() => setMore(false)} />
+          <div className="safe-b absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-3xl border-t border-line bg-card p-4 shadow-2xl">
+            <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-line" />
+            <div className="mb-3 flex items-center gap-3"><OrgSwitcher current={org} orgs={orgs} canSwitch={owner} /></div>
+            <div className="mb-4 flex items-center gap-3 rounded-2xl bg-ink/[0.04] p-3">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-extrabold text-white" style={{ backgroundImage: "linear-gradient(135deg, rgb(var(--grad-a)), rgb(var(--grad-b)))" }}>{initials}</span>
+              <div className="min-w-0 flex-1"><div className="truncate font-bold">{name}</div><div className="text-xs font-semibold text-mute">Level {lvl.level} · {lvl.name} · {lvl.points} pts</div></div>
+            </div>
+            {groups.map((g) => (
+              <div key={g.title} className="mb-4">
+                <div className="eyebrow mb-2 px-1">{g.title}</div>
+                <div className="grid grid-cols-3 gap-2">
+                  {g.items.map((i) => {
+                    const on = active(i.href);
+                    return (
+                      <Link key={i.href} href={i.href} aria-current={on ? "page" : undefined}
+                        className={`flex flex-col items-center gap-1.5 rounded-2xl border px-1 py-3 text-center text-xs font-bold ${on ? "border-brand/50 bg-brand/10 text-brand" : "border-line bg-card"}`}>
+                        <Icon name={i.icon} className="h-6 w-6" />{i.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+            <div className="mb-3"><InstallApp variant="card" /></div>
+            <div className="grid grid-cols-2 gap-2">
+              <Link href="/settings" className="btn">Settings</Link>
+              <button onClick={logout} className="btn">Sign out</button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

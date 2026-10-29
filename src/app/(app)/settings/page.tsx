@@ -12,6 +12,8 @@ import { whatsappConfigured } from "@/lib/whatsapp";
 
 export const dynamic = "force-dynamic";
 
+import InstallApp from "@/components/InstallApp";
+
 export default async function Settings() {
   const u = await requireUser();
   const profile = await db.employeeProfile.findUnique({ where: { userId: u.id }, select: { phone: true, whatsappOptIn: true } });
@@ -21,6 +23,7 @@ export default async function Settings() {
       <h1 className="page-title">Settings</h1>
       <p className="text-sm text-mute">Signed in as {u.name} ({u.email})</p>
       <div className="flex flex-wrap items-start gap-4">
+        <div className="w-full max-w-md"><InstallApp variant="card" /></div>
         <ChangePasswordForm />
         <CalendarFeedCard />
         <BirthdayCard current={bday?.birthday ?? null} />

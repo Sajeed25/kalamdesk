@@ -255,6 +255,19 @@ const parts = [
     id: "settings", title: "Settings and security", lead: "Your account, your privacy and how KalamDesk reaches you.",
     steps: [
       {
+        title: "Install KalamDesk on your phone", who: "ALL", time: "2 min", img: "61-phone-more",
+        intro: "KalamDesk works as an app. Once installed, it opens from your home screen in one tap, full screen, with no browser bar, and the icon shows a red number when you have unread notifications.",
+        callouts: [],
+        tips: [
+          "**Android (Chrome or Edge):** open KalamDesk, tap the **Install app** button at the top of the screen (or **More → Install KalamDesk as an app**), then tap Install. If you do not see it, open the browser menu (three dots) and choose **Install app** or **Add to Home screen**.",
+          "**iPhone or iPad (Safari):** open KalamDesk in Safari, tap the **Share** button (the square with an arrow), scroll down, tap **Add to Home Screen**, then tap **Add**.",
+          "**Laptop (Chrome or Edge):** click the small install icon at the right of the address bar, or the **Install app** button in KalamDesk.",
+          "On a phone the bottom bar has three shortcuts (My Day, Stand-up, Board), a big **+** to add a task, and **More**, which opens every other page, your level, Settings and Sign out.",
+          "Press and hold the KalamDesk icon on Android to jump straight to **Add a task**, **My Day** or **Daily update**.",
+          "If your phone loses its connection, KalamDesk shows an offline notice. Changes are only saved when you are back online.",
+        ],
+      },
+      {
         title: "Settings: your account in one page", who: "ALL", time: "4 min", img: "20-settings",
         intro: "Click **Settings** at the bottom of the left menu.",
         callouts: [

@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { getOrg, listOrgs } from "@/lib/orgs";
 import { orgThemeCss } from "@/lib/orgTheme";
 import OrgSwitcher from "@/components/OrgSwitcher";
+import InstallApp from "@/components/InstallApp";
 import { levelFor, lifetimePoints } from "@/lib/gamify";
 import Nav, { Logo } from "@/components/Nav";
 import Bell from "@/components/Bell";
@@ -34,7 +35,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         <header className="glass sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-line/70 px-4 py-3 sm:px-8">
           <div className="min-w-0 max-w-[60%] md:hidden"><OrgSwitcher current={{ id: here.id, name: here.name, color: here.color }} orgs={lite} canSwitch={user.allOrgs} compact /></div>
           <p className="hidden text-sm font-semibold text-mute md:block">Press <kbd className="rounded-lg border border-line bg-card px-2 py-0.5 font-sans text-xs font-bold text-ink shadow-sm">N</kbd> anywhere to add a task</p>
-          <div className="flex items-center gap-2"><QuickAdd people={people} meId={user.id} canAssign={isLead(user)} /><Bell /></div>
+          <div className="flex items-center gap-2"><InstallApp /><QuickAdd people={people} meId={user.id} canAssign={isLead(user)} /><Bell /></div>
         </header>
         {needs2fa && (
           <Link href="/settings/security" className="mx-4 mt-4 flex items-center justify-between gap-3 rounded-2xl border border-amber-400/50 bg-amber-400/10 px-5 py-3 text-sm font-bold sm:mx-8">
