@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { taskInclude } from "@/lib/tasks";
 import { filterOptions, filteredWhere, type TaskFilters } from "@/lib/filters";
 import Filters from "@/components/Filters";
+import { isLead } from "@/lib/rbac";
 import KanbanBoard, { type BoardTask } from "@/components/KanbanBoard";
 import { isOverdue } from "@/components/TaskRow";
 
@@ -37,7 +38,7 @@ export default async function Board({ searchParams }: { searchParams: TaskFilter
     <div className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <h1 className="page-title">Board</h1>
-        <Filters {...opts} current={searchParams} />
+        <Filters {...opts} current={searchParams} simple={!isLead(u)} />
       </div>
       {initial.length === 0 ? (
         <div className="panel p-8 text-center text-sm text-mute">No tasks match these filters.</div>

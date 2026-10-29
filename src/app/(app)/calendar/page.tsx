@@ -5,6 +5,7 @@ import { taskInclude } from "@/lib/tasks";
 import { filterOptions, filteredWhere, type TaskFilters } from "@/lib/filters";
 import { fromIst, toIstParts } from "@/lib/time";
 import Filters from "@/components/Filters";
+import { isLead } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
@@ -62,7 +63,7 @@ export default async function Calendar({ searchParams }: { searchParams: TaskFil
           <h1 className="page-title min-w-44 text-center">{MONTHS[mo]} {y}</h1>
           <Link href={link(1)} className="btn" aria-label="Next month">→</Link>
         </div>
-        <Filters {...opts} current={searchParams} />
+        <Filters {...opts} current={searchParams} simple={!isLead(u)} />
       </div>
 
       <div className="panel overflow-hidden">

@@ -41,7 +41,7 @@ export default async function List({ searchParams }: { searchParams: SP }) {
           <h1 className="page-title mt-1">All tasks <span className="text-lg font-bold text-mute">({tasks.length})</span></h1>
           {isLead(u) && <p className="text-sm font-semibold text-mute">Tick several tasks to change their priority, status, assignee or due date at once.</p>}
         </div>
-        <Filters {...opts} current={searchParams} />
+        <Filters {...opts} current={searchParams} simple={!isLead(u)} />
       </div>
       <BulkTaskTable rows={rows} people={opts.people} canBulk={isLead(u)} sortLinks={{ title: q("title"), priority: q("priority"), status: q("status"), due: q("due") }} />
     </div>

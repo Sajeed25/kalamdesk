@@ -21,8 +21,7 @@ export default async function People() {
           <thead className="border-b border-line text-left text-xs uppercase tracking-wide text-mute">
             <tr>
               <th className="px-3 py-2">Name</th><th className="px-3 py-2">Role</th><th className="px-3 py-2">Dept</th>
-              <th className="px-3 py-2">Office</th><th className="px-3 py-2">Email</th>
-              {lead && <th className="px-3 py-2">Phone</th>}<th className="px-3 py-2">Reports to</th>
+              {lead && <><th className="px-3 py-2">Office</th><th className="px-3 py-2">Email</th><th className="px-3 py-2">Phone</th><th className="px-3 py-2">Reports to</th></>}
             </tr>
           </thead>
           <tbody>
@@ -34,16 +33,18 @@ export default async function People() {
                 </td>
                 <td className="px-3 py-2 text-mute">{p.profile?.title ?? p.role}</td>
                 <td className="px-3 py-2">{p.department?.name ?? "—"}</td>
-                <td className="px-3 py-2">{p.profile?.office}</td>
-                <td className="px-3 py-2 text-mute">{p.email}</td>
-                {lead && <td className="px-3 py-2 text-mute">{p.profile?.phone ?? "—"}</td>}
-                <td className="px-3 py-2 text-mute">{p.profile?.manager?.name ?? "—"}</td>
+                {lead && <>
+                  <td className="px-3 py-2">{p.profile?.office}</td>
+                  <td className="px-3 py-2 text-mute">{p.email}</td>
+                  <td className="px-3 py-2 text-mute">{p.profile?.phone ?? "—"}</td>
+                  <td className="px-3 py-2 text-mute">{p.profile?.manager?.name ?? "—"}</td>
+                </>}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <p className="text-xs text-mute">Bank and ID details are not part of this directory; they arrive in Phase 3 as an encrypted, founder-only section.</p>
+      <p className="text-xs text-mute">{lead ? "Bank and ID details are never part of this directory; founders open them from a person's edit page." : "Contact details are visible to managers and founders only."}</p>
     </div>
   );
 }

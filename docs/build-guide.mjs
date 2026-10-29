@@ -61,7 +61,7 @@ const parts = [
           "**Your organisation** at the top. If you work for more than one organisation and have been given access, click it to switch.",
           "**My Day.** Your home screen: what is due, what is overdue, and what to do next.",
           "**Scores.** The leaderboard: points this week, this month and all time.",
-          "**People.** Names, roles and contact details of your colleagues. You only ever see people in your own organisation.",
+          "**People.** A names-only directory: your colleagues' names, roles and departments. Contact details are visible to managers and founders only, and you only ever see people in your own organisation.",
           "**Group headings.** *My work*, *Performance* and *Company* group everything. Items you cannot use are simply not shown to you.",
           "**+ New task.** Add a task from any screen. Tip: press `N` anywhere on your keyboard.",
           "**The bell.** Your notifications: tasks assigned to you, comments, kudos and reminders. A red dot means something is new.",
@@ -127,7 +127,7 @@ const parts = [
         title: "Board, List and Calendar: three ways to see your work", who: "ALL", time: "4 min", img: "10-board",
         intro: "**Board** shows tasks as cards in columns. Drag a card to another column to change its status.",
         callouts: [
-          "**Filters.** Narrow by person, department, priority or tag. Employees see their own work; managers see their team.",
+          "**Filters.** Narrow by priority or tag. Employees and interns see only their own work. Managers and founders also get Person and Department filters, to see their team or everyone.",
           "**A task card.** Click it to open the task. The coloured edge shows priority.",
           "**To Do column.** Work that has not started.",
           "**Done column.** Finished work. Drop a card here to finish it.",
@@ -138,7 +138,7 @@ const parts = [
         title: "List: sort and filter every task", who: "ALL", time: "2 min", img: "11-list",
         intro: "**List** shows the same tasks as a sortable table. It is the best view for searching and for bulk work.",
         callouts: [
-          "**Priority filter.** Also filter by person, department or tag, then click Apply.",
+          "**Priority filter.** Also filter by tag, then click Apply. (Managers and founders can filter by person and department too.)",
           "**Apply.** Run your filters.",
           "**Column headings.** Click TASK, PRIORITY, STATUS or DUE to sort.",
           "**A row.** Click to open the task.",
@@ -504,7 +504,7 @@ const faqHtml = `
     <div class="grid2">
       <div><h4>Priorities</h4><table class="ref"><tr><td><b>P1</b></td><td>Urgent. Do it now.</td></tr><tr><td><b>P2</b></td><td>High. Today.</td></tr><tr><td><b>P3</b></td><td>Normal. The default.</td></tr><tr><td><b>P4</b></td><td>When you are free.</td></tr></table></div>
       <div><h4>Task statuses</h4><table class="ref"><tr><td><b>To Do</b></td><td>Not started.</td></tr><tr><td><b>In Progress</b></td><td>You are on it.</td></tr><tr><td><b>Blocked</b></td><td>Stuck. A reason is required.</td></tr><tr><td><b>In Review</b></td><td>Waiting for approval.</td></tr><tr><td><b>Done</b></td><td>Finished.</td></tr></table></div>
-      <div><h4>Who can do what</h4><table class="ref"><tr><td><b>Intern / Employee</b></td><td>Own tasks, stand-ups, leave, leads, expenses, scores, kudos.</td></tr><tr><td><b>Manager</b></td><td>Everything above, plus assign work to the team, review, approve leave, Desk, Dashboard.</td></tr><tr><td><b>Founder</b></td><td>Everything in the organisation, including people, departments, bank details, expenses and incentives.</td></tr><tr><td><b>Group owner</b></td><td>A founder who can switch between organisations.</td></tr></table></div>
+      <div><h4>Who can do what</h4><table class="ref"><tr><td><b>Intern / Employee</b></td><td>Their own tasks, stand-ups, leave, leads, expenses, scores and kudos. A names-only People directory (no contact details). They can add any teammate to a task as a request.</td></tr><tr><td><b>Manager</b></td><td>Everything above, plus assign work to the team, review, approve leave, Desk, Dashboard.</td></tr><tr><td><b>Founder</b></td><td>Everything in the organisation, including people, departments, bank details, expenses and incentives.</td></tr><tr><td><b>Group owner</b></td><td>A founder who can switch between organisations.</td></tr></table></div>
       <div><h4>Handy shortcuts</h4><table class="ref"><tr><td><kbd>N</kbd></td><td>Add a task from anywhere.</td></tr><tr><td><kbd>Enter</kbd></td><td>Save in the quick-add box.</td></tr><tr><td><kbd>Esc</kbd></td><td>Close a pop-up or menu.</td></tr></table>
       <h4 style="margin-top:14px">WhatsApp replies (if turned on)</h4><table class="ref"><tr><td><b>DONE a1b2c3</b></td><td>Finish a task. The code is in each alert.</td></tr><tr><td><b>START a1b2c3</b></td><td>Mark it in progress.</td></tr><tr><td><b>BLOCKED a1b2c3 reason</b></td><td>Mark it blocked.</td></tr><tr><td><b>UPDATE …</b></td><td>File your stand-up.</td></tr><tr><td><b>TASKS</b></td><td>See what is due.</td></tr></table></div>
     </div></section>
