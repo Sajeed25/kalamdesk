@@ -523,8 +523,12 @@ model VisitReport {
   id        String   @id @default(cuid())
   taskId    String   @unique
   userId    String
+  kind      String   @default("VISIT") // VISIT | SESSION | WORKSHOP
+  topics    String   @default("") @db.VarChar(1000) // topics covered
+  grade     String?  @db.VarChar(100) // class / grade / batch
+  teachers  Int? // teachers or other adults present
   summary   String   @db.VarChar(2000)
-  attendees Int?
+  attendees Int? // students attended
   outcome   String   @default("GOOD") // GREAT | GOOD | NEEDS_FOLLOW_UP | PROBLEM
   followUp  String   @default("") @db.VarChar(1000)
   createdAt DateTime @default(now())
@@ -589,4 +593,14 @@ model PushConfig {
   publicKey     String   @db.VarChar(255)
   privateKeyEnc String   @db.Text
   createdAt     DateTime @default(now())
+}
+
+// =====================================================================
+// Phase 7: uploaded files live in the database (they survive redeploys and are covered by your database backups).
+// =====================================================================
+model FileBlob {
+  key       String   @id @db.VarChar(191)
+  data      Bytes
+  size      Int
+  createdAt DateTime @default(now())
 }

@@ -4,6 +4,7 @@ import { authed } from "@/lib/api";
 import { db } from "@/lib/db";
 import { HttpError } from "@/lib/tasks";
 import { storage } from "@/lib/storage";
+import { assertRealFile } from "@/lib/files";
 import { MAX_RECEIPT, RECEIPT_MIME, expenseSchema, inr } from "@/lib/expenses";
 import { notifyMany } from "@/lib/notify";
 import { istDateKey } from "@/lib/time";
@@ -19,7 +20,9 @@ export const POST = authed(async (req, u) => {
     if (file.size > MAX_RECEIPT) throw new HttpError(413, "The receipt must be 5 MB or smaller");
     if (!RECEIPT_MIME.has(file.type)) throw new HttpError(415, "Receipt must be a photo (JPG, PNG, WebP) or a PDF");
     const key = `receipts/${u.id}/${randomUUID()}`;
-    await storage.put(key, Buffer.from(await file.arrayBuffer()));
+    const bytes = Buffer.from(await file.arrayBuffer());
+    assertRealFile(file.type, bytes);
+    await storage.put(key, bytes);
     receipt = { receiptKey: key, receiptName: file.name.replace(/[^\w.\- ()]/g, "_").slice(0, 150), receiptMime: file.type };
   }
   const claim = await db.expenseClaim.create({ data: { ...b, userId: u.id, ...(receipt ?? {}) } });

@@ -4,6 +4,7 @@ import { authed } from "@/lib/api";
 import { db } from "@/lib/db";
 import { ALLOWED_MIME, MAX_UPLOAD_BYTES, storage } from "@/lib/storage";
 import { HttpError, loadContributableTask } from "@/lib/tasks";
+import { assertRealFile } from "@/lib/files";
 
 export const POST = authed<{ params: { id: string } }>(async (req, u, { params }) => {
   await loadContributableTask(u, params.id);
@@ -13,8 +14,10 @@ export const POST = authed<{ params: { id: string } }>(async (req, u, { params }
   if (file.size > MAX_UPLOAD_BYTES) throw new HttpError(413, "Files must be 10 MB or smaller");
   if (!ALLOWED_MIME.has(file.type)) throw new HttpError(415, "Allowed: images, PDF, Word/Excel/PowerPoint, text/CSV");
 
+  const bytes = Buffer.from(await file.arrayBuffer());
+  assertRealFile(file.type, bytes);
   const key = `${params.id}/${randomUUID()}`;
-  await storage.put(key, Buffer.from(await file.arrayBuffer()));
+  await storage.put(key, bytes);
   const a = await db.taskAttachment.create({
     data: { taskId: params.id, fileName: file.name.replace(/[^\w.\- ()]/g, "_").slice(0, 150), storageKey: key, mimeType: file.type, sizeBytes: file.size },
   });

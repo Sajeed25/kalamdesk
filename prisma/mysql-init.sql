@@ -527,6 +527,10 @@ CREATE TABLE `VisitReport` (
     `id` VARCHAR(191) NOT NULL,
     `taskId` VARCHAR(191) NOT NULL,
     `userId` VARCHAR(191) NOT NULL,
+    `kind` VARCHAR(191) NOT NULL DEFAULT 'VISIT',
+    `topics` VARCHAR(1000) NOT NULL DEFAULT '',
+    `grade` VARCHAR(100) NULL,
+    `teachers` INTEGER NULL,
     `summary` VARCHAR(2000) NOT NULL,
     `attendees` INTEGER NULL,
     `outcome` VARCHAR(191) NOT NULL DEFAULT 'GOOD',
@@ -602,6 +606,16 @@ CREATE TABLE `PushConfig` (
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `FileBlob` (
+    `key` VARCHAR(191) NOT NULL,
+    `data` LONGBLOB NOT NULL,
+    `size` INTEGER NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+
+    PRIMARY KEY (`key`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- AddForeignKey

@@ -81,9 +81,9 @@ export default async function TaskPage({ params }: { params: { id: string } }) {
         <a href={`https://www.google.com/maps?q=${t.instances[0].checkInLat},${t.instances[0].checkInLng}`} target="_blank" rel="noopener noreferrer" className="btn w-fit">📍 See where they checked in</a>
       )}
 
-      {(t.instances.length > 0 || !!t.location || !!visit) && canEdit && <VisitReportForm taskId={t.id} initial={visit ? { summary: visit.summary, attendees: visit.attendees, outcome: visit.outcome, followUp: visit.followUp } : null} />}
+      {canEdit && <VisitReportForm taskId={t.id} title={t.title} fieldTask={t.instances.length > 0 || !!t.location} initial={visit ? { kind: visit.kind, topics: visit.topics, grade: visit.grade ?? "", teachers: visit.teachers, summary: visit.summary, attendees: visit.attendees, outcome: visit.outcome, followUp: visit.followUp } : null} />}
 
-      <ChecklistAndFiles taskId={t.id} canEdit={canEdit} items={t.checklist} files={t.attachments.map((a) => ({ id: a.id, fileName: a.fileName, sizeBytes: a.sizeBytes }))} />
+      <ChecklistAndFiles taskId={t.id} canEdit={canEdit} items={t.checklist} files={t.attachments.map((a) => ({ id: a.id, fileName: a.fileName, sizeBytes: a.sizeBytes, mimeType: a.mimeType }))} />
 
       <TaskActions id={t.id} canReview={canReview(u)} inReview={t.status === "IN_REVIEW"} selfInitiated={t.selfInitiated} accepted={t.initiativeAccepted} />
 

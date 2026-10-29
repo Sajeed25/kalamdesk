@@ -101,7 +101,7 @@ Reset demo data: `npm run db:reset`.
 | `APP_URL` | public URL, used for links in emails |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `EMAIL_FROM` | email over SMTP. Hostinger: `smtp.hostinger.com`, port `465` (or `587`), user = full mailbox address. If `SMTP_HOST` is empty, emails are logged to the server console |
 | `CRON_SECRET` | bearer token required by `/api/cron/*` |
-| `UPLOAD_DIR` | where attachments are stored (default `./uploads`) |
+| `UPLOAD_DIR` | disk fallback for attachments (default `./uploads`); normally files live in the database |
 | `FIELD_ENCRYPTION_KEY` | 32-byte base64 key for bank/ID encryption. Required to save or view bank details. See "Bank details" below |
 | `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_TEMPLATE`, `WHATSAPP_LANG` | optional WhatsApp alerts. Off unless the first three are set |
 | `WHATSAPP_APP_SECRET`, `WHATSAPP_VERIFY_TOKEN` | optional: let staff reply DONE/START/BLOCKED on WhatsApp (webhook `/api/inbound/whatsapp`) |
@@ -137,7 +137,7 @@ On Vercel, put these in `vercel.json` `crons` (Vercel sends the secret as `Autho
 3. **Employees can assign to others only as a request.** A non-lead creating a task for a colleague is allowed; the assignee sees who raised it. If you'd rather block this, say so.
 4. **Managers' scope = people whose profile lists them as `managerId`.** Founders see everyone.
 5. **Health dot rules** (`src/lib/desk.ts`): red = 2+ overdue or any overdue P1; amber = 1 overdue, any blocked, or no activity in 24h with open work; else green. Easy to change.
-6. **Attachments** use a local-disk driver (`UPLOAD_DIR`). On Vercel or multiple servers, swap `src/lib/storage.ts` for an S3-compatible bucket (the interface is three functions). The file type check uses the browser-declared type; downloads are forced as attachments with `nosniff`, so uploads can never render as pages. Add content sniffing before opening uploads to untrusted users.
+6. **Attachments** are stored in the database (table `FileBlob`, see Phase 7) so they survive redeploys; the local disk (`UPLOAD_DIR`) is only a fallback. Photos and PDFs open in the browser; every other type downloads. Uploads are checked against the file's real content (a script renamed to .jpg is refused), served with `nosniff`, never cached, and inline images carry a locked-down content policy.
 6b. **Still missing:** bulk actions on the list, editing location / estimate / tags / proof-required after creation (the form sets them at creation), per-person calendar, a reminder nudge for missing stand-ups (they are flagged on the Desk and in the 7 PM digest). Schema tables exist.
 7. UI uses Tailwind with small custom components rather than the full shadcn/ui library.
 
@@ -381,3 +381,11 @@ KalamDesk is an installable web app (PWA). Nothing to configure and no database 
 - **Safety:** a device may only register an address on a known push service (https, Google / Apple / Microsoft / Mozilla); anything else is refused. Devices that uninstall or block notifications are removed automatically. A failure to send never blocks the action that triggered it.
 - **iPhone / iPad:** Apple only allows web notifications for apps added to the Home Screen (iOS 16.4+). The card explains this.
 - **Privacy:** the alert shows the task title on the lock screen. People can turn it off any time, in KalamDesk or in the phone's settings.
+
+## Phase 7: files that stay, and session / workshop reports
+
+- **Upgrade (BEFORE redeploying):** in phpMyAdmin → SQL tab, run `prisma/phase7-files-reports-upgrade.sql` once. It adds a table (`FileBlob`) and four columns on the visit report; nothing is removed. `/api/health` then shows `filesInDatabase: true`.
+- **Why:** on shared hosting the app folder is replaced on every redeploy, which deleted files saved to disk (attachments looked uploaded but would not open). Files now go into the database, which is backed up and untouched by redeploys. **Files that were saved to disk before this change and have since been wiped cannot be recovered: ask people to attach them again.**
+- **Viewing:** on a task, photos show as thumbnails; **View** opens a photo or PDF in the browser, **Download** saves it. Expense receipts open the same way (**view receipt**).
+- **Reports for visits, training sessions and workshops:** every task now offers **+ Add a visit, session or workshop report**. It records the kind (guessed from the title), **topics covered**, **students attended**, teachers present, class or grade, how it went, and follow-up. The **Visits** page lists them with this-week totals (reports, sessions and workshops, students reached).
+- Database size: photos are stored in the database, so it grows with uploads (10 MB per file at most). Check your Hostinger database quota occasionally.

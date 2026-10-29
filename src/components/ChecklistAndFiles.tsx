@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 type Item = { id: string; text: string; done: boolean };
-type File_ = { id: string; fileName: string; sizeBytes: number };
+type File_ = { id: string; fileName: string; sizeBytes: number; mimeType: string };
 
 export default function ChecklistAndFiles({ taskId, items, files, canEdit }: { taskId: string; items: Item[]; files: File_[]; canEdit: boolean }) {
   const router = useRouter();
@@ -62,10 +62,22 @@ export default function ChecklistAndFiles({ taskId, items, files, canEdit }: { t
         <h2 className="mb-2 eyebrow">Attachments · {files.length}</h2>
         <ul className="space-y-1 text-sm">
           {files.map((f) => (
-            <li key={f.id} className="flex items-center gap-2">
-              <a href={`/api/attachments/${f.id}`} className="underline">{f.fileName}</a>
-              <span className="text-xs text-mute">{f.sizeBytes < 1048576 ? `${Math.max(1, Math.round(f.sizeBytes / 1024))} KB` : `${(f.sizeBytes / 1048576).toFixed(1)} MB`}</span>
-              {canEdit && <button onClick={() => window.confirm(`Delete ${f.fileName}?`) && call(`/api/attachments/${f.id}`, { method: "DELETE" })} className="ml-auto text-xs text-mute hover:text-red-600">Delete</button>}
+            <li key={f.id} className="flex items-center gap-3 rounded-xl border border-line p-2">
+              {f.mimeType.startsWith("image/") ? (
+                <a href={`/api/attachments/${f.id}`} target="_blank" rel="noopener noreferrer" aria-label={`View ${f.fileName}`} className="shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={`/api/attachments/${f.id}`} alt={f.fileName} loading="lazy" className="h-14 w-14 rounded-lg object-cover" />
+                </a>
+              ) : (
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-ink/5 text-xs font-extrabold uppercase text-mute">{(f.fileName.split(".").pop() ?? "file").slice(0, 4)}</span>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="truncate font-semibold">{f.fileName}</div>
+                <div className="text-xs text-mute">{f.sizeBytes < 1048576 ? `${Math.max(1, Math.round(f.sizeBytes / 1024))} KB` : `${(f.sizeBytes / 1048576).toFixed(1)} MB`}</div>
+              </div>
+              <a href={`/api/attachments/${f.id}`} target="_blank" rel="noopener noreferrer" className="btn !min-h-0 !py-1 text-xs">{/^(image\/|application\/pdf)/.test(f.mimeType) ? "View" : "Open"}</a>
+              <a href={`/api/attachments/${f.id}?download=1`} className="btn !min-h-0 !py-1 text-xs">Download</a>
+              {canEdit && <button onClick={() => window.confirm(`Delete ${f.fileName}?`) && call(`/api/attachments/${f.id}`, { method: "DELETE" })} className="text-xs text-mute hover:text-red-600">Delete</button>}
             </li>
           ))}
           {files.length === 0 && <li className="text-mute">No files yet.</li>}

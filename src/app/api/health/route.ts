@@ -73,6 +73,7 @@ export async function GET() {
     phase4Schema: null as boolean | null,
     orgSchema: null as boolean | null,
     pushSchema: null as boolean | null,
+    filesInDatabase: null as boolean | null,
     encryptionKeyOk: cryptoConfigured(),
     whatsappConfigured: whatsappConfigured(),
     emailMode: emailStatus().mode, // "console" means no real email is being sent
@@ -92,6 +93,8 @@ export async function GET() {
     try { await db.organization.count(); await db.user.findFirst({ select: { orgId: true, allOrgs: true } }); out.orgSchema = true; } catch { out.orgSchema = false; }
     // Phase 6 added lock-screen notifications (two new tables). If false, run prisma/phase6-push-upgrade.sql; the rest keeps working.
     try { await db.pushSubscription.count(); await db.pushConfig.count(); out.pushSchema = true; } catch { out.pushSchema = false; }
+    // Phase 7: uploads stored in the database + session/workshop report columns. If false, run prisma/phase7-files-reports-upgrade.sql.
+    try { await db.fileBlob.count(); await db.visitReport.findFirst({ select: { kind: true, topics: true } }); out.filesInDatabase = true; } catch { out.filesInDatabase = false; }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[health]", msg);

@@ -176,15 +176,16 @@ const parts = [
         tips: ["Ask as early as you can. Leave longer than 60 days needs a conversation with a founder.", "While you are on approved leave, your name shows an *Away until* tag on the founders' desk."],
       },
       {
-        title: "Record a school visit", who: "ALL", time: "3 min", img: "45-visit",
-        intro: "For field work such as school visits, open the visit task right after you finish. Two minutes now saves a long phone call later.",
+        title: "Report a school visit, training session or workshop", who: "ALL", time: "3 min", img: "45-visit",
+        intro: "Open the task right after you finish and fill in the report. It works for school visits, training sessions and workshops, and every task has a **+ Add a visit, session or workshop report** button. Two minutes now saves a long phone call later.",
         callouts: [
           "**Location.** The place from the task. Tap it to open the address in Google Maps.",
           "**How did it go?** Great, Good, Needs follow-up or Problem. A **Problem** alerts the founders immediately.",
-          "**What happened?** Who you met, what you showed, how students reacted.",
+          "**What happened?** Who you met, what you showed, how students reacted. (Above it, choose **School visit**, **Training session** or **Workshop**, then fill in **Topics covered**, **Students attended**, **Teachers present** and **Class or grade**.)",
           "**Save visit report.** You can come back and edit it.",
         ],
-        tips: ["Add photos with **Attach file** on the same task. The **Visits** page in the menu lists every report.", "Fill in **How many people attended** and **Follow-up needed** too. They feed the reports founders see."],
+        tips: ["Add photos with **Attach file** on the same task. Photos appear as thumbnails; tap **View** to open one, or **Download** to save it. The same works for PDFs.",
+          "The **Visits** page in the menu lists every report with this week's totals: reports, sessions and workshops, and students reached.", "Fill in **How many people attended** and **Follow-up needed** too. They feed the reports founders see."],
       },
       {
         title: "Track your leads", who: "ALL", time: "4 min", img: "46-add-lead",

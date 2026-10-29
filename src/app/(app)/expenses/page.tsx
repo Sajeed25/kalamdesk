@@ -36,7 +36,7 @@ export default async function Expenses() {
         <article key={r.id} className="panel p-4">
           <div className="flex flex-wrap items-start justify-between gap-2">
             <div className="min-w-0"><div className="text-lg font-extrabold tracking-tight">{inr(r.amountInr)} <span className="font-semibold text-mute">· {r.title}</span></div>
-              <div className="text-xs font-semibold text-mute">{founder && `${names.get(r.userId) ?? ""} · `}{CATEGORY_LABEL[r.category]} · spent {r.spentOn}{r.receiptKey && <> · <a className="text-brand" href={`/api/expenses/${r.id}/receipt`}>receipt</a></>}</div></div>
+              <div className="text-xs font-semibold text-mute">{founder && `${names.get(r.userId) ?? ""} · `}{CATEGORY_LABEL[r.category]} · spent {r.spentOn}{r.receiptKey && <> · <a className="text-brand" href={`/api/expenses/${r.id}/receipt`} target="_blank" rel="noopener noreferrer">view receipt</a></>}</div></div>
             <span className={`chip ${CLS[r.status]}`}>{EXPENSE_STATUS_LABEL[r.status]}</span>
           </div>
           {r.notes && <p className="mt-1 text-sm">{r.notes}</p>}
