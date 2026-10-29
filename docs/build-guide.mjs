@@ -268,6 +268,19 @@ const parts = [
         ],
       },
       {
+        title: "Lock-screen notifications on your phone", who: "ALL", time: "2 min", img: "62-push-settings",
+        intro: "Get a normal alert on your phone's lock screen for new tasks, blockers, sent-back work, reminders and kudos, even when KalamDesk is closed. Tap the alert and KalamDesk opens on that task.",
+        callouts: [],
+        tips: [
+          "Open **Settings** (on a phone: **More → Settings**) and find **Lock-screen notifications**. Tap **Turn on for this phone**, then tap **Allow** when your phone asks. Tap **Send me a test** to check it works.",
+          "On **My Day** you may also see a **Never miss a task** card with a **Turn on alerts** button. It does the same thing. Tap **Not now** to hide it.",
+          "**iPhone and iPad:** alerts work only after you add KalamDesk to the Home Screen (iOS 16.4 or newer) and open it from there. Follow the install step first.",
+          "Each phone or browser is set up separately, so turn it on everywhere you want alerts. **Turn off** stops them on that device.",
+          "Blocked them by accident? Open your phone's browser site settings for KalamDesk, set **Notifications** to **Allow**, and reload.",
+          "Alerts show the task title on the lock screen. If that is private for you, keep notifications off, or hide previews in your phone's own notification settings.",
+        ],
+      },
+      {
         title: "Settings: your account in one page", who: "ALL", time: "4 min", img: "20-settings",
         intro: "Click **Settings** at the bottom of the left menu.",
         callouts: [

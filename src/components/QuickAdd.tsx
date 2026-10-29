@@ -69,7 +69,7 @@ export default function QuickAdd({ people, meId, canAssign }: { people: Person[]
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className="btn btn-primary" title="Press N">+ New task</button>
+      <button onClick={() => setOpen(true)} className="btn btn-primary max-md:!hidden" title="Press N">+ New task</button>
       {open && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 pt-24" onClick={() => setOpen(false)}>
           <form onSubmit={submit} onClick={(e) => e.stopPropagation()} className="panel w-full max-w-xl space-y-3 p-4 shadow-2xl">

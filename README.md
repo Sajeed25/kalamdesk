@@ -370,4 +370,14 @@ KalamDesk is an installable web app (PWA). Nothing to configure and no database 
 - **Offline:** an offline banner appears when the connection drops, and a friendly page replaces the browser error. The service worker (`public/sw.js`) caches only static files and icons. It never caches pages or API responses, so private work data is never stored on the device by the app.
 - Installing needs the site to be served over **HTTPS** (Hostinger does this) and works in production only (the service worker is not registered in `next dev`).
 - Icons are in `public/icons/`; the manifest is `public/manifest.webmanifest`.
-- Not included yet: push notifications to the phone's lock screen (needs a database table and push keys) and offline editing.
+- Not included yet: offline editing.
+
+### Lock-screen notifications (Web Push)
+
+- **Who gets them:** only people who turn them on, from **Settings → Lock-screen notifications** (or the *Never miss a task* card on My Day), on each phone or browser separately. They receive the same events as the bell (new task, blocked, sent back, reminders, kudos ...) except long digests. Tapping one opens KalamDesk on that task.
+- **Upgrade (do this BEFORE redeploying):** in phpMyAdmin → SQL tab, run `prisma/phase6-push-upgrade.sql` once. It adds two new tables (`PushSubscription`, `PushConfig`) and changes nothing else. `/api/health` then shows `pushSchema: true`. Until then everything else keeps working and the Settings card says it is not switched on.
+- **Keys:** nothing to set up. The server creates its own key pair on first use and stores it in the database (the private half encrypted with `FIELD_ENCRYPTION_KEY`). Optionally set `VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY` to use your own (make them with `npx web-push generate-vapid-keys`); keep the private one secret. Do not change keys later: every phone would have to turn alerts on again.
+- **Delivery:** through the phone's own push service (Google for Android/Chrome, Apple for iPhone, Microsoft for Edge). The message carries only the title, a short line and a link.
+- **Safety:** a device may only register an address on a known push service (https, Google / Apple / Microsoft / Mozilla); anything else is refused. Devices that uninstall or block notifications are removed automatically. A failure to send never blocks the action that triggered it.
+- **iPhone / iPad:** Apple only allows web notifications for apps added to the Home Screen (iOS 16.4+). The card explains this.
+- **Privacy:** the alert shows the task title on the lock screen. People can turn it off any time, in KalamDesk or in the phone's settings.

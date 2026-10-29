@@ -564,3 +564,29 @@ model Challenge {
   createdAt   DateTime @default(now())
   @@index([orgId])
 }
+
+// =====================================================================
+// Phase 6: lock-screen (web push) notifications. NEW TABLES ONLY.
+// =====================================================================
+
+// One row per phone / browser a person has allowed notifications on.
+model PushSubscription {
+  id           String    @id @default(cuid())
+  userId       String
+  endpointHash String    @unique // SHA-256 of the endpoint, so the unique index stays small
+  endpoint     String    @db.Text
+  p256dh       String    @db.VarChar(255)
+  auth         String    @db.VarChar(255)
+  userAgent    String?   @db.VarChar(255)
+  createdAt    DateTime  @default(now())
+  lastUsedAt   DateTime?
+  @@index([userId])
+}
+
+// The server's push key pair, generated once. The private half is stored encrypted (AES-256-GCM).
+model PushConfig {
+  id            String   @id
+  publicKey     String   @db.VarChar(255)
+  privateKeyEnc String   @db.Text
+  createdAt     DateTime @default(now())
+}

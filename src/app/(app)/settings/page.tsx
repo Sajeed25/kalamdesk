@@ -13,6 +13,7 @@ import { whatsappConfigured } from "@/lib/whatsapp";
 export const dynamic = "force-dynamic";
 
 import InstallApp from "@/components/InstallApp";
+import PushPrefs from "@/components/PushPrefs";
 
 export default async function Settings() {
   const u = await requireUser();
@@ -24,6 +25,7 @@ export default async function Settings() {
       <p className="text-sm text-mute">Signed in as {u.name} ({u.email})</p>
       <div className="flex flex-wrap items-start gap-4">
         <div className="w-full max-w-md"><InstallApp variant="card" /></div>
+        <PushPrefs />
         <ChangePasswordForm />
         <CalendarFeedCard />
         <BirthdayCard current={bday?.birthday ?? null} />

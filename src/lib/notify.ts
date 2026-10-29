@@ -2,6 +2,7 @@ import { db } from "./db";
 import { sendEmail, emailTemplate, appUrl } from "./email";
 import { normalizePhone, sendWhatsapp, whatsappConfigured } from "./whatsapp";
 import { taskCode } from "./whatsappInbound";
+import { sendPush } from "./push";
 
 /**
  * Notification service. Each delivery channel implements `Channel`; `notify()` fans out
@@ -15,6 +16,7 @@ export type NotifyInput = {
   body?: string;
   url?: string; // app-relative, e.g. /tasks/abc
   email?: boolean; // default true
+  push?: boolean; // default true: also shown on the lock screen of any phone the person has allowed it on
 };
 
 type Recipient = { id: string; email: string; name: string };
@@ -71,7 +73,17 @@ const whatsappChannel: Channel = {
   },
 };
 
-const CHANNELS: Channel[] = [inAppChannel, emailChannel, whatsappChannel];
+// Lock-screen alert. Only people who switched notifications on (a stored device subscription) ever receive one.
+// Digests are skipped: they are long, scheduled, and already arrive by email.
+const pushChannel: Channel = {
+  name: "push",
+  async send(to, n) {
+    if (n.push === false || n.kind === "DIGEST") return;
+    await sendPush(to.id, { title: n.title, body: n.body, url: n.url, tag: `${n.kind}:${n.url ?? n.title}` });
+  },
+};
+
+const CHANNELS: Channel[] = [inAppChannel, emailChannel, whatsappChannel, pushChannel];
 
 export async function notify(n: NotifyInput) {
   const user = await db.user.findUnique({ where: { id: n.userId }, select: { id: true, email: true, name: true, active: true } });

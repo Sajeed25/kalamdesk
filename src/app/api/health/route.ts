@@ -72,6 +72,7 @@ export async function GET() {
     phase3Schema: null as boolean | null,
     phase4Schema: null as boolean | null,
     orgSchema: null as boolean | null,
+    pushSchema: null as boolean | null,
     encryptionKeyOk: cryptoConfigured(),
     whatsappConfigured: whatsappConfigured(),
     emailMode: emailStatus().mode, // "console" means no real email is being sent
@@ -89,6 +90,8 @@ export async function GET() {
     try { await db.lead.count(); await db.recoveryCode.count(); await db.challenge.count(); out.phase4Schema = true; } catch { out.phase4Schema = false; }
     // Phase 5 added organisations. If false, run prisma/phase5-orgs-upgrade.sql BEFORE using this version: nobody can sign in until then.
     try { await db.organization.count(); await db.user.findFirst({ select: { orgId: true, allOrgs: true } }); out.orgSchema = true; } catch { out.orgSchema = false; }
+    // Phase 6 added lock-screen notifications (two new tables). If false, run prisma/phase6-push-upgrade.sql; the rest keeps working.
+    try { await db.pushSubscription.count(); await db.pushConfig.count(); out.pushSchema = true; } catch { out.pushSchema = false; }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[health]", msg);

@@ -11,6 +11,7 @@ import { dailyLine, greeting, levelFor, lifetimePoints, standupStreak } from "@/
 import TaskRow, { PriorityChip, isOverdue } from "@/components/TaskRow";
 import CompleteButton from "@/components/CompleteButton";
 import ProgressRing from "@/components/ProgressRing";
+import PushPrompt from "@/components/PushPrompt";
 import Icon from "@/components/Icon";
 import { AttendanceCard } from "@/components/LeaveParts";
 import RecapCard from "@/components/RecapCard";
@@ -94,6 +95,8 @@ export default async function MyDay() {
           </div>
         </div>
       </section>
+
+      <PushPrompt />
 
       <CelebrationBanner items={cheers} dayKey={istDateKey(now)} />
       {recap && <RecapCard r={recap} />}
