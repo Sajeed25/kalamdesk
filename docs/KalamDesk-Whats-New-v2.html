@@ -1,0 +1,222 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KalamDesk Version 2: What's New</title><style>
+:root{--ink:#0f172a;--mute:#5b6478;--line:#e3e7ee;--brand:#4f46e5;--deep:#1e1b4b;--red:#e11d48}
+*{box-sizing:border-box}html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+body{margin:0;font:15px/1.6 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;color:var(--ink);background:#f4f5f8}
+.wrap{max-width:980px;margin:0 auto;padding:0 28px}
+.cover{min-height:100vh;color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:64px 56px;background:radial-gradient(circle at 85% 10%,rgba(255,255,255,.16),transparent 40%),linear-gradient(145deg,#4f46e5,#1e1b4b 70%)}
+.cover .logo{width:60px;height:60px;border-radius:16px;background:rgba(255,255,255,.16);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:28px}
+.cover h1{font-size:60px;line-height:1.04;margin:0 0 16px;letter-spacing:-.02em}.cover p.sub{font-size:21px;max-width:620px;opacity:.9;margin:0}
+.cover .foot{display:flex;justify-content:space-between;opacity:.8;font-size:14px}
+.page{padding:56px 0}.page h2{font-size:30px;margin:0 0 6px;letter-spacing:-.01em}.page .lead{color:var(--mute);margin:0 0 24px}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px 28px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 10px 30px -16px rgba(15,23,42,.18)}
+.how{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.mark{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;font-weight:700;font-size:14px;box-shadow:0 0 0 3px #fff,0 0 0 4px #e3e7ee}
+.hl{display:inline-block;border:3px solid var(--red);border-radius:8px;background:rgba(250,204,21,.18);padding:2px 12px;font-weight:600}
+.toc{columns:2;gap:36px;list-style:none;padding:0;margin:0}.toc li{break-inside:avoid;margin:0 0 10px}.toc a{color:var(--ink);text-decoration:none;display:block;padding:10px 14px;border:1px solid var(--line);border-radius:12px;background:#fff}.toc b{color:var(--brand);margin-right:8px}
+.who-legend span{display:inline-block;margin:4px 8px 4px 0}
+.part{padding:20px 0}.part-title{margin:52px 0 22px;padding:34px 34px;border-radius:22px;color:#fff;background:linear-gradient(135deg,#4f46e5,#1e1b4b);page-break-before:always;break-before:page}
+.part-title span{font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.8;font-weight:700}.part-title h2{margin:6px 0 8px;font-size:34px;letter-spacing:-.02em}.part-title p{margin:0;opacity:.9;max-width:680px}
+.step{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px 30px 24px;margin:0 0 26px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 12px 34px -18px rgba(15,23,42,.22);break-inside:avoid-page}
+.step header{display:flex;gap:16px;align-items:center;margin-bottom:12px}.num{flex:none;width:46px;height:46px;border-radius:14px;background:linear-gradient(160deg,#4f46e5,#1e1b4b);color:#fff;font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center}
+.step h3{margin:0;font-size:22px;letter-spacing:-.01em;line-height:1.25}.meta{margin:4px 0 0;color:var(--mute);font-size:13px;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.who{padding:2px 10px;border-radius:999px;font-weight:700;font-size:12px;background:#eef2ff;color:#3730a3}.who-LEAD{background:#fef3c7;color:#92400e}.who-FOUNDER{background:#fee2e2;color:#991b1b}.who-OWNER{background:#dcfce7;color:#166534}
+.intro{margin:6px 0 14px;font-size:16px}
+figure{margin:0 0 16px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#f4f5f8}figure img{display:block;width:100%;height:auto}
+ol.callouts{list-style:none;counter-reset:c;margin:0;padding:0;display:grid;gap:10px}
+ol.callouts li{counter-increment:c;position:relative;padding:10px 14px 10px 54px;border:1px solid var(--line);border-radius:12px;background:#fbfbfd}
+ol.callouts li::before{content:counter(c);position:absolute;left:12px;top:9px;width:28px;height:28px;border-radius:50%;background:var(--red);color:#fff;font-weight:700;text-align:center;line-height:28px;box-shadow:0 0 0 3px #fff,0 0 0 4px #e3e7ee}
+.tips{margin-top:16px;padding:14px 18px;border-radius:12px;background:#eef2ff;border:1px solid #dfe4ff}.tips b{display:block;margin-bottom:4px;color:#3730a3}.tips ul{margin:0;padding-left:18px}.tips li{margin:3px 0}
+kbd{font:600 .85em ui-monospace,Consolas,monospace;background:#eef0f5;border:1px solid #d9dde6;border-bottom-width:2px;border-radius:6px;padding:1px 6px}
+.phases{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.phase{border:1px solid var(--line);border-radius:14px;padding:14px 16px;background:#fbfbfd}.phase h4{margin:0 0 8px;color:var(--brand);font-size:16px}.phase ul{list-style:none;margin:0;padding:0}.phase li{display:flex;gap:10px;margin:7px 0;font-size:14px;line-height:1.45}.box{flex:none;width:16px;height:16px;border:2px solid #9aa3b5;border-radius:4px;margin-top:3px}
+table.tasks{width:100%;border-collapse:collapse;font-size:14px;margin-top:10px}.tasks th,.tasks td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.tasks th{background:#f4f5f8;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+.faq dt{font-weight:700;margin-top:14px}.faq dd{margin:4px 0 0;color:#2b3348}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}.grid2 h4{margin:0 0 6px}table.ref{width:100%;border-collapse:collapse;font-size:14px}.ref td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}.ref td:first-child{white-space:nowrap}
+.end{text-align:center;color:var(--mute);padding:40px 0 70px}
+@page{size:A4;margin:12mm}
+@media print{body{background:#fff}.wrap{max-width:none;padding:0}.cover{min-height:270mm;border-radius:0}.page{padding:6mm 0}.step{box-shadow:none;margin-bottom:6mm;padding:5mm 6mm}.card{box-shadow:none}.part-title{margin-top:0}.toc a{border-color:#ccd}}
+@media(max-width:760px){.how,.grid2,.phases{grid-template-columns:1fr}.toc{columns:1}.cover h1{font-size:40px}}
+
+figure.phone{max-width:380px;margin-left:auto;margin-right:auto}
+.new{display:inline-block;margin-left:8px;padding:2px 9px;border-radius:999px;background:#dcfce7;color:#166534;font:700 11px/1.6 system-ui;letter-spacing:.08em;text-transform:uppercase;vertical-align:middle}
+table.glance{width:100%;border-collapse:collapse;font-size:14px}.glance td,.glance th{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}.glance th{background:#f4f5f8;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+ol.todo{margin:0;padding-left:22px}ol.todo li{margin:8px 0}
+.warn{margin-top:14px;padding:14px 18px;border-radius:12px;background:#fff7ed;border:1px solid #fed7aa;color:#7c2d12}
+</style></head><body>
+<section class="cover"><div class="logo">K</div>
+<div><h1>What's new in<br>KalamDesk 2.0</h1><p class="sub">Only the new features since the first user guide, explained step by step, screen by screen.</p></div>
+<div class="foot"><span>Version 2.0 · 29 October 2026</span><span>Screenshots use demo data</span></div></section>
+
+<div class="wrap">
+<section class="page"><h2>Version 2.0 at a glance</h2><p class="lead">Everything in the first guide still applies. This edition covers six additions.</p>
+<div class="card"><table class="glance"><thead><tr><th>New in 2.0</th><th>What it does</th><th>For</th></tr></thead><tbody><tr><td><b>Install as a phone app</b></td><td>Android, iPhone, laptops. Bottom bar, More sheet, offline notice, icon badge.</td><td>Everyone</td></tr><tr><td><b>Lock-screen notifications</b></td><td>New tasks, blockers, reminders and kudos on the lock screen. Opt-in, per phone.</td><td>Everyone</td></tr><tr><td><b>Photos and files you can open</b></td><td>Thumbnails, View and Download. Files kept safely in the database.</td><td>Everyone</td></tr><tr><td><b>Visit, session and workshop reports</b></td><td>Topics covered, students attended, teachers, class. New Visits page totals.</td><td>Everyone</td></tr><tr><td><b>Least-privilege access</b></td><td>Names-only People directory and simpler filters for employees and interns.</td><td>Employees, interns</td></tr><tr><td><b>Storage clean-up with approval</b></td><td>Warns at 80%, asks at 90%, oldest first. Optional Auto-rotate.</td><td>Group owners</td></tr></tbody></table></div>
+<div class="how" style="margin-top:20px"><div class="card"><p><b>How to read this guide</b></p><p>Each step has a screenshot. The red numbers on the screenshot match the numbered list under it. The <span class="hl">yellow highlight</span> shows what to look at or tap.</p></div>
+<div class="card"><p><b>Who is each step for?</b></p><p class="who-legend"><span class="who">Everyone</span><span class="who who-LEAD">Managers &amp; founders</span><span class="who who-OWNER">Group owners</span></p><p>Employees and interns need Parts 1 to 5 only.</p></div></div></section>
+<section class="page"><h2>Contents</h2><ul class="toc"><li><a href="#p-phone"><b>Part 1</b> Install KalamDesk as a phone app</a></li><li><a href="#p-push"><b>Part 2</b> Lock-screen notifications</a></li><li><a href="#p-files"><b>Part 3</b> Photos and files you can actually open</a></li><li><a href="#p-reports"><b>Part 4</b> Reports for visits, training sessions and workshops</a></li><li><a href="#p-access"><b>Part 5</b> What employees and interns see</a></li><li><a href="#p-storage"><b>Part 6</b> Storage: kept tidy, with your approval</a></li><li><a href="#checklist"><b>Extra</b> Upgrade checklist for whoever looks after the website</a></li></ul></section>
+
+<section class="part" id="p-phone">
+  <div class="part-title"><span>New · Part 1</span><h2>Install KalamDesk as a phone app</h2><p>Open it from your home screen in one tap, full screen, with a layout built for thumbs. Works on Android, iPhone and laptops. No app store needed.</p></div>
+  
+<section class="step" id="s1">
+  <header><span class="num">01</span><div><h3>A layout made for phones</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">On a phone, the left menu becomes a bar along the bottom. The three pages you use most are one tap away, and everything else is under <b>More</b>.</p>
+  <figure class="phone"><img src="img/v2-phone-myday.png" alt="A layout made for phones"></figure>
+  <ol class="callouts"><li><b>My Day.</b> Your home screen. (Managers and founders get <b>Desk</b> here too.)</li><li><b>Stand-up.</b> File your daily update.</li><li><b>The big + button.</b> Add a task from any screen, in ten seconds. On a laptop, press <kbd>N</kbd> instead.</li><li><b>Board.</b> Your tasks as cards.</li><li><b>More.</b> Opens every other page, in one sheet (next step).</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>The bar stays put while you scroll, and it keeps clear of the notch and the home bar on newer phones.</li><li>The My Day banner is shorter on a phone, so your tasks come into view sooner.</li></ul></aside>
+</section>
+<section class="step" id="s2">
+  <header><span class="num">02</span><div><h3>The More sheet: every page in one place</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">Tap <b>More</b> and a sheet slides up with all the pages, grouped just like the desktop menu.</p>
+  <figure class="phone"><img src="img/v2-phone-more.png" alt="The More sheet: every page in one place"></figure>
+  <ol class="callouts"><li><b>Your card.</b> Your name, level and points. If you look after several organisations, the organisation switcher sits just above it.</li><li><b>A page tile.</b> Tap any tile, for example <b>Leave</b>, to open that page. The sheet closes by itself.</li><li><b>Performance and Company groups.</b> Scores, Challenges, Incentives, Referrals, People, Leads, Visits, Expenses and more. Scroll down for <b>Settings</b>, <b>Sign out</b> and the install card.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Tap the dark area above the sheet, or choose a page, to close it.</li></ul></aside>
+</section>
+<section class="step" id="s3">
+  <header><span class="num">03</span><div><h3>Install on Android or a laptop</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">On Chrome or Edge, KalamDesk offers to install itself. You will see the button in two places.</p>
+  <figure><img src="img/v2-install-desktop.png" alt="Install on Android or a laptop"></figure>
+  <ol class="callouts"><li><b>The Install app button</b> at the top of every screen. On a phone it shows as a small download arrow.</li><li><b>Install the app</b> on the <b>Settings</b> page, under a short explanation.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Tap it, then confirm <b>Install</b>. KalamDesk now has its own icon on your home screen (or desktop) and opens full screen with no browser bar.</li><li>Don't see the button? Open the browser menu (three dots) and choose <b>Install app</b> or <b>Add to Home screen</b>.</li><li>Press and hold the icon on Android for shortcuts: <b>Add a task</b>, <b>My Day</b> and <b>Daily update</b>.</li><li>The icon shows a red number when you have unread notifications, on phones that support it.</li><li>Installing needs the website to start with <b>https</b>, which your hosting already provides.</li></ul></aside>
+</section>
+<section class="step" id="s4">
+  <header><span class="num">04</span><div><h3>Install on iPhone or iPad</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">Safari has no install button, so KalamDesk shows the steps instead. Open <b>Settings</b> in Safari and tap <b>Show me how</b>.</p>
+  <figure class="phone"><img src="img/v2-install-iphone.png" alt="Install on iPhone or iPad"></figure>
+  <ol class="callouts"><li><b>The heading.</b> *Add KalamDesk to your iPhone*.</li><li><b>The three steps.</b> Tap the <b>Share</b> button (the square with an arrow), then <b>Add to Home Screen</b>, then <b>Add</b>.</li><li><b>Got it.</b> Closes the help.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Open KalamDesk from the new home-screen icon from now on. That is also what makes lock-screen alerts possible on iPhone.</li></ul></aside>
+</section>
+<section class="step" id="s5">
+  <header><span class="num">05</span><div><h3>When the phone loses its connection</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">If you are offline, KalamDesk says so plainly instead of showing a browser error.</p>
+  <figure class="phone"><img src="img/v2-offline.png" alt="When the phone loses its connection"></figure>
+  <ol class="callouts"><li><b>You are offline.</b> Nothing you did earlier has been lost.</li><li><b>Try again.</b> Reloads the page once your connection is back.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>While you are offline, an orange bar at the top reminds you that changes will not save.</li><li>For privacy, KalamDesk never stores your tasks or personal data on the phone. Only its icons and styling are kept for speed.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-push">
+  <div class="part-title"><span>New · Part 2</span><h2>Lock-screen notifications</h2><p>New tasks, blockers, sent-back work, reminders and kudos appear as a normal alert on your phone, even when KalamDesk is closed. Tap one and KalamDesk opens on that task.</p></div>
+  
+<section class="step" id="s6">
+  <header><span class="num">06</span><div><h3>Turn alerts on from My Day</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">Until you decide, My Day shows a small card offering to turn alerts on.</p>
+  <figure class="phone"><img src="img/v2-push-prompt.png" alt="Turn alerts on from My Day"></figure>
+  <ol class="callouts"><li><b>Never miss a task.</b> The offer.</li><li><b>Turn on alerts.</b> Tap it, then tap <b>Allow</b> when your phone asks.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li><b>Not now</b> (next to the button) hides the card on this phone. You can still turn alerts on later in Settings.</li><li>Each phone or browser is set up separately, so turn it on everywhere you want alerts.</li></ul></aside>
+</section>
+<section class="step" id="s7">
+  <header><span class="num">07</span><div><h3>Or turn them on in Settings</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">Open <b>Settings</b> (on a phone: <b>More → Settings</b>) and find <b>Lock-screen notifications</b>.</p>
+  <figure class="phone"><img src="img/v2-push-off.png" alt="Or turn them on in Settings"></figure>
+  <ol class="callouts"><li><b>Turn on for this phone.</b> Tap it, then <b>Allow</b>.</li><li><b>The card.</b> It explains what you will get, and it tells you if something stops it working on this device.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li><b>iPhone and iPad:</b> alerts work once KalamDesk is on your Home Screen (iOS 16.4 or newer). The card tells you if you still need to do that.</li><li>Blocked it by mistake? Open your phone's browser site settings for KalamDesk, set <b>Notifications</b> to <b>Allow</b>, and reload.</li></ul></aside>
+</section>
+<section class="step" id="s8">
+  <header><span class="num">08</span><div><h3>Check that it works</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">Once it is on, the card changes. Send yourself a test to be sure.</p>
+  <figure class="phone"><img src="img/v2-push-on.png" alt="Check that it works"></figure>
+  <ol class="callouts"><li><b>On for this phone.</b> Alerts are active here.</li><li><b>Send me a test.</b> A test alert should appear on your lock screen within seconds.</li><li><b>Turn off.</b> Stops alerts on this phone. Nothing else changes.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li><b>You will get alerts for:</b> a new task, a task marked blocked, work sent back, reminders (due in 2 hours, overdue), approvals and kudos. Long digests stay in email.</li><li>Tapping an alert opens KalamDesk on that exact task.</li><li>The alert shows the task title on your lock screen. If that is private for you, keep alerts off, or hide previews in your phone's own notification settings.</li><li>Your phone's own settings can switch KalamDesk alerts off at any time.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-files">
+  <div class="part-title"><span>New · Part 3</span><h2>Photos and files you can actually open</h2><p>Attachments now show as thumbnails, open in the browser, and are stored safely so they are no longer lost when the website is updated.</p></div>
+  
+<section class="step" id="s9">
+  <header><span class="num">09</span><div><h3>View, download and attach</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 2 min</span></p></div></header>
+  <p class="intro">Open any task and scroll to <b>Attachments</b>.</p>
+  <figure><img src="img/v2-files.png" alt="View, download and attach"></figure>
+  <ol class="callouts"><li><b>A photo thumbnail.</b> Click it to see the photo full size in a new tab.</li><li><b>View.</b> Opens a photo or a PDF in the browser. For Word, Excel and other files it says <b>Open</b> and downloads them.</li><li><b>Download.</b> Saves a copy to your device.</li><li><b>A document tile.</b> PDFs and other files show their type instead of a picture.</li><li><b>Attach file.</b> Add photos, PDFs, Office files or CSV, up to 10 MB each.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li><b>Why this changed:</b> files used to be kept inside the website's own folder, which is replaced every time the site is updated, so older attachments could stop opening. They are now kept in the database, which updates do not touch and your backups include.</li><li><b>Files uploaded before this change may be gone.</b> If one will not open, attach it again.</li><li>KalamDesk now checks that a file really is what it claims to be. A web page renamed to <kbd>.jpg</kbd> is refused.</li><li>Expense receipts open the same way: click <b>view receipt</b> on a claim.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-reports">
+  <div class="part-title"><span>New · Part 4</span><h2>Reports for visits, training sessions and workshops</h2><p>Record what was covered and how many students came, for school visits, training sessions and workshops.</p></div>
+  
+<section class="step" id="s10">
+  <header><span class="num">10</span><div><h3>Fill in the report</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 3 min</span></p></div></header>
+  <p class="intro">Every task now has a <b>+ Add a visit, session or workshop report</b> button. It opens straight away on visit tasks.</p>
+  <figure><img src="img/v2-report-form.png" alt="Fill in the report"></figure>
+  <ol class="callouts"><li><b>What kind of activity was it?</b> School visit, Training session or Workshop. KalamDesk guesses from the task title, so you rarely need to change it.</li><li><b>Topics covered.</b> For example *Sensors, Arduino basics, line-follower build*.</li><li><b>Students attended.</b> The number of students who took part.</li><li><b>Teachers present</b> (optional).</li><li><b>Class or grade</b> (optional), for example *Grades 6 to 8*.</li><li><b>How did it go?</b> Great, Good, Needs follow-up or Problem. A <b>Problem</b> alerts the founders at once.</li><li><b>Save.</b> The button names the kind, for example <b>Save session report</b>.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Below the form, <b>What happened?</b> and <b>Follow-up needed</b> are still there. Add photos with <b>Attach file</b> on the same task.</li><li>Saved by mistake or something changed? Click <b>Edit</b> on the saved report.</li></ul></aside>
+</section>
+<section class="step" id="s11">
+  <header><span class="num">11</span><div><h3>The saved report</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">After you save, the form is replaced by a neat summary at the top of the task.</p>
+  <figure><img src="img/v2-report-saved.png" alt="The saved report"></figure>
+  <ol class="callouts"><li><b>How it went.</b> The coloured tag.</li><li><b>Students attended.</b> Next to it: teachers and class or grade.</li><li><b>Topics covered.</b> What the session was about.</li><li><b>Edit.</b> Change anything and save again.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>The follow-up you wrote is shown underneath, and founders are told when a report says *Needs follow-up* or *Problem*.</li></ul></aside>
+</section>
+<section class="step" id="s12">
+  <header><span class="num">12</span><div><h3>The Visits page: totals at a glance</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro"><b>Visits</b> in the menu is now <b>Visits, sessions and workshops</b>. It lists every report you can see, newest first.</p>
+  <figure><img src="img/v2-visits.png" alt="The Visits page: totals at a glance"></figure>
+  <ol class="callouts"><li><b>Reports this week.</b></li><li><b>Students reached</b> this week.</li><li><b>The kind of activity.</b> Visit, Session or Workshop.</li><li><b>Topics covered</b>, students, teachers and class on every report.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Beside them, <b>sessions and workshops</b> counts those two kinds this week, and <b>need attention</b> counts reports that need follow-up.</li><li>Employees see their own reports. Managers see their team's. Founders see everyone's.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-access">
+  <div class="part-title"><span>New · Part 5</span><h2>What employees and interns see</h2><p>Employees and interns now see only what they need: their own work, and a names-only directory of colleagues.</p></div>
+  
+<section class="step" id="s13">
+  <header><span class="num">13</span><div><h3>A names-only People directory</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">Employees and interns can still see who works in their organisation, so they can add a teammate to a task. Contact details are private.</p>
+  <figure><img src="img/v2-people-employee.png" alt="A names-only People directory"></figure>
+  <ol class="callouts"><li><b>Name.</b> Every active person in your organisation.</li><li><b>Dept.</b> Their department.</li><li><b>The note.</b> *Contact details are visible to managers and founders only.* Email, phone, office and who reports to whom are hidden.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Managers and founders keep the full table.</li><li>Only people in your own organisation are ever listed.</li></ul></aside>
+</section>
+<section class="step" id="s14">
+  <header><span class="num">14</span><div><h3>Simpler filters for employees and interns</h3><p class="meta"><span class="who who-ALL">Everyone</span><span>About 1 min</span></p></div></header>
+  <p class="intro">On <b>Board</b>, <b>List</b> and <b>Calendar</b>, employees and interns only ever see their own tasks, so the person and department pickers are gone.</p>
+  <figure><img src="img/v2-board-employee.png" alt="Simpler filters for employees and interns"></figure>
+  <ol class="callouts"><li><b>Priority.</b> P1 to P4.</li><li><b>Tag.</b> Type a tag to narrow the view.</li><li><b>Apply.</b></li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Nothing else about your own work changes.</li></ul></aside>
+</section>
+<section class="step" id="s15">
+  <header><span class="num">15</span><div><h3>What managers and founders still have</h3><p class="meta"><span class="who who-LEAD">Managers & founders</span><span>About 1 min</span></p></div></header>
+  <p class="intro">Managers and founders get two extra pickers, to look at one person or one department, or at the whole team.</p>
+  <figure><img src="img/v2-board-founder.png" alt="What managers and founders still have"></figure>
+  <ol class="callouts"><li><b>Person.</b> Choose someone, or Everyone.</li><li><b>Department.</b> Choose a department, or All.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Managers see their own team. Founders see the whole organisation.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="p-storage">
+  <div class="part-title"><span>New · Part 6</span><h2>Storage: kept tidy, with your approval</h2><p>The database has a size limit (2 GB by default). KalamDesk watches it, asks a group owner before deleting anything, and always removes the oldest first.</p></div>
+  
+<section class="step" id="s16">
+  <header><span class="num">16</span><div><h3>The warning</h3><p class="meta"><span class="who who-OWNER">Group owners</span><span>About 1 min</span></p></div></header>
+  <p class="intro">At <b>80% full</b> group owners get a notice. At <b>90% full</b> a red banner appears at the top of every screen, and a request arrives by bell and email once a week.</p>
+  <figure><img src="img/v2-storage-banner.png" alt="The warning"></figure>
+  <ol class="callouts"><li><b>The red banner.</b> It shows how full storage is. Nothing is deleted. Click it to review.</li><li><b>Organisations</b> in the menu. The Storage panel is at the bottom of that page.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Only group owners see the banner and the Storage panel. The database is shared by every organisation.</li><li>The screenshots use a tiny demo limit so the warning triggers. On your site the limit is 2 GB.</li></ul></aside>
+</section>
+<section class="step" id="s17">
+  <header><span class="num">17</span><div><h3>Review and approve</h3><p class="meta"><span class="who who-OWNER">Group owners</span><span>About 3 min</span></p></div></header>
+  <p class="intro">The <b>Storage</b> panel shows the usage, and lists exactly what an approved clean-up would remove.</p>
+  <figure><img src="img/v2-storage-panel.png" alt="Review and approve"></figure>
+  <ol class="callouts"><li><b>The status.</b> *Healthy*, *Getting full* or *Approval needed*.</li><li><b>The bar.</b> How much of the limit is used.</li><li><b>What would be removed.</b> Old notifications, files that nothing uses, and attachments on tasks finished long ago, oldest first. Nothing is removed yet.</li><li><b>Approve clean-up.</b> Deletes exactly that list, then stops once usage is back under 80%.</li><li><b>Remove only the junk.</b> The harmless part only: old notifications and unused files. Available any time.</li><li><b>Auto-rotate (overwrite the oldest).</b> Optional. Tick it and KalamDesk makes room by itself at 90%, always removing the <b>oldest</b> first, so new uploads take the place of the oldest ones. Off by default.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li><b>Never removed automatically:</b> people, tasks, scores, incentives, leave, leads, expense claims and their receipts, ID documents, bank details, and anything on a task that is still open. Files younger than 30 days are never touched.</li><li>Want a copy first? Use the company data export. It saves your records but not the photos.</li><li>Every clean-up is written to the audit log with who approved it, and the other group owners are told.</li></ul></aside>
+</section>
+<section class="step" id="s18">
+  <header><span class="num">18</span><div><h3>After the clean-up</h3><p class="meta"><span class="who who-OWNER">Group owners</span><span>About 1 min</span></p></div></header>
+  <p class="intro">When it finishes, the panel reports what happened.</p>
+  <figure><img src="img/v2-storage-done.png" alt="After the clean-up"></figure>
+  <ol class="callouts"><li><b>The result.</b> How many old items were removed and the new size.</li><li><b>Healthy</b> again.</li><li><b>The bar</b> is back under the limit.</li></ol>
+  <aside class="tips"><b>Good to know</b><ul><li>Each affected task shows a line in its history: *old attachments were removed automatically to free up storage*.</li><li>If usage is still over the limit, the rest is data that is deliberately never removed. Export what you need and ask your host about more space.</li></ul></aside>
+</section>
+</section>
+<section class="part" id="checklist">
+  <div class="part-title"><span>Extra</span><h2>Upgrade checklist</h2><p>For the person who looks after the website on Hostinger. Do these in order, before staff try the new features.</p></div>
+  <section class="step"><header><span class="num">✓</span><div><h3>Putting Version 2.0 live</h3><p class="meta"><span class="who who-FOUNDER">Whoever manages Hostinger</span><span>About 10 minutes</span></p></div></header>
+    <ol class="todo">
+      <li><b>Back up first.</b> In hPanel open <b>phpMyAdmin</b>, choose your database, and use <b>Export</b>.</li>
+      <li>In phpMyAdmin, open the <b>SQL</b> tab and run <code>prisma/phase6-push-upgrade.sql</code> (paste all of it, click Go). It adds two tables for lock-screen notifications. Run it <b>once</b>.</li>
+      <li>Run <code>prisma/phase7-files-reports-upgrade.sql</code> the same way. It adds the file table and four columns for the new reports. Run it <b>once</b>.</li>
+      <li><b>Redeploy</b> from GitHub in Hostinger.</li>
+      <li>Open <code>your-site/api/health</code> and check <b>pushSchema: true</b> and <b>filesInDatabase: true</b>.</li>
+      <li>Optional: add <code>DB_LIMIT_MB</code> in the environment variables to change the 2 GB storage limit (for example <code>1024</code>). <code>STORAGE_AUTOCLEAN=off</code> switches Auto-rotate off for good.</li>
+      <li>Tell the team: <b>install the app</b>, <b>turn on lock-screen alerts</b>, and <b>re-attach</b> any file that no longer opens.</li>
+    </ol>
+    <div class="warn"><b>Heads-up:</b> files saved before this version may already have been lost when the website was last updated. They cannot be recovered. New uploads are safe from now on. The storage clean-up needs no database step of its own.</div>
+  </section>
+</section>
+<p class="end">KalamDesk 2.0 · If something here does not match what you see, tell your founder so the guide can be fixed.</p>
+</div></body></html>

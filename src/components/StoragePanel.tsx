@@ -1,4 +1,5 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 type Step = { id: string; label: string; rows: number; bytes: number };
@@ -9,6 +10,7 @@ const size = (b: number) => (b >= 1024 * MB ? `${(b / 1024 / MB).toFixed(2)} GB`
 
 /** Database storage for group owners: how full it is, what a clean-up would remove, approve it, or switch on Auto-rotate. */
 export default function StoragePanel() {
+  const router = useRouter();
   const [d, setD] = useState<Data | null>(null);
   const [busy, setBusy] = useState("");
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
@@ -30,6 +32,7 @@ export default function StoragePanel() {
       setMsg({ ok: true, text: `Done. ${removed} old item${removed === 1 ? "" : "s"} removed${j.result.after != null ? `; the database is now ${size(j.result.after)}` : ""}.${j.result.stillOver ? " It is still over the limit, so please export what you need and ask your host about more space." : ""}` });
     } else setMsg({ ok: true, text: payload && (payload as { on?: boolean }).on ? "Auto-rotate is on." : "Auto-rotate is off. Clean-ups need your approval again." });
     load();
+    router.refresh(); // so the red banner at the top updates too
   }
 
   if (!d) return <section className="panel p-5"><h2 className="section-title">Storage</h2><p className="mt-2 text-sm text-mute">Checking…</p></section>;
