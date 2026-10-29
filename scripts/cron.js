@@ -25,6 +25,9 @@ if (minutes >= 19 * 60) jobs.push(["evening digest", "/api/cron/digest"]);
 // Monday 9 AM IST: last week's summary. 1st of the month 9 AM IST: last month's. Both are once-only on the server.
 if (minutes >= 9 * 60 && ist.getUTCDay() === 1) jobs.push(["weekly summary", "/api/cron/summary?type=weekly"]);
 if (minutes >= 9 * 60 && ist.getUTCDate() === 1) jobs.push(["monthly summary", "/api/cron/summary?type=monthly"]);
+// 3 AM IST, once a day: check how full the database is. Warns at 80%; at 90% asks a group owner to approve clearing the oldest data
+// (or does it by itself if they switched on Auto-rotate). Never deletes anything otherwise.
+if (minutes >= 3 * 60 && minutes < 6 * 60) jobs.push(["storage check", "/api/cron/storage"]);
 // 1st of the month, 10 AM IST: work out last month's incentive eligibility and tell the founders (nothing is paid automatically).
 if (minutes >= 10 * 60 && ist.getUTCDate() === 1) jobs.push(["incentive calculation", "/api/cron/incentives"]);
 

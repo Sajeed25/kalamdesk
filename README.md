@@ -389,3 +389,22 @@ KalamDesk is an installable web app (PWA). Nothing to configure and no database 
 - **Viewing:** on a task, photos show as thumbnails; **View** opens a photo or PDF in the browser, **Download** saves it. Expense receipts open the same way (**view receipt**).
 - **Reports for visits, training sessions and workshops:** every task now offers **+ Add a visit, session or workshop report**. It records the kind (guessed from the title), **topics covered**, **students attended**, teachers present, class or grade, how it went, and follow-up. The **Visits** page lists them with this-week totals (reports, sessions and workshops, students reached).
 - Database size: photos are stored in the database, so it grows with uploads (10 MB per file at most). Check your Hostinger database quota occasionally.
+
+## Storage limit and approved clean-up (database stays under 2 GB)
+
+Photos and PDFs live in the database (Phase 7), so it can grow. KalamDesk watches its size (default limit **2 GB**, set `DB_LIMIT_MB` to change, e.g. `1024`) and keeps it fast **without ever deleting anything unless a group owner approves it**.
+
+- **80% full:** group owners get a notice (bell + email), once a month.
+- **90% full:** a red banner appears for group owners, and they get a bell and email request once a week. **Organisations → Storage** shows the bar, the biggest tables, and an exact list of what would be removed. Nothing is deleted until they click **Approve clean-up**.
+- **Approve clean-up** removes the **oldest, least valuable data first**, stopping when usage is back under 80%:
+  1. Junk: notifications read 30+ days ago (or older than 120 days), expired password links, old scheduler markers, files that nothing uses.
+  2. Attachments (photos, PDFs) on tasks that **finished** over a year ago, then 180, 90 and 30 days ago if more room is needed, oldest first. Files younger than 30 days are never touched. Each affected task records "N old attachments were removed to free up storage".
+  3. Only if still needed: daily updates and finished-task history older than 400 days, audit entries older than 2 years.
+- **Never removed automatically:** people, tasks, scores, incentives, leave, leads, expense claims **and their receipts**, ID documents, bank details, and anything on a task that is still open.
+- **Auto-rotate (overwrite the oldest):** an optional tick-box on the same screen. It is a standing approval: at 90% KalamDesk makes room by itself, always oldest first, so new uploads take the place of the oldest ones. **Off by default.** `STORAGE_AUTOCLEAN=off` switches it off permanently.
+- **Remove only the junk** is always available and is harmless.
+- Every clean-up is written to the audit log (who approved it, how much was freed) and the other group owners are told.
+- After a clean-up the tables are rebuilt (`OPTIMIZE TABLE`) so the space is really returned to the host, not just freed inside the database.
+- **Scheduler:** `scripts/cron.js` runs the check once a day around 3 AM IST; no new cron job is needed. There is **no database change** for this feature.
+- Before approving, download any backup you want: **Company data export** (`/api/admin/export`) saves your records; photos are not part of that file.
+- If usage is still over the limit after a clean-up, you are told, because the rest is data that is deliberately never removed. Export what you need, or ask Hostinger about more space.

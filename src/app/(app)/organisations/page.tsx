@@ -3,6 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { dbRaw } from "@/lib/db";
 import { listOrgs } from "@/lib/orgs";
 import OrgManager, { type OrgCard, type OwnerRow } from "@/components/OrgManager";
+import StoragePanel from "@/components/StoragePanel";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,7 @@ export default async function Organisations() {
         <p className="mt-1 max-w-2xl text-mute">Each organisation has its own people, tasks, scores, leads and expenses. Nobody in one can see another; only group owners can move between them.</p>
       </div>
       <OrgManager orgs={cards} owners={ownerRows} />
+      <StoragePanel />
     </div>
   );
 }

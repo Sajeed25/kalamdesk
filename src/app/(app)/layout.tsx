@@ -5,6 +5,7 @@ import { getOrg, listOrgs } from "@/lib/orgs";
 import { orgThemeCss } from "@/lib/orgTheme";
 import OrgSwitcher from "@/components/OrgSwitcher";
 import InstallApp from "@/components/InstallApp";
+import { storageState } from "@/lib/storageMaintenance";
 import { levelFor, lifetimePoints } from "@/lib/gamify";
 import Nav, { Logo } from "@/components/Nav";
 import Bell from "@/components/Bell";
@@ -22,6 +23,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     lifetimePoints(user.id),
   ]);
   const lvl = levelFor(pts);
+  // Group owners are asked to approve a clean-up once the database is nearly full (checked at most every 10 minutes).
+  const storage = user.allOrgs ? await storageState().catch(() => null) : null;
   const here = org ?? { id: "", name: "KalamDesk", color: "#4f46e5" };
   const lite = orgs.map((o) => ({ id: o.id, name: o.name, color: o.color }));
   // Founders can reveal bank details, so remind them (non-blocking) until two-step sign-in is on.
@@ -37,6 +40,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <p className="hidden text-sm font-semibold text-mute md:block">Press <kbd className="rounded-lg border border-line bg-card px-2 py-0.5 font-sans text-xs font-bold text-ink shadow-sm">N</kbd> anywhere to add a task</p>
           <div className="flex items-center gap-2"><InstallApp /><QuickAdd people={people} meId={user.id} canAssign={isLead(user)} /><Bell /></div>
         </header>
+        {storage?.level === "approve" && !storage.autoRotate && (
+          <Link href="/organisations" className="mx-4 mt-4 flex items-center justify-between gap-3 rounded-2xl border border-red-400/50 bg-red-400/10 px-5 py-3 text-sm font-bold sm:mx-8">
+            <span>💾 Storage is {Math.round((storage.pct ?? 0) * 100)}% full. Review and approve a clean-up of the oldest data. Nothing is deleted without your approval.</span><span className="underline">Review</span>
+          </Link>
+        )}
         {needs2fa && (
           <Link href="/settings/security" className="mx-4 mt-4 flex items-center justify-between gap-3 rounded-2xl border border-amber-400/50 bg-amber-400/10 px-5 py-3 text-sm font-bold sm:mx-8">
             <span>🔒 Protect your account: turn on two-step sign-in. Founder accounts can view bank details.</span><span className="underline">Set up</span>
